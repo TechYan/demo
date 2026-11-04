@@ -13,7 +13,7 @@ const result = spawnSync(process.execPath, [fileURLToPath(astroBin), 'build'], {
 });
 if (result.status !== 0) process.exit(result.status || 1);
 
-const packages = ['assets', 'pvkit', 'bus-protocol-lab', 'pg_gen', 'uvm_wiki', 'svip', 'xpggen', 'xDCT'];
+const packages = ['assets', 'pvkit', 'wavedbg', 'bus-protocol-lab', 'pg_gen', 'uvm_wiki', 'svip', 'xpggen', 'xDCT'];
 for (const directory of packages) {
   if (!existsSync(new URL(`../${directory}/`, import.meta.url))) throw new Error(`Missing demo package: ${directory}`);
   cpSync(new URL(`../${directory}/`, import.meta.url), new URL(`../dist/${directory}/`, import.meta.url), { recursive: true });

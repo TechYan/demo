@@ -1,0 +1,80 @@
+{
+  "kind": "educational-synthesis",
+  "based_on": "src/wavedbg/skills/wavedbg-credit/SKILL.md",
+  "clock": "rising, period 10 ns",
+  "observe": "inputs before edge; counter observed 0.2 ns after edge",
+  "reset": "active low, known initial credit 2; released at 8 ns",
+  "capacity": 4,
+  "initial_credit": 2,
+  "virtual_channels": 1,
+  "send_free_encoding": "one asserted sample consumes/returns one unit",
+  "returned_credit_usable": "next cycle",
+  "accounting": "C_next = C_before + free - send",
+  "native_execution": false,
+  "rows": [
+    {
+      "edge_ns": 15,
+      "offered": 1,
+      "send": 1,
+      "free": 0,
+      "credit_before": 2,
+      "credit_after": 1
+    },
+    {
+      "edge_ns": 25,
+      "offered": 1,
+      "send": 1,
+      "free": 1,
+      "credit_before": 1,
+      "credit_after": 1
+    },
+    {
+      "edge_ns": 35,
+      "offered": 0,
+      "send": 0,
+      "free": 1,
+      "credit_before": 1,
+      "credit_after": 2
+    },
+    {
+      "edge_ns": 45,
+      "offered": 1,
+      "send": 1,
+      "free": 0,
+      "credit_before": 2,
+      "credit_after": 1
+    },
+    {
+      "edge_ns": 55,
+      "offered": 1,
+      "send": 1,
+      "free": 0,
+      "credit_before": 1,
+      "credit_after": 0
+    },
+    {
+      "edge_ns": 65,
+      "offered": 1,
+      "send": 0,
+      "free": 0,
+      "credit_before": 0,
+      "credit_after": 0
+    },
+    {
+      "edge_ns": 75,
+      "offered": 1,
+      "send": 0,
+      "free": 1,
+      "credit_before": 0,
+      "credit_after": 1
+    },
+    {
+      "edge_ns": 85,
+      "offered": 1,
+      "send": 1,
+      "free": 0,
+      "credit_before": 1,
+      "credit_after": 0
+    }
+  ]
+}

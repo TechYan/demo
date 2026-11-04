@@ -49,9 +49,12 @@ No account credentials, account IDs, or tokens are embedded in `wrangler.toml` o
 python scripts/check_site.py dist
 python scripts/build_uvm_svip.py --check
 python scripts/build_register_demos.py --check
+python scripts/build_wavedbg_examples.py --check
 ```
 
-The static checker validates all HTML local paths, seven project routes, every registered artifact link, 348 PVKit hashes, asset sizes below the Pages 25 MiB single-file limit, and the absence of source-only binaries or internal register catalogs.
+The static checker validates all HTML local paths, eight project routes, every registered artifact link and its section anchor, 348 PVKit hashes, asset sizes below the Pages 25 MiB single-file limit, and the absence of source-only binaries or internal register catalogs. The wavedbg check additionally validates four-state traces, original fake query outputs, the educational credit ledger, the seven shipped skills, and published data hashes.
+
+The wavedbg interactive route (`src/pages/wavedbg/index.astro`) is built by Astro; its top-level package directory contains data and provenance only. The copy step merges these data files into `dist/wavedbg/` without replacing the generated page.
 
 Individual rebuild commands are in each package README. A private source checkout is only needed to rebuild the corresponding package, not to build or browse this public site.
 

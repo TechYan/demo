@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "source": {
+    "repository": "TechYan/wavedbg",
+    "revision": "9bf7b333dce94c73f64877bd7e676524b35b033e",
+    "version": "0.2.1"
+  },
+  "title": "让 AI 围绕证据调试波形",
+  "description": "wavedbg 是接给 AI Agent 的本地查询服务：xwave 读取 FSDB 的时间、值和事件，xtrace 查询 KDB 的层次、连接和源码位置。",
+  "positioning": "它提供查询能力和调试工作流；本页的波形回放用于说明如何逐步收窄问题。",
+  "entry_flow": [
+    {
+      "title": "给出问题",
+      "description": "告诉 Agent 要看哪份数据、哪条信号、大致哪段时间，以及你观察到了什么。"
+    },
+    {
+      "title": "定位相关证据",
+      "description": "先确认数据身份、时间单位和真实信号路径；需要追因时再查连接与相关代码。"
+    },
+    {
+      "title": "收窄并验证",
+      "description": "从少量信号的概览进入局部变化和时钟采样，逐条核对假设。"
+    },
+    {
+      "title": "给出可复查结论",
+      "description": "列出信号、时间、值、采样规则和证据缺口，让人能继续验证。"
+    }
+  ],
+  "benefits": [
+    {
+      "title": "少搬运无关数据",
+      "description": "按信号和时间窗口查询，无需为局部问题先把整个 FSDB 导出成文本。"
+    },
+    {
+      "title": "从现象走向原因",
+      "description": "把波形异常、实际 driver/load 和相关赋值放进同一条可检查的证据链。"
+    },
+    {
+      "title": "按场景带上经验",
+      "description": "随包 skills 提醒 Agent 先问清协议和采样约定，再判断握手、FIFO 或额度。"
+    }
+  ],
+  "zoom": {
+    "title": "越看越窄，证据越具体",
+    "summary": "先用少量轨道和时间桶寻找活动或异常区域，再缩小时间范围，最后读取精确事件或对齐采样。",
+    "stages": [
+      {
+        "id": "overview",
+        "title": "全局概览",
+        "description": "少量信号 + 有界时间桶，知道哪里值得继续看。",
+        "tools": [
+          "wave_overview"
+        ]
+      },
+      {
+        "id": "focus",
+        "title": "聚焦区间",
+        "description": "只保留与问题相关的路径、窗口和必要历史。",
+        "tools": [
+          "wave_find",
+          "wave_overview",
+          "wave_edge"
+        ]
+      },
+      {
+        "id": "evidence",
+        "title": "精确证据",
+        "description": "核对变化、定点值或时钟采样，保留 X/Z 和完整性。",
+        "tools": [
+          "wave_values",
+          "wave_changes",
+          "wave_analyze",
+          "wave_count"
+        ]
+      }
+    ],
+    "demo_note": "本页“全局 → 聚焦 → 细节”是合成数据上的导览可视化，不是产品自带的 GUI 波形查看器；也没有在浏览器启动 native 引擎。",
+    "source_note": "底层 wave.overview 支持时间桶、focus_windows 与持久摘要块；公开 MCP 将其封装为 wave_overview。"
+  },
+  "efficiency": {
+    "title": "效率来自更有针对性的查询",
+    "items": [
+      {
+        "title": "限定范围",
+        "description": "减少信号数、时间跨度和返回行数；先查局部故障，必要时再补历史。"
+      },
+      {
+        "title": "复用已打开的数据",
+        "description": "兼容客户端可以共享本机资源会话，各自保留租约；避免反复打开同一份数据。"
+      },
+      {
+        "title": "复用索引和摘要",
+        "description": "发现索引和持久概览摘要可用于后续查询；底层结果会报告复用摘要块。"
+      },
+      {
+        "title": "检查预算与完整性",
+        "description": "按工具支持使用计数 checkpoint、设计查询 continuation，或缩窄/划分窗口。部分结果不能当成全量事实。"
+      }
+    ],
+    "limits": [
+      "首次打开、索引和大范围扫描仍有成本。",
+      "本页没有速度倍数、吞吐或真实大文件性能基准。",
+      "公开 wave_changes 不提供通用 cursor 参数；被截断时应缩窄或划分窗口。计数、设计查询和底层引擎各有继续规则。",
+      "Registry 历史和磁盘摘要不等于 native 句柄永远有效；关闭后的实时查询引用不会被历史恢复。"
+    ]
+  },
+  "skills": [
+    {
+      "id": "wavedbg",
+      "title": "主调试流程",
+      "description": "从问题和时间范围出发，选择波形、设计连接与源码证据，保留尚未证实的部分。",
+      "examples": [
+        "信号何时变化",
+        "谁驱动这个信号",
+        "X 从哪段开始追"
+      ],
+      "source_path": "src/wavedbg/skills/wavedbg/SKILL.md"
+    },
+    {
+      "id": "wavedbg-axi",
+      "title": "AXI / AXI-Lite / AXI-Stream",
+      "description": "按实际接口映射分析握手、背压、burst、ID 和包边界。",
+      "examples": [
+        "一条通道为什么停顿",
+        "最后一拍是否真的被接受"
+      ],
+      "source_path": "src/wavedbg/skills/wavedbg-axi/SKILL.md"
+    },
+    {
+      "id": "wavedbg-apb",
+      "title": "APB",
+      "description": "区分 setup、access 和 wait，按完成时刻核对寄存器数据与错误。",
+      "examples": [
+        "等待了几拍",
+        "PSLVERR 是否发生在完成访问时"
+      ],
+      "source_path": "src/wavedbg/skills/wavedbg-apb/SKILL.md"
+    },
+    {
+      "id": "wavedbg-ahb",
+      "title": "AHB-Lite",
+      "description": "保留地址/数据流水关系，避免把同刻的地址和返回数据错配。",
+      "examples": [
+        "HREADY 低时哪笔事务仍在等待",
+        "返回数据属于哪个地址"
+      ],
+      "source_path": "src/wavedbg/skills/wavedbg-ahb/SKILL.md"
+    },
+    {
+      "id": "wavedbg-clock-reset",
+      "title": "时钟 / 复位",
+      "description": "核对接收端边沿、复位顺序、门控和沿前/沿后观察规则。",
+      "examples": [
+        "时钟何时停止",
+        "复位后为什么还是 X"
+      ],
+      "source_path": "src/wavedbg/skills/wavedbg-clock-reset/SKILL.md"
+    },
+    {
+      "id": "wavedbg-fifo",
+      "title": "FIFO",
+      "description": "依据已接受读写、深度、指针和读出规则核对占用量、顺序与标志。",
+      "examples": [
+        "请求是否真的被接受",
+        "指针相等是空还是满"
+      ],
+      "source_path": "src/wavedbg/skills/wavedbg-fifo/SKILL.md"
+    },
+    {
+      "id": "wavedbg-credit",
+      "title": "Send / Free / Credit",
+      "description": "先明确额度、编码、VC 和归还时机，再逐拍核账并解释等待。",
+      "examples": [
+        "额度是否耗尽",
+        "归还额度何时可用"
+      ],
+      "source_path": "src/wavedbg/skills/wavedbg-credit/SKILL.md"
+    }
+  ],
+  "skills_note": "v0.2.1 随包包含主 skill 加六个专用 skill，共七个；它们是在查询原语之上组织证据的工作流。",
+  "extension": {
+    "title": "把自己的接口经验写成 skill",
+    "description": "已有私有总线、项目握手或额外协议时，可在客户端的 skills 目录添加自己的工作流，继续调用 wavedbg 的通用查询能力。",
+    "steps": [
+      "写清触发场景、真实信号映射和时钟/复位。",
+      "说明接受条件、采样时机、数量单位、延迟和跨窗口状态。",
+      "安排“发现路径 → 局部采样 → 核账/配对 → 查连接和代码”的顺序。",
+      "用小型已知结果案例核对结论，说明 X/Z、截断和缺记录如何处理。"
+    ],
+    "example": {
+      "name": "wavedbg-my-link",
+      "scenario": "项目自定义链路的 send/free 核账",
+      "contract": [
+        "每个 VC 的初始额度和容量",
+        "send/free 是脉冲、数量还是电平",
+        "归还延迟以及能否同拍使用",
+        "复位和未完成事务如何清理"
+      ]
+    },
+    "boundary": "自定义 skill 是用户扩展，不会自动新增引擎或协议解码器。PCIe、CXL 等可以作为扩展示例讨论，不属于本版本随包七个 skills。"
+  },
+  "boundaries": [
+    "原生数据查询面向现场有授权的 Verdi SDK/runtime 环境；本页只展示合成回放。",
+    "skills 不是完整内建协议解码器，也不是自动证明动态因果的系统。",
+    "设计结构兼容不等于相同编译/运行；配对后仍须核对身份和动态时序。",
+    "扫描完成不自动证明 dump 覆盖完整；观察不到事件不必然表示仿真中没有事件。"
+  ],
+  "references": [
+    {
+      "path": "README.md",
+      "description": "定位、开始调试与七个 skills"
+    },
+    {
+      "path": "docs/architecture.md",
+      "description": "本机共享会话、查询工具与有限采样边界"
+    },
+    {
+      "path": "src/wavedbg/engines/wave/wave_overview.py",
+      "description": "时间桶、focus windows、持久摘要与复用计数"
+    },
+    {
+      "path": "src/wavedbg/engines/wave/discovery_index.py",
+      "description": "信号发现索引"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg/references/xwave.md",
+      "description": "缩小窗口、复用会话、预算与工具继续规则"
+    },
+    {
+      "path": "src/wavedbg/skill_catalog.py",
+      "description": "随包 skills 目录及安装器"
+    },
+    {
+      "path": "examples/fake-query-export.json",
+      "description": "实际 Python 假后端概览、复用与定点查询输出"
+    }
+  ]
+}

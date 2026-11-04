@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "source": {
+    "repository": "TechYan/wavedbg",
+    "revision": "9bf7b333dce94c73f64877bd7e676524b35b033e",
+    "version": "0.2.1"
+  },
+  "policy": "Only synthetic fixture/query evidence and original public-demo content. Source hashes identify inspected private-repository files; source runtime, SDK, native binaries, FSDB, KDB, DUT and licenses are excluded.",
+  "source_files": [
+    {
+      "path": "README.md",
+      "sha256": "d8ae58cc633d6c39b634fa22524ac7dd239810427ee3b211f0f50621373f3797"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "bcf057f5810058f95ce16321a1ecb3e3a1880cc385c2b9461bd968a6faff1283"
+    },
+    {
+      "path": "docs/architecture.md",
+      "sha256": "ed965457c985b648dfbbb8ca235ecb257b60916b6d9dae7caa89ffb3c56306a9"
+    },
+    {
+      "path": "docs/compatibility.md",
+      "sha256": "2ad1ce1a9f79f22de4a0e0b4a230822902f308fd5134b0c7728698a95206f7d9"
+    },
+    {
+      "path": "docs/skills-review.md",
+      "sha256": "04dbd7a32f849ee7acea5ff6c869a535bae960dab36abb22caee8479b35499a5"
+    },
+    {
+      "path": "docs/pdf/build_documents.py",
+      "sha256": "bac163c7637eb05762ea6ffea126a4a11fdaf79243ccec40f356ae68ae26436a"
+    },
+    {
+      "path": "docs/pdf/evidence/synthetic-results.json",
+      "sha256": "1735fb5592b470c40db9ac9c87153ba07ff728df1a4436bf679e1b4aa22c6ff8"
+    },
+    {
+      "path": "src/wavedbg/engines/wave/fake_backend.py",
+      "sha256": "5830b58aeb55eef6db53f52ce837fdc88a8c989b947cf2d66090f34e4f2451ec"
+    },
+    {
+      "path": "src/wavedbg/engines/wave/_native/tests/fixtures/sv/progressive_wave.sv",
+      "sha256": "560ccd70830fd122e7308eaf91f34b442eb728d559c1279237a291ec985557ec"
+    },
+    {
+      "path": "src/wavedbg/skill_catalog.py",
+      "sha256": "42db69b3eadee670d7369cb715681e841ee681415b2d141271dd51a1bd28497b"
+    },
+    {
+      "path": "src/wavedbg/engines/wave/wave_overview.py",
+      "sha256": "5e4b164f1c172b9679f4ff8bfc1306d5266f8ac2ec51862e03f9c170ea074d88"
+    },
+    {
+      "path": "src/wavedbg/engines/wave/overview_summary.py",
+      "sha256": "fa15e83402ba4ff40898295ffa5e9155e08d6bd763590497f14c8dc5dabd228f"
+    },
+    {
+      "path": "src/wavedbg/engines/wave/semantic.py",
+      "sha256": "abd576e7b96974d812c7956ac04c6be615ad7bfde88b42f92cf91263291ee024"
+    },
+    {
+      "path": "src/wavedbg/engines/wave/discovery_index.py",
+      "sha256": "a348e427c4bb52d5ab01a87ffb695f77dc0cdea35ae4823cea22736dedba8e1e"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg/SKILL.md",
+      "sha256": "bf46b7714cedcb45c4e70b2b8fd9321519f0f256209f796e61b2f3c674b4cada"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg-axi/SKILL.md",
+      "sha256": "18df1a54cd3bf5aec28b81a29e3cd4694936977d4cb9020cb0c916ea1001ad3e"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg-apb/SKILL.md",
+      "sha256": "b73bb37197bd80d9ffea8960a76955534d8b00373f2bd42e282769957ca01e88"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg-ahb/SKILL.md",
+      "sha256": "9fa8d2bbf8e2496bb8b4d19394bc2c6eed73ed756fd977f395e1cc647983f08c"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg-clock-reset/SKILL.md",
+      "sha256": "3450f6917458e002c26c5d241a057bd94ce862d814e9fcf89846a9ac225cbb05"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg-fifo/SKILL.md",
+      "sha256": "a00bb4477600271b6270297c1bb14518b1c567bf029a9d001da0b7629d9ae830"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg-credit/SKILL.md",
+      "sha256": "9b9b4cef8c7a683b92517b27169e2d5db6945da85749184d0736184222e410f3"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg/references/xwave.md",
+      "sha256": "88e932defb9a04a1f14437809ffcea745949af9da870ff1831a57ab772bfcc17"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg/references/xtrace.md",
+      "sha256": "265c432666798be6916f7879073f227e6eb1f69fc2b8b5b3b75fd524b695c79b"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg/references/sampling.md",
+      "sha256": "d1dcb8abb16a4a8cd5a17f12836336561200eb1a2d747326894dcbf5c86c7be2"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg/references/joint-debug.md",
+      "sha256": "62e2a940d32c6e1c9b2158b18c5f708680ccfeab7eb347bbfbe29f1e0bb06898"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg/references/x-propagation.md",
+      "sha256": "b6f219c5a30f72491b310aaf29c866e1f72958e00bebbb6601d3be90793d75c8"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg/references/tool-reference.md",
+      "sha256": "c297e165f747ca28c9d73117ab87516f368db63fff1efc3cc133dc1957dacb0e"
+    },
+    {
+      "path": "src/wavedbg/skills/wavedbg/references/session-management.md",
+      "sha256": "ec6037f9e3652c8b1bd22a60105674f70ce28f2e427c3e4de8e2db3c5cbc6e13"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "cases.json",
+      "sha256": "11d43276c323d55603109c0a5b11fbc24797a770ebad210064eed0a539dd3e3d"
+    },
+    {
+      "path": "capabilities.json",
+      "sha256": "71c61df838b703c673016c08d925ff8c053d81647aab86334a8fb908bf2ce12f"
+    },
+    {
+      "path": "examples/fake-query-export.json",
+      "sha256": "9e0351ecb6d9d226a50adc307200b15d5a9c058b52778d59ef08feda1aa1011b"
+    },
+    {
+      "path": "examples/credit-contract.json",
+      "sha256": "fcff4c3874b88ad4a77944858fce2aa8064ce1b6f20f473532ad8a3bb698c96f"
+    },
+    {
+      "path": "examples/progressive_wave.sv",
+      "sha256": "560ccd70830fd122e7308eaf91f34b442eb728d559c1279237a291ec985557ec"
+    }
+  ]
+}

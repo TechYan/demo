@@ -33,6 +33,7 @@ jobs:
       - run: python scripts/check_site.py dist /demo
       - run: python scripts/build_uvm_svip.py --check
       - run: python scripts/build_register_demos.py --check
+      - run: python scripts/build_wavedbg_examples.py --check
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

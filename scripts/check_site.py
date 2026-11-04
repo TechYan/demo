@@ -12,7 +12,7 @@ repo = Path(__file__).resolve().parents[1]
 base = sys.argv[2].rstrip('/') if len(sys.argv) > 2 else ''
 assert root.is_dir(), root
 projects = json.loads((repo / 'src/data/projects.json').read_text(encoding='utf-8'))
-assert {'pvkit', 'bus-protocol-lab', 'pg_gen', 'uvm_wiki', 'svip', 'xpggen', 'xDCT'} <= {p['id'] for p in projects}
+assert {'pvkit', 'wavedbg', 'bus-protocol-lab', 'pg_gen', 'uvm_wiki', 'svip', 'xpggen', 'xDCT'} <= {p['id'] for p in projects}
 
 class Links(HTMLParser):
     def __init__(self):
@@ -56,7 +56,13 @@ for project in projects:
     assert (root / 'projects' / project['id'] / 'index.html').is_file(), project['id']
     assert (root / project['primary']).is_file(), project['primary']
     for action in project['actions']:
-        assert (root / action['path']).is_file(), action['path']
+        target = root / unquote(urlsplit(action['path']).path)
+        assert target.is_file(), action['path']
+        fragment = unquote(urlsplit(action['path']).fragment)
+        if fragment:
+            parser = Links()
+            parser.feed(target.read_text(encoding='utf-8'))
+            assert fragment in parser.ids, action['path']
 
 checksums = (root / 'pvkit/SHA256SUMS').read_text().splitlines()
 for line in checksums:

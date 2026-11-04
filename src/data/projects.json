@@ -80,6 +80,33 @@
     "scope": "使用 xpvkit 0.5.5 release 的合成数据。响应未完成案例包含预期诊断；示例不代表真实 DUT 性能。"
   },
   {
+    "id": "wavedbg",
+    "name": "wavedbg",
+    "category": "analysis",
+    "label": "WAVEFORM INVESTIGATION / WITH AI",
+    "color": "cyan",
+    "description": "带着问题读波形，从全局概览走到关键几拍。",
+    "lead": "通过握手等待、时钟停摆、credit 回补和首次出现 X 四个典型问题，探索 wavedbg 如何逐步聚焦证据，以及如何用协议 skills 扩展分析思路。",
+    "tags": ["Waveform", "AI", "AXI4", "Protocol Skills"],
+    "keywords": ["波形", "缩放", "时钟", "reset", "FIFO", "credit", "X", "APB", "AHB", "FSDB", "KDB", "MCP"],
+    "format": "交互波形 / 分析导览",
+    "metric": "04",
+    "metricLabel": "guided waveform cases",
+    "primary": "wavedbg/index.html",
+    "actions": [
+      { "title": "探索典型波形", "description": "在四个问题中切换全局、关注区间与关键几拍", "path": "wavedbg/index.html", "type": "INTERACTIVE" },
+      { "title": "效率与渐进分析", "description": "先看概览，再按信号和时间范围逐步补证", "path": "wavedbg/index.html#efficiency", "type": "GUIDE" },
+      { "title": "协议 skills 与扩展", "description": "七个随包工作流，以及自定义协议的扩展方法", "path": "wavedbg/index.html#skills", "type": "GUIDE" },
+      { "title": "案例与来源说明", "description": "合成回放、原始假后端输出及固定版本校验", "path": "wavedbg/README.md", "type": "GUIDE" }
+    ],
+    "highlights": [
+      { "title": "从问题到时间证据", "detail": "用自然语言描述现象，沿波形、连接与代码逐步验证解释。" },
+      { "title": "视野越小，证据越具体", "detail": "先从变化概览找方向，再缩小到相关信号和精确时间，减少无关信息。" },
+      { "title": "协议经验可以继续积累", "detail": "AXI、APB、AHB、时钟复位、FIFO 与 credit skills 提供工作流，也支持补充自己的接口约定。" }
+    ],
+    "scope": "演示基于 wavedbg v0.2.1 的合成数据。网页是预先整理的分析导览；真实查询需本地波形、设计数据与已授权的 Verdi 环境。"
+  },
+  {
     "id": "bus-protocol-lab",
     "name": "Bus Protocol Lab",
     "category": "protocol",

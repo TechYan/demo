@@ -1,0 +1,70 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import '../../styles/wavedbg.css';
+import examples from '../../../wavedbg/cases.json';
+import capabilities from '../../../wavedbg/capabilities.json';
+import { sitePath } from '../../lib/catalog.mjs';
+const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
+const caseLabels = ['握手等待', '时钟停摆', 'Credit 回补', '首次出现 X'];
+const first = examples.cases[0];
+const efficiency = [
+  { title: '先看轮廓，再读细节', text: '先用变化概览找到值得看的区间，逐步缩小到相关信号和关键几拍，让返回的信息紧贴问题。', icon: 'search' },
+  { title: '已查过的，尽量复用', text: '复用可用的本机会话、信号索引和概览摘要，减少重复打开、重复寻找和重复扫描。', icon: 'layers' },
+  { title: '沿着证据，按需补查', text: '先回答当前问题，再补相邻历史、连接和代码；遇到不完整结果，继续收窄或分段核对。', icon: 'pulse' },
+];
+---
+<Base title="wavedbg — 从问题到关键几拍 · TechYan Demo" description="通过四个典型波形问题，体验 wavedbg 从全局概览到关键几拍的证据分析，以及可扩展的协议 skills。" projectName="wavedbg">
+  <div class="wave-page accent-cyan">
+    <div class="detail-back"><a href={href('') + '#projects'} class="text-link"><Icon name="back" size={15}/>返回项目索引</a><span class="wave-version mono">WAVEDBG / v{examples.source.version}</span></div>
+    <section class="wave-hero">
+      <div class="eyebrow">WAVEFORM INVESTIGATION / WITH AI</div>
+      <h1>从一句问题，<br/>走到<span>关键几拍。</span></h1>
+      <p class="wave-lead">让 AI 带着问题读波形：找出等待发生在哪里、异常从何时开始，再沿着信号、连接和代码核对原因。</p>
+      <div class="wave-hero-bottom"><a href="#wave-demo" class="primary-button">探索四个波形案例<Icon name="arrow" size={16}/></a><a href="#skills" class="text-link">查看协议 skills<Icon name="arrow" size={15}/></a><div class="wave-hero-note"><span class="status-dot"></span>问得自然 · 查得聚焦 · 证据可复查</div></div>
+    </section>
+    <section class="wave-benefits" aria-label="wavedbg 的用法和优点">
+      <article><span class="mono">01 / ASK</span><h2>先说你遇到的问题</h2><p>“有数据为什么没发出去？”“这个 X 从哪里开始？”用自然语言发起调试。</p></article>
+      <article><span class="mono">02 / FOCUS</span><h2>把长波形缩成关键证据</h2><p>先看全局，再聚焦局部，最后核对时间、信号值与真正被接受的事件。</p></article>
+      <article><span class="mono">03 / EXTEND</span><h2>让协议经验成为工作流</h2><p>用随包 skills 带上检查思路，也能为自己的接口补充信号映射和判断规则。</p></article>
+    </section>
+
+    <section class="wave-section" id="wave-demo" aria-labelledby="wave-demo-heading">
+      <div class="section-kicker"><span>01</span> FOLLOW THE EVIDENCE</div>
+      <div class="wave-section-title"><div><h2 id="wave-demo-heading">选一个问题，跟着波形走。</h2><p>点击分析步骤，观察窗口如何收窄；也可以自己缩放、平移或拖选。</p></div><span class="wave-replay-badge mono">GUIDED REPLAY</span></div>
+      <div class="wave-case-tabs" role="group" aria-label="选择波形案例">{examples.cases.map((item, index) => <button type="button" data-wave-case={item.id} aria-pressed={index === 0 ? 'true' : 'false'}><span class="mono">0{index + 1} / {item.protocol}</span><strong>{caseLabels[index]}</strong><small>{item.title}</small></button>)}</div>
+      <div class="wave-workbench" data-package-base={href('wavedbg/')}>
+        <div class="wave-question-bar"><div><span class="mono">THE QUESTION</span><h3 id="wave-question">{first.question}</h3><p id="wave-summary">{first.summary}</p></div><span id="wave-origin">{first.origin_label}</span></div>
+        <div class="wave-workspace">
+          <div class="wave-viewer">
+            <div class="wave-toolbar"><div class="wave-presets" role="group" aria-label="波形观察层级"><button type="button" data-wave-preset="span" aria-pressed="true">全局</button><span>→</span><button type="button" data-wave-preset="focus" aria-pressed="false">关注区间</button><span>→</span><button type="button" data-wave-preset="detail" aria-pressed="false">关键几拍</button></div><div class="wave-tools" role="group" aria-label="波形缩放与平移"><button type="button" data-wave-control="left" aria-label="向左平移" title="向左平移">←</button><button type="button" data-wave-control="out" aria-label="缩小波形" title="缩小波形">−</button><button type="button" data-wave-control="in" aria-label="放大波形" title="放大波形">＋</button><button type="button" data-wave-control="right" aria-label="向右平移" title="向右平移">→</button></div></div>
+            <div class="wave-window-meta"><span>当前窗口 <b id="wave-range" aria-live="polite"></b></span><span id="wave-zoom-level" class="mono"></span></div>
+            <div class="wave-canvas-scroll"><svg id="wave-svg" viewBox="0 0 1000 320" role="img" aria-label="波形载入中"></svg></div>
+            <div class="wave-overview"><div><span>变化概览</span><span class="mono">FULL CAPTURE</span></div><svg id="wave-overview-svg" viewBox="0 0 800 48" preserveAspectRatio="none" role="img" aria-label="全部信号的变化分布与当前窗口"></svg><div class="wave-overview-labels"><span id="wave-domain-start"></span><span id="wave-domain-end"></span></div></div>
+            <div class="wave-cursor-line"><span>游标 <b id="wave-cursor"></b></span><span class="wave-gesture-hint"><span class="wave-desktop-hint">点击读值 · 拖选放大 · Ctrl + 滚轮缩放</span><span class="wave-mobile-hint">左右滑动查看波形 · 下方滑杆移动游标</span></span></div>
+            <div class="wave-cursor-slider"><input id="wave-cursor-slider" type="range" min="0" max="999" value="500" aria-label="移动波形游标"/></div>
+            <div id="wave-values" class="wave-values" aria-label="游标处的信号值" aria-live="polite"></div>
+          </div>
+          <aside class="wave-analysis" aria-label="逐步分析"><div class="wave-analysis-heading"><span class="status-dot"></span>WAVEDBG / ANALYSIS PATH</div><div id="wave-steps"></div><div class="wave-evidence"><span class="mono">OBSERVED EVIDENCE</span><ul id="wave-evidence" aria-live="polite"></ul></div></aside>
+        </div>
+        <div class="wave-result"><span class="mono">WHAT WE CAN SAY</span><p id="wave-conclusion" aria-live="polite">{first.conclusion}</p><details><summary>本例资料与观察边界</summary><ul id="wave-limitations"></ul><div id="wave-references"></div></details></div>
+      </div>
+      <div class="wave-demo-note"><Icon name="file" size={16}/><p>这是用合成数据呈现的分析导览。缩放交互用来解释 wavedbg 的逐步聚焦方法；真实使用时，AI 通过本地工具查询波形与设计数据。网页中的分析步骤和结论已预先整理。</p></div>
+      <noscript><p class="scope-note">交互回放需要 JavaScript。也可以直接阅读<a href={href('wavedbg/README.md')}>案例说明</a>和<a href={href('wavedbg/cases.json')}>完整案例数据</a>。</p></noscript>
+    </section>
+
+    <section class="wave-section" id="try-prompts" aria-labelledby="wave-prompts-heading"><div class="wave-prompt-card"><div><div class="section-kicker"><span>02</span> START WITH A QUESTION</div><h2 id="wave-prompts-heading">你可以这样开始一次调试。</h2><p>在本地连接 wavedbg 后，补上自己的数据路径、信号和时间范围，再把问题交给 AI。</p></div><div class="wave-prompt-content"><span class="mono">PROMPT / 当前案例</span><blockquote id="wave-prompt">{first.prompt}</blockquote><div><button type="button" id="wave-copy" class="secondary-button" aria-label="复制当前问题"><Icon name="code" size={14}/>复制问题</button><span id="wave-copy-status" role="status" aria-live="polite"></span></div></div></div></section>
+
+    <section class="wave-section" id="efficiency" aria-labelledby="wave-efficiency-heading"><div class="section-kicker"><span>03</span> LESS TO READ. MORE TO UNDERSTAND.</div><h2 id="wave-efficiency-heading">效率，来自每一步都查得更准。</h2><p class="wave-section-intro">局部问题通常只需要少量信号和一段时间。wavedbg 让 AI 先找方向，再补充证据，避免把整份波形搬进对话。</p><div class="wave-efficiency-grid">{efficiency.map(item => <article><Icon name={item.icon} size={22}/><h3>{item.title}</h3><p>{item.text}</p></article>)}</div><p class="wave-subnote">首次打开、建立索引和大范围扫描仍有成本。实际收益取决于数据、查询范围与缓存状态；本页没有给出真实大文件的加速倍数。</p></section>
+
+    <section class="wave-section" id="skills" aria-labelledby="wave-skills-heading"><div class="section-kicker"><span>04</span> PROTOCOL KNOWLEDGE, READY TO EXTEND</div><h2 id="wave-skills-heading">工具读波形，skills 带上分析经验。</h2><p class="wave-section-intro">随 v{examples.source.version} 提供 7 个 skills：一个主流程，加六个专用场景。它们帮助 AI 选择证据、遵循接口约定，并保留尚未证实的判断。</p><div class="wave-skills-grid">{capabilities.skills.map((skill, index) => <article data-skill={skill.id}><div><span class="mono">0{index + 1}</span><code>{skill.id}</code></div><h3>{skill.title}</h3><p>{skill.description}</p><span class="wave-skill-example">试着问：{skill.examples[0]}</span></article>)}</div><p class="wave-subnote">这些 skills 是基于通用查询能力的分析工作流，协议覆盖与判断规则以实际接口为准。</p>
+      <div class="wave-extension"><div><span class="mono">YOUR PROTOCOL / YOUR WORKFLOW</span><h3>换一种协议，继续用同一套取证思路。</h3><p>为自定义链路、项目内部总线或新的协议编写 skill，将团队经验沉淀成 AI 可以遵循的步骤。</p></div><ol><li><b>映射接口</b><span>列出信号、时钟、复位和触发场景。</span></li><li><b>写清规则</b><span>约定接受条件、采样时机、数量与延迟。</span></li><li><b>安排取证</b><span>从概览到局部采样，再查连接和代码。</span></li><li><b>用案例验证</b><span>补充正常、异常和未知数据的已知结果。</span></li></ol></div>
+    </section>
+
+    <section class="wave-start"><div><span class="mono">TAKE IT TO YOUR WORKSPACE</span><h2>把这个思路带到你的工程里。</h2><p>真实查询需要本地 Linux / Python 环境，以及已授权、版本匹配的 Verdi 环境与对应波形、设计数据。接入 AI 助手后，从一个明确问题、一组相关信号和一段时间开始。</p></div><div><a class="primary-button" href={href('wavedbg/README.md')}>阅读使用与案例说明<Icon name="arrow" size={16}/></a><a class="text-link" href="https://github.com/TechYan/demo/tree/main/wavedbg" target="_blank" rel="noopener noreferrer"><Icon name="github" size={16}/>查看示例与来源记录</a><a class="text-link" href={href('wavedbg/provenance.json')}>查看固定版本与校验信息<Icon name="file" size={14}/></a></div></section>
+  </div>
+  <script id="wave-data" type="application/json" set:html={JSON.stringify(examples).replace(/</g, '\\u003c')}/>
+</Base>
+<script>
+  import '../../scripts/wavedbg.mjs';
+</script>

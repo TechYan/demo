@@ -1,0 +1,1028 @@
+{
+  "schema_version": 1,
+  "mode": "guided-synthetic-replay",
+  "source": {
+    "repository": "TechYan/wavedbg",
+    "revision": "9bf7b333dce94c73f64877bd7e676524b35b033e",
+    "version": "0.2.1"
+  },
+  "cases": [
+    {
+      "id": "ready-valid",
+      "title": "VALID 已拉高，为什么还在等？",
+      "protocol": "Ready / Valid",
+      "question": "是没有发送请求，还是接收端暂时接不住？",
+      "prompt": "请用 wavedbg 查看这段 ready/valid：先确认请求何时出现，再检查等待期间的 READY 和 DATA，给出时间证据，并说明是否足以确认一次时钟握手。",
+      "summary": "把“没有数据可发”和“有数据但对方没准备好”分开，再用局部证据核对。",
+      "span": [
+        0,
+        0.04
+      ],
+      "focus": [
+        0.012,
+        0.027
+      ],
+      "detail": [
+        0.014,
+        0.021
+      ],
+      "signals": [
+        {
+          "id": "clk",
+          "label": "clk",
+          "width": 1,
+          "role": "时钟",
+          "events": [
+            [
+              0.0,
+              "0"
+            ],
+            [
+              0.005,
+              "1"
+            ],
+            [
+              0.01,
+              "0"
+            ],
+            [
+              0.015,
+              "1"
+            ],
+            [
+              0.02,
+              "0"
+            ],
+            [
+              0.025,
+              "1"
+            ],
+            [
+              0.03,
+              "0"
+            ],
+            [
+              0.035,
+              "1"
+            ],
+            [
+              0.04,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "rst_n",
+          "label": "rst_n",
+          "width": 1,
+          "role": "低有效复位",
+          "events": [
+            [
+              0.0,
+              "0"
+            ],
+            [
+              0.012,
+              "1"
+            ]
+          ]
+        },
+        {
+          "id": "valid",
+          "label": "valid",
+          "width": 1,
+          "role": "发送意愿",
+          "events": [
+            [
+              0.0,
+              "0"
+            ],
+            [
+              0.015,
+              "1"
+            ],
+            [
+              0.025,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "ready",
+          "label": "ready",
+          "width": 1,
+          "role": "接收能力",
+          "events": [
+            [
+              0.0,
+              "0"
+            ],
+            [
+              0.02,
+              "1"
+            ],
+            [
+              0.03,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "data",
+          "label": "data[7:0]",
+          "width": 8,
+          "role": "数据，保留 X/Z",
+          "events": [
+            [
+              0.0,
+              "00000000"
+            ],
+            [
+              0.015,
+              "00010010"
+            ],
+            [
+              0.02,
+              "xxxx0010"
+            ],
+            [
+              0.03,
+              "1010zzzz"
+            ],
+            [
+              0.035,
+              "01011010"
+            ]
+          ]
+        }
+      ],
+      "evidence_kind": "original-fake-backend",
+      "origin_label": "内建假后端的原始查询回放 · 时间单位 1 ps",
+      "steps": [
+        {
+          "title": "先看全貌",
+          "summary": "先选时钟、复位和一条通道，观察请求出现的位置。",
+          "evidence": [
+            "复位在 12 ps 释放。",
+            "VALID 在 15 ps 变为 1，READY 此时仍为 0。"
+          ],
+          "window": [
+            0,
+            0.04
+          ],
+          "signals": [
+            "clk",
+            "rst_n",
+            "valid",
+            "ready"
+          ]
+        },
+        {
+          "title": "聚焦等待区间",
+          "summary": "将视野收窄到请求附近，分辨等待与重叠。",
+          "evidence": [
+            "15–20 ps：VALID=1 且 READY=0，等待持续 5 ps。",
+            "20–25 ps：VALID 与 READY 的稳定值同时为 1。"
+          ],
+          "window": [
+            0.012,
+            0.027
+          ],
+          "signals": [
+            "valid",
+            "ready",
+            "data"
+          ]
+        },
+        {
+          "title": "核对精确变化",
+          "summary": "读原始变化和数据，防止把电平重叠直接当成协议通过。",
+          "evidence": [
+            "DATA 在 15 ps 是 00010010，在 20 ps 变成 xxxx0010。",
+            "VALID 在 15 ps 与时钟上升沿同一 tick 变化；25 ps 又与上升沿同 tick 拉低。",
+            "这些记录没有仿真调度区域，不能据此给出无歧义的接受拍数。"
+          ],
+          "window": [
+            0.014,
+            0.021
+          ],
+          "signals": [
+            "clk",
+            "valid",
+            "ready",
+            "data"
+          ]
+        }
+      ],
+      "conclusion": "可以确认：发送意愿已出现，READY 低电平造成了 15–20 ps 的等待。20 ps 之后两者电平重叠，但 DATA 含 X，且边沿采样有同 tick 歧义；还不能宣布一次干净的协议传输。",
+      "limitations": [
+        "这是内建合成假后端，不是真实 DUT、FSDB 或 native 运行。",
+        "展示电平与变化事实；接受拍数还需要时钟、复位、沿前/沿后及同 tick 采样契约。",
+        "数据中保留 X/Z；这里只观察现象，没有证明 READY 或 X 的设计原因。"
+      ],
+      "references": [
+        {
+          "path": "examples/fake-query-export.json",
+          "description": "本版本原始 Python FakeBackend 查询响应；1 ps/tick"
+        },
+        {
+          "path": "src/wavedbg/engines/wave/fake_backend.py",
+          "description": "五条内建合成信号的确定时间线"
+        },
+        {
+          "path": "src/wavedbg/skills/wavedbg-axi/SKILL.md",
+          "description": "单通道背压、接受条件与采样边界"
+        }
+      ]
+    },
+    {
+      "id": "clock-stop",
+      "title": "活动还在，时钟为什么停了？",
+      "protocol": "Clock / Reset",
+      "question": "先确认接收端真的没有沿，再讨论门控或复位。",
+      "prompt": "请用 wavedbg 先查看 clk 的活动概览，再找最后一次上升/下降沿。指出能确认的时钟事实，以及还需哪些门控、复位或设计连接证据。",
+      "summary": "从全局活动缩到最后几条边沿，把“没有观察到时钟”变成可核对的时间点。",
+      "span": [
+        0,
+        40
+      ],
+      "focus": [
+        19,
+        34
+      ],
+      "detail": [
+        23,
+        28
+      ],
+      "signals": [
+        {
+          "id": "clk",
+          "label": "clk",
+          "width": 1,
+          "role": "激励时钟",
+          "events": [
+            [
+              0,
+              "0"
+            ],
+            [
+              5.0,
+              "1"
+            ],
+            [
+              8.0,
+              "0"
+            ],
+            [
+              15.0,
+              "1"
+            ],
+            [
+              19.0,
+              "0"
+            ],
+            [
+              24.0,
+              "1"
+            ],
+            [
+              26.0,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "valid",
+          "label": "valid",
+          "width": 1,
+          "role": "请求脉冲",
+          "events": [
+            [
+              0,
+              "0"
+            ],
+            [
+              4.0,
+              "1"
+            ],
+            [
+              6.0,
+              "0"
+            ],
+            [
+              14.0,
+              "1"
+            ],
+            [
+              16.0,
+              "0"
+            ],
+            [
+              23.0,
+              "1"
+            ],
+            [
+              25.0,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "ready",
+          "label": "ready",
+          "width": 1,
+          "role": "持续允许",
+          "events": [
+            [
+              0,
+              "1"
+            ]
+          ]
+        },
+        {
+          "id": "narrow",
+          "label": "narrow",
+          "width": 1,
+          "role": "1 ps 窄脉冲",
+          "events": [
+            [
+              0,
+              "0"
+            ],
+            [
+              11.0,
+              "1"
+            ],
+            [
+              11.001,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "initial_x",
+          "label": "initial_x",
+          "width": 1,
+          "role": "初始未知值",
+          "events": [
+            [
+              0,
+              "x"
+            ]
+          ]
+        },
+        {
+          "id": "bus",
+          "label": "bus[7:0]",
+          "width": 8,
+          "role": "原 64 位总线的低 8 位",
+          "events": [
+            [
+              0,
+              "00000000"
+            ],
+            [
+              12.0,
+              "0000x000"
+            ],
+            [
+              13.0,
+              "00z00000"
+            ],
+            [
+              14.0,
+              "00000000"
+            ]
+          ]
+        }
+      ],
+      "evidence_kind": "source-fixture-reconstruction",
+      "origin_label": "现有合成激励的时间线重建 · 未运行仿真或 native 查询",
+      "steps": [
+        {
+          "title": "先找活动范围",
+          "summary": "少量轨道便能看到时钟活动集中在前半段。",
+          "evidence": [
+            "这个教学激励声明了 5、15、24 ns 三次上升沿。",
+            "VALID 在相应沿附近短暂拉高，READY 保持为 1。"
+          ],
+          "window": [
+            0,
+            40
+          ],
+          "signals": [
+            "clk",
+            "valid",
+            "ready"
+          ]
+        },
+        {
+          "title": "收窄到最后一组沿",
+          "summary": "概览只负责指路，精确时间由变化记录核对。",
+          "evidence": [
+            "相邻上升沿间隔是 10 ns、9 ns。",
+            "高电平宽度分别为 3 ns、4 ns、2 ns；不能先假定它是固定周期时钟。"
+          ],
+          "window": [
+            19,
+            34
+          ],
+          "signals": [
+            "clk",
+            "valid"
+          ]
+        },
+        {
+          "title": "保留能确认的边界",
+          "summary": "最后一次下降沿在 26 ns；下一步应查真实接收时钟的驱动。",
+          "evidence": [
+            "24 ns 上升，26 ns 下降；该合成激励之后不再产生时钟。",
+            "源文件另有 28–32 ns dump-off 区间；真实数据分析须单独确认记录覆盖。",
+            "门控 enable、reset 和 driver 不在此示例中，不能替它们编造根因。"
+          ],
+          "window": [
+            23,
+            28
+          ],
+          "signals": [
+            "clk",
+            "valid",
+            "ready"
+          ]
+        }
+      ],
+      "conclusion": "这个教学激励在 26 ns 的下降沿后主动停止产生时钟。wavedbg 的实用路径是先定位活动边界，再取精确边沿，随后结合真实接收端的门控、复位和连接解释原因。",
+      "limitations": [
+        "轨道从随库 SystemVerilog 合成激励的显式延时与赋值重建，未生成或读取 FSDB。",
+        "仅展示 clk、valid、ready、narrow、initial_x 和原 64 位 bus 的低 8 位。",
+        "未重建同 tick 的 glitch 轨道；真实 dump-off 区间不能用“扫描完成”证明没有事件。",
+        "数字时间线不能用于模拟抖动、setup/hold 或 CDC 签核。"
+      ],
+      "references": [
+        {
+          "path": "examples/progressive_wave.sv",
+          "description": "随库小型合成激励的原样副本"
+        },
+        {
+          "path": "src/wavedbg/engines/wave/_native/tests/fixtures/sv/progressive_wave.sv",
+          "description": "固定版本的原始夹具路径"
+        },
+        {
+          "path": "src/wavedbg/skills/wavedbg-clock-reset/SKILL.md",
+          "description": "先查接收端边沿，再查门控/复位的证据流程"
+        }
+      ]
+    },
+    {
+      "id": "credit-return",
+      "title": "有数据想发，credit 却不够了？",
+      "protocol": "Send / Free",
+      "question": "归还的额度能否在同一拍使用，会改变结论。",
+      "prompt": "请分析这段 send/free：初始 credit=2，容量=4，单 VC，每个 SEND/FREE 表示一份，归还的 credit 下一拍才能用。先重建额度，再解释 65 ns、75 ns 为什么没有发送。",
+      "summary": "先说清规则，再逐拍核账；把没有请求、额度耗尽和额度尚未生效分开。",
+      "span": [
+        0,
+        90
+      ],
+      "focus": [
+        45,
+        88
+      ],
+      "detail": [
+        60,
+        88
+      ],
+      "signals": [
+        {
+          "id": "clk",
+          "label": "clk",
+          "width": 1,
+          "role": "10 ns 周期",
+          "events": [
+            [
+              0,
+              "0"
+            ],
+            [
+              5,
+              "1"
+            ],
+            [
+              10,
+              "0"
+            ],
+            [
+              15,
+              "1"
+            ],
+            [
+              20,
+              "0"
+            ],
+            [
+              25,
+              "1"
+            ],
+            [
+              30,
+              "0"
+            ],
+            [
+              35,
+              "1"
+            ],
+            [
+              40,
+              "0"
+            ],
+            [
+              45,
+              "1"
+            ],
+            [
+              50,
+              "0"
+            ],
+            [
+              55,
+              "1"
+            ],
+            [
+              60,
+              "0"
+            ],
+            [
+              65,
+              "1"
+            ],
+            [
+              70,
+              "0"
+            ],
+            [
+              75,
+              "1"
+            ],
+            [
+              80,
+              "0"
+            ],
+            [
+              85,
+              "1"
+            ],
+            [
+              90,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "rst_n",
+          "label": "rst_n",
+          "width": 1,
+          "role": "低有效复位",
+          "events": [
+            [
+              0,
+              "0"
+            ],
+            [
+              8,
+              "1"
+            ]
+          ]
+        },
+        {
+          "id": "offered",
+          "label": "offered",
+          "width": 1,
+          "role": "上游有数据想发",
+          "events": [
+            [
+              0,
+              "0"
+            ],
+            [
+              10,
+              "1"
+            ],
+            [
+              30,
+              "0"
+            ],
+            [
+              40,
+              "1"
+            ]
+          ]
+        },
+        {
+          "id": "send",
+          "label": "send",
+          "width": 1,
+          "role": "本周期真正发出一份",
+          "events": [
+            [
+              0,
+              "0"
+            ],
+            [
+              10,
+              "1"
+            ],
+            [
+              30,
+              "0"
+            ],
+            [
+              40,
+              "1"
+            ],
+            [
+              60,
+              "0"
+            ],
+            [
+              80,
+              "1"
+            ]
+          ]
+        },
+        {
+          "id": "free",
+          "label": "free",
+          "width": 1,
+          "role": "本周期归还一份",
+          "events": [
+            [
+              0,
+              "0"
+            ],
+            [
+              20,
+              "1"
+            ],
+            [
+              40,
+              "0"
+            ],
+            [
+              70,
+              "1"
+            ],
+            [
+              80,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "credit",
+          "label": "credit[2:0]",
+          "width": 3,
+          "role": "沿后更新的可用额度",
+          "events": [
+            [
+              0,
+              "010"
+            ],
+            [
+              15.2,
+              "001"
+            ],
+            [
+              35.2,
+              "010"
+            ],
+            [
+              45.2,
+              "001"
+            ],
+            [
+              55.2,
+              "000"
+            ],
+            [
+              75.2,
+              "001"
+            ],
+            [
+              85.2,
+              "000"
+            ]
+          ]
+        }
+      ],
+      "evidence_kind": "educational-synthesis",
+      "origin_label": "依据 credit skill 构造的教学时序 · 独立核账检查通过",
+      "steps": [
+        {
+          "title": "先固定接口约定",
+          "summary": "这个示例只有一个 VC，额度初值和使用时机都已知。",
+          "evidence": [
+            "复位 8 ns 释放；上升沿取沿前输入，counter 在沿后 0.2 ns 更新。",
+            "初始 credit=2，容量=4；SEND/FREE 各代表一份，归还额度下一拍可用。"
+          ],
+          "window": [
+            0,
+            90
+          ],
+          "signals": [
+            "clk",
+            "rst_n",
+            "send",
+            "free",
+            "credit"
+          ]
+        },
+        {
+          "title": "按已接受事件核账",
+          "summary": "每拍应用 C_next=C_before+FREE−SEND，不能只看 SEND 高了多久。",
+          "evidence": [
+            "15、25、35 ns 的 send/free 分别是 (1,0)、(1,1)、(0,1)：额度 2→1→1→2。",
+            "45、55 ns 再各发一份，55.2 ns 的 counter 已归零。"
+          ],
+          "window": [
+            45,
+            88
+          ],
+          "signals": [
+            "clk",
+            "offered",
+            "send",
+            "free",
+            "credit"
+          ]
+        },
+        {
+          "title": "解释等待与恢复",
+          "summary": "把上游意愿、实际发出和归还生效时机并排看。",
+          "evidence": [
+            "65 ns：offered=1、credit_before=0、FREE=0，因此没有 SEND。",
+            "75 ns：虽有 FREE=1，credit_before 仍为 0；按此契约本拍不能使用归还额度。",
+            "75.2 ns counter=1；到 85 ns 才发出下一份。"
+          ],
+          "window": [
+            60,
+            88
+          ],
+          "signals": [
+            "clk",
+            "offered",
+            "send",
+            "free",
+            "credit"
+          ]
+        }
+      ],
+      "conclusion": "这个教学例子里，65 ns 没有发送是额度耗尽；75 ns 收到归还但按约定下一拍才可用，85 ns 恢复发送。所有已展示周期的额度都保持在 0–4，结论依赖这里明确给出的初始状态和接口契约。",
+      "limitations": [
+        "这是手工构造并由脚本逐拍核账的教学时序，不是 wavedbg 引擎响应或真实 NoC 波形。",
+        "send/free 没有统一通用协议；不能把本例的逐拍单份编码和下一拍可用规则套到未知接口。",
+        "真实多 VC、数量编码、归还延迟、跨窗口状态和丢失记录都需要额外约定与证据。",
+        "这里解释已给定的控制关系；没有 KDB/RTL 证据来证明真实实现的 gating 根因。"
+      ],
+      "references": [
+        {
+          "path": "examples/credit-contract.json",
+          "description": "明确的教学契约与独立逐拍核账表"
+        },
+        {
+          "path": "src/wavedbg/skills/wavedbg-credit/SKILL.md",
+          "description": "额度更新公式、未知初值和同拍归还使用的边界"
+        }
+      ]
+    },
+    {
+      "id": "first-x",
+      "title": "DATA 变成 X，从哪一刻开始查？",
+      "protocol": "Four-state / X",
+      "question": "先定位首个已记录的 X，再沿设计连接追原因。",
+      "prompt": "请用 wavedbg 找到 DATA 第一次出现 X 的记录，保留受影响位和相邻控制值。不要仅凭时间相近就认定某个信号导致 X；说明下一步需要的设计证据。",
+      "summary": "把长波形中的异常缩成一个时间、几条信号和一个待验证的假设。",
+      "span": [
+        0,
+        0.04
+      ],
+      "focus": [
+        0.014,
+        0.036
+      ],
+      "detail": [
+        0.019,
+        0.022
+      ],
+      "signals": [
+        {
+          "id": "clk",
+          "label": "clk",
+          "width": 1,
+          "role": "时钟",
+          "events": [
+            [
+              0.0,
+              "0"
+            ],
+            [
+              0.005,
+              "1"
+            ],
+            [
+              0.01,
+              "0"
+            ],
+            [
+              0.015,
+              "1"
+            ],
+            [
+              0.02,
+              "0"
+            ],
+            [
+              0.025,
+              "1"
+            ],
+            [
+              0.03,
+              "0"
+            ],
+            [
+              0.035,
+              "1"
+            ],
+            [
+              0.04,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "rst_n",
+          "label": "rst_n",
+          "width": 1,
+          "role": "低有效复位",
+          "events": [
+            [
+              0.0,
+              "0"
+            ],
+            [
+              0.012,
+              "1"
+            ]
+          ]
+        },
+        {
+          "id": "valid",
+          "label": "valid",
+          "width": 1,
+          "role": "发送意愿",
+          "events": [
+            [
+              0.0,
+              "0"
+            ],
+            [
+              0.015,
+              "1"
+            ],
+            [
+              0.025,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "ready",
+          "label": "ready",
+          "width": 1,
+          "role": "接收能力",
+          "events": [
+            [
+              0.0,
+              "0"
+            ],
+            [
+              0.02,
+              "1"
+            ],
+            [
+              0.03,
+              "0"
+            ]
+          ]
+        },
+        {
+          "id": "data",
+          "label": "data[7:0]",
+          "width": 8,
+          "role": "数据，保留 X/Z",
+          "events": [
+            [
+              0.0,
+              "00000000"
+            ],
+            [
+              0.015,
+              "00010010"
+            ],
+            [
+              0.02,
+              "xxxx0010"
+            ],
+            [
+              0.03,
+              "1010zzzz"
+            ],
+            [
+              0.035,
+              "01011010"
+            ]
+          ]
+        }
+      ],
+      "evidence_kind": "original-fake-backend",
+      "origin_label": "内建假后端的原始查询回放 · 保留原始四态值",
+      "steps": [
+        {
+          "title": "从概览找异常区域",
+          "summary": "先看 DATA 的活动和 X/Z 分布，再挑一小段取证。",
+          "evidence": [
+            "DATA 初值是 00000000；15 ps 变为 00010010。",
+            "概览可指出含 X/Z 的区间，但不能代替逐条变化证据。"
+          ],
+          "window": [
+            0,
+            0.04
+          ],
+          "signals": [
+            "data",
+            "valid",
+            "ready"
+          ]
+        },
+        {
+          "title": "定位首个 X",
+          "summary": "保留值和位掩码，不把未知数据填成零。",
+          "evidence": [
+            "20 ps：DATA=xxxx0010，X mask=0xF0，受影响的是高 4 位。",
+            "同一时刻 READY 变高，只能说明时间相近，不能证明因果。",
+            "30 ps 变为 1010zzzz，Z mask=0x0F；35 ps 恢复为 01011010。"
+          ],
+          "window": [
+            0.014,
+            0.036
+          ],
+          "signals": [
+            "data",
+            "valid",
+            "ready"
+          ]
+        },
+        {
+          "title": "把追因问题变具体",
+          "summary": "接下来需要匹配的设计数据，沿实际 driver 逐段验证。",
+          "evidence": [
+            "下一步：核对 FSDB/KDB 身份与路径映射，再查 DATA 的 driver 和相关赋值。",
+            "检查输入、选择条件、使能、复位在异常前后的值；不能从名称猜连接。",
+            "本回放没有 KDB/源码证据，因此结论停在已记录的 X 现象。"
+          ],
+          "window": [
+            0.019,
+            0.022
+          ],
+          "signals": [
+            "clk",
+            "rst_n",
+            "data",
+            "valid",
+            "ready"
+          ]
+        }
+      ],
+      "conclusion": "首个已记录 X 在 20 ps：DATA 高 4 位未知、低 4 位是 0010。已定位到值得追查的时间和位；X 的真实来源仍需设计连接、相关代码及上游局部波形共同验证。",
+      "limitations": [
+        "这是 Python FakeBackend 的五信号合成模型，没有 native FSDB/KDB 执行。",
+        "没有设计 driver 或源代码关联，不能把 READY 的同时变化当成 X 来源。",
+        "假后端记录范围内的首个 X 不代表任意真实仿真的最早 X；真实分析仍须确认 dump 覆盖和窗口历史。",
+        "未知值、缺记录和不支持的数据是不同状态，不能相互替代。"
+      ],
+      "references": [
+        {
+          "path": "examples/fake-query-export.json",
+          "description": "本版本原始 Python FakeBackend 查询响应；1 ps/tick"
+        },
+        {
+          "path": "src/wavedbg/engines/wave/fake_backend.py",
+          "description": "五条内建合成信号的确定时间线"
+        },
+        {
+          "path": "src/wavedbg/skills/wavedbg/references/x-propagation.md",
+          "description": "沿连接、控制与局部波形逐段验证 X 的工作流"
+        }
+      ]
+    }
+  ]
+}
