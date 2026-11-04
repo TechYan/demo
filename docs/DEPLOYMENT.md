@@ -17,7 +17,7 @@ python scripts/check_site.py dist /demo
 
 ## Cloudflare Pages
 
-Target project: **techyan-demo**. Root-path build:
+Production: **https://techyan-demo.pages.dev/** · project **techyan-demo**, production branch `main`. This project was created as a Direct Upload project; its first deployment used the build validated on 2026-11-04. Repeat uploads use the same Pages project and the root-path build below.
 
 ```bash
 npm ci
@@ -25,7 +25,7 @@ npm run build
 npm run check:site
 ```
 
-For a Cloudflare Pages Git integration, use repository `TechYan/demo`, production branch `main`, build command `npm run build`, output directory `dist`, and Node.js `24`. Leave `SITE_BASE` unset. Cloudflare provides `CF_PAGES_URL` for canonical URL generation.
+For a separate future Cloudflare Pages Git-integration project, use repository `TechYan/demo`, production branch `main`, build command `npm run build`, output directory `dist`, and Node.js `24`. Leave `SITE_BASE` unset. Cloudflare provides `CF_PAGES_URL` for canonical URL generation; a direct local build defaults to the current production URL.
 
 For an account-authorized direct upload using the project-local Wrangler:
 

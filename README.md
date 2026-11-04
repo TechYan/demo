@@ -1,6 +1,6 @@
 # TechYan / Engineering Playground
 
-**[打开在线 Demo](https://techyan.github.io/demo/)** · [部署与本地开发](docs/DEPLOYMENT.md)
+**[Cloudflare Pages](https://techyan-demo.pages.dev/)** · **[GitHub Pages](https://techyan.github.io/demo/)** · [部署与本地开发](docs/DEPLOYMENT.md)
 
 可直接体验的协议、验证、性能分析与寄存器工具。导航以 [DevPortfolio](https://github.com/RyanFitzgerald/devportfolio) 为基础，使用 **Astro 7 + Tailwind CSS 4** 静态构建；包含分类筛选、中英文搜索、深浅主题、移动布局，以及每个项目的详情与演示入口。字体随站点构建，无运行时字体服务依赖。
 
