@@ -1,0 +1,45 @@
+[1mXPVKIT[0m[2m  ·  [0m[1;92mPV SUMMARY[0m
+traffic
+[2mCXL Native / CSV cxl-native-1.0[0m
+[2m──────────────────────────────────────────────────────────[0m
+1.50 µs[2m  ·  [0m2,598 rows[2m  ·  [0m[32mintegrity OK[0m
+
+[1mACTIVITY     [0m[1m [0m[1;92m87.60%            [0m [2midle 186.00 ns            [0m
+[1mBANDWIDTH    [0m[1m [0m[1;92mtotal 62.34 GB/s  [0m                           
+[1m             [0m[1m [0m[1;92mread 31.17 GB/s   [0m                           
+[1m             [0m[1m [0m[1;95mwrite 31.17 GB/s  [0m                           
+[1m             [0m[1m [0m[2mpeak 98.91 GB/s   [0m                           
+[1mOUTSTANDING  [0m[1m [0m[1;92mavg 35.79         [0m [2mpeak 58                   [0m
+[1mCREDIT EMPTY [0m[1m [0m[1;92mworst 24.00%      [0m [2mS2M_DRC[0] · 6 interval(s)[0m
+Partial write: 0.00% (0 / 640 known messages; 0 unknown) 
+[partial-write opcode]
+
+[1m PV TREND[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[37mRead BW  [0m [37m▂▅▆▄▇▆▅▄▇▅▅▅▆▅▄▆▅▅▄▇▅▅▃█▅▅▅▅[0m[2;37m  avg [0m[37m31.17 GB/s[0m
+                                                      
+[37mWrite BW [0m [37m▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▂[0m[2;37m  avg [0m[37m31.17 GB/s[0m
+                                                      
+[37mRead OS  [0m [37m▅▆▆█▆▆▅█▆▆▅█▅▆▇█▆▅▇▇▆▅█▇▆▅▆▅[0m[2;37m  avg [0m[37m18.72     [0m
+                                                      
+[37mWrite OS [0m [37m▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅[0m[2;37m  avg [0m[37m17.07     [0m
+
+[1m CREDIT EMPTY[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[37mS2M_DRC[0]    [0m [37m··▒▓·░█░·▓▒·░▓··█░·▒▒·······[0m[2;37m  [0m[37m 24.00%[0m
+[37mS2M_DRC[1]    [0m [37m···▓▒·▒▓·░█░·▓▒·░▓··█░······[0m[2;37m  [0m[37m 24.00%[0m
+[2mdensity       [0m [2mlow ░▒▓█ high                        [0m
+
+[1m INTEGRITY[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[2mProtocol checks  [0m[2;32mOK[0m[2m  no structural or transaction-matching [0m
+[2missues detected[0m
+
+[2m──────────────────────────────────────────────────────────[0m
+[2mActive window  20.00 ns → 1.33 µs  ·  auto-active  ·  1 [0m
+[2mregion[0m
+[2mBandwidth: accepted-data; transactions / latency / [0m
+[2moutstanding / backpressure: capture[0m
+[2mHTML …[0m[2m [0mpvkit/examples/cxl_native/staggered_slots/traffic.p…
+[2mTrack…[0m[2m [0mpvkit/examples/cxl_native/staggered_slots/traffic.t…
+[2mAnaly…[0m[2m [0mpvkit/examples/cxl_native/staggered_slots/traffic.a…

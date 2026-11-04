@@ -1,0 +1,36 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                                           AXI / CSV 2.0
+──────────────────────────────────────────────────────────────────────────────
+20.00 µs  ·  473 rows  ·  integrity OK
+
+ACTIVITY                 85.56%                            idle 2.89 µs        
+BANDWIDTH                total 0.29 GB/s                                       
+                         write 0.29 GB/s                                       
+                         peak 0.74 GB/s                                        
+OUTSTANDING              avg 0.29                          peak 1              
+Partial write: 0.00% (0 / 156 known beats; 0 unknown) [WSTRB]
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────
+Write BW  ▆▆▆▆▁▆▆▆▁▆▆▆▁▆▆▅▆▆▁▆▆▆▆▁▆▆▆▁▆▆▆▅▆▁▆▆▆▁▆▆▆▆▁▆▆▆▁█  avg 0.29 GB/s
+                                                                         
+Write OS  ▁███▁▁██▁████▁█▁███▁█▁█▁███▁██▁██▁████▁█▁█▁███▁█  avg 0.29     
+
+ BACKPRESSURE
+ ─────────────────────────────────────────────────────────────────────────────
+AW        ················································    0.00%
+W         ······················░·························   47.14%
+B         ················································    0.00%
+density   low ░▒▓█ high                                            
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────
+Active window  520.00 ns → 17.63 µs  ·  auto-active  ·  1 region
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: 
+capture
+HTML report      pvkit/examples/axi4/write_only/traffic.pv.html                
+Tracker log      pvkit/examples/axi4/write_only/traffic.tracker.log            
+Analyze log      pvkit/examples/axi4/write_only/traffic.analyze.log            

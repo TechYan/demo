@@ -1,0 +1,39 @@
+[1mXPVKIT[0m[2m  ·  [0m[1;92mPV SUMMARY[0m
+traffic
+[2mCXL Native / CSV cxl-native-1.0[0m
+[2m──────────────────────────────────────────────────────────[0m
+960.00 ns[2m  ·  [0m2,428 rows[2m  ·  [0m[32mintegrity OK[0m
+
+[1mACTIVITY       [0m[1m [0m[1;92m41.67%             [0m [2midle 560.00 ns         [0m
+[1mBANDWIDTH      [0m[1m [0m[1;92mtotal 192.00 GB/s  [0m                        
+[1m               [0m[1m [0m[1;92mread 96.00 GB/s    [0m                        
+[1m               [0m[1m [0m[1;95mwrite 96.00 GB/s   [0m                        
+[1m               [0m[1m [0m[2mpeak 256.00 GB/s   [0m                        
+[1mOUTSTANDING    [0m[1m [0m[1;92mavg 25.00          [0m [2mpeak 80                [0m
+[1mCREDIT EMPTY   [0m[1m [0m[1;92mworst 0.00%        [0m [2mno exhaustion recorded [0m
+Partial write: 0.00% (0 / 600 known messages; 0 unknown) 
+[partial-write opcode]
+
+[1m PV TREND[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[37mRead BW  [0m [37m▂█▆▁▁▁▁▇█▁▁▁▁▅█▅▁▁▁▂█▆▁▁▁▁▇█[0m[2;37m  avg [0m[37m96.00 GB/s[0m
+                                                      
+[37mWrite BW [0m [37m██▂▁▁▁▅█▄▁▁▁▃█▇▁▁▁▁▆█▂▁▁▁▅█▄[0m[2;37m  avg [0m[37m96.00 GB/s[0m
+                                                      
+[37mRead OS  [0m [37m██▆▁▁▁▇██▁▁▁▄██▃▁▁▁██▆▁▁▁▇██[0m[2;37m  avg [0m[37m12.50     [0m
+                                                      
+[37mWrite OS [0m [37m██▆▁▁▁▇██▁▁▁▄██▃▁▁▁██▆▁▁▁▇██[0m[2;37m  avg [0m[37m12.50     [0m
+
+[1m INTEGRITY[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[2mProtocol checks  [0m[2;32mOK[0m[2m  no structural or transaction-matching [0m
+[2missues detected[0m
+
+[2m──────────────────────────────────────────────────────────[0m
+[2mActive window  20.00 ns → 900.00 ns  ·  auto-active  ·  5 [0m
+[2mregions[0m
+[2mBandwidth: accepted-data; transactions / latency / [0m
+[2moutstanding / backpressure: capture[0m
+[2mHTML …[0m[2m [0mpvkit/examples/cxl_native/reinitialize/traffic.pv.h…
+[2mTrack…[0m[2m [0mpvkit/examples/cxl_native/reinitialize/traffic.trac…
+[2mAnaly…[0m[2m [0mpvkit/examples/cxl_native/reinitialize/traffic.anal…

@@ -1,0 +1,40 @@
+XPVKIT  ·  PV SUMMARY
+traffic
+CXL Native / CSV cxl-native-1.0
+──────────────────────────────────────────────────────────
+1.12 µs  ·  3,536 rows  ·  integrity OK
+
+ACTIVITY      89.29%             idle 120.00 ns            
+BANDWIDTH     total 112.64 GB/s                            
+              read 112.64 GB/s                             
+              peak 128.00 GB/s                             
+OUTSTANDING   avg 174.29         peak 322                  
+CREDIT EMPTY  worst 10.71%       S2M_DRC[0] · 1 interval(s)
+Partial write: n/a (0 / 0 known messages; 0 unknown) 
+[partial-write opcode]
+
+ PV TREND
+ ─────────────────────────────────────────────────────────
+Read BW   ██████████▁▁▁▆█████████████▆  avg 112.64 GB/s
+                                                       
+Read OS   ▃▃▃▃▃▃▃▃▃▃▄▆████████████▇▅▃▂  avg 174.29     
+
+ CREDIT EMPTY
+ ─────────────────────────────────────────────────────────
+S2M_DRC[0]     ··········▒██▒··············   10.71%
+S2M_DRC[1]     ··········▒██▒··············   10.71%
+density        low ░▒▓█ high                        
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching 
+issues detected
+
+──────────────────────────────────────────────────────────
+Active window  60.00 ns → 1.06 µs  ·  auto-active  ·  1 
+region
+Bandwidth: accepted-data; transactions / latency / 
+outstanding / backpressure: capture
+HTML … pvkit/examples/cxl_native/read_credit_throttle/traf…
+Track… pvkit/examples/cxl_native/read_credit_throttle/traf…
+Analy… pvkit/examples/cxl_native/read_credit_throttle/traf…

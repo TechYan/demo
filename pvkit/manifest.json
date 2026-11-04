@@ -1,0 +1,147 @@
+{
+  "tool": "xpvkit",
+  "version": "0.5.5",
+  "release_tag": "v0.5.5",
+  "release_sha256": "c3cddb9de23104ad8be9db2f564f2a3c721a42dfdbb575bd336eda093b2533cd",
+  "window": "auto",
+  "report_mode": "full",
+  "trend": "all",
+  "data": "synthetic demo, not measured DUT performance",
+  "scenarios": [
+    {
+      "protocol": "axi4",
+      "slug": "read_only",
+      "title": "只读流量",
+      "description": "观察 AR/R 关联、读带宽与请求到响应延迟。",
+      "source": "examples/axi4/read_only/traffic.csv",
+      "source_sha256": "cc1493417e5715450b8f83b131e41d6aa1aff04950b90b93470d63fad30c8c64",
+      "directory": "pvkit/examples/axi4/read_only"
+    },
+    {
+      "protocol": "axi4",
+      "slug": "write_only",
+      "title": "只写流量",
+      "description": "观察 AW/W/B 关联、写带宽与写响应。",
+      "source": "examples/axi4/write_only/traffic.csv",
+      "source_sha256": "c47dbdd5f3c31d87c5f89cc87fc0ca8c00407b881c81f774f38771dfe95d338d",
+      "directory": "pvkit/examples/axi4/write_only"
+    },
+    {
+      "protocol": "axi4",
+      "slug": "concurrent",
+      "title": "并发读写",
+      "description": "在同一时间轴比较读写带宽、outstanding 和通道背压。",
+      "source": "examples/axi4/concurrent/traffic.csv",
+      "source_sha256": "dea958b0b1a1bce811092437689665a05983ffa914ab790428cef93d4ee8c0dd",
+      "directory": "pvkit/examples/axi4/concurrent"
+    },
+    {
+      "protocol": "axi4",
+      "slug": "bandwidth_steps",
+      "title": "阶梯带宽",
+      "description": "观察负载分阶段变化及有效数据窗口。",
+      "source": "examples/axi4/bandwidth_steps/traffic.csv",
+      "source_sha256": "021747063d0ede6214b4dccfcdf8e3adf3b7ca8b2568b14afed53ad5f07cda99",
+      "directory": "pvkit/examples/axi4/bandwidth_steps"
+    },
+    {
+      "protocol": "axi4",
+      "slug": "mixed_metrics",
+      "title": "混合指标",
+      "description": "检查 WSTRB、Partial write、延迟与背压。",
+      "source": "examples/axi4/mixed_metrics/traffic.csv",
+      "source_sha256": "7131c536f5361bf9b0a679aa1257aee925785e904267443c2122fdd1e2b70fa6",
+      "directory": "pvkit/examples/axi4/mixed_metrics"
+    },
+    {
+      "protocol": "axi4",
+      "slug": "high_outstanding",
+      "title": "高并发请求",
+      "description": "观察 1024 outstanding 场景的趋势与事务查询。",
+      "source": "examples/axi4/high_outstanding/traffic.csv",
+      "source_sha256": "e16ad814fa909744a909df0bd3322d7252f033351cea5e2f0d189d945e23d81a",
+      "directory": "pvkit/examples/axi4/high_outstanding"
+    },
+    {
+      "protocol": "axi4",
+      "slug": "incomplete_response",
+      "title": "响应未完成",
+      "description": "诊断示例：保留缺失响应、未完成事务及已观察证据。",
+      "source": "examples/axi4/incomplete_response/traffic.csv",
+      "source_sha256": "554e0d10e749c580d383481b2d28e93d05d4ac60c43b0281922b563721441f95",
+      "directory": "pvkit/examples/axi4/incomplete_response"
+    },
+    {
+      "protocol": "cxl_native",
+      "slug": "full_duplex",
+      "title": "全双工流量",
+      "description": "比较 M2S/S2M 消息、双向带宽与事务关联。",
+      "source": "examples/cxl_native/full_duplex/traffic.csv",
+      "source_sha256": "280a09e44222539b7008cc24d24cbd8e9d5170f95fe3f3fdc4ef797f33a287e4",
+      "directory": "pvkit/examples/cxl_native/full_duplex"
+    },
+    {
+      "protocol": "cxl_native",
+      "slug": "reinitialize",
+      "title": "突发与重新初始化",
+      "description": "观察独立初始化域、突发流量与重新初始化。",
+      "source": "examples/cxl_native/reinitialize/traffic.csv",
+      "source_sha256": "2722d5d9f716c6476395b45a206d49736148b314e3f50da5069da7bb0cb5ec7a",
+      "directory": "pvkit/examples/cxl_native/reinitialize"
+    },
+    {
+      "protocol": "cxl_native",
+      "slug": "read_credit_throttle",
+      "title": "读 credit 限流",
+      "description": "观察读方向各 channel/slot 记录到的 credit EMPTY 区间。",
+      "source": "examples/cxl_native/read_credit_throttle/traffic.csv",
+      "source_sha256": "729fc68dfba38e08508f3932fbff7aea97f60e1bb8dbec38a245039823c61a2c",
+      "directory": "pvkit/examples/cxl_native/read_credit_throttle"
+    },
+    {
+      "protocol": "cxl_native",
+      "slug": "write_credit_throttle",
+      "title": "写 credit 限流",
+      "description": "观察写方向 credit EMPTY 与消息发送的时间关系。",
+      "source": "examples/cxl_native/write_credit_throttle/traffic.csv",
+      "source_sha256": "ab1cd7631edc493ec91f03548b0617c6c381bd5b1d50ae3a4df1ce58e4775485",
+      "directory": "pvkit/examples/cxl_native/write_credit_throttle"
+    },
+    {
+      "protocol": "cxl_native",
+      "slug": "repeated_empty",
+      "title": "同一 slot 反复 EMPTY",
+      "description": "观察同一个物理 slot 多次耗尽与恢复。",
+      "source": "examples/cxl_native/repeated_empty/traffic.csv",
+      "source_sha256": "68ee80dc76ee40c4038ad79f5f0a8390efa41012a2cb96c1f15f4a2545cd3799",
+      "directory": "pvkit/examples/cxl_native/repeated_empty"
+    },
+    {
+      "protocol": "cxl_native",
+      "slug": "staggered_slots",
+      "title": "交错与重叠 EMPTY",
+      "description": "展开各 slot，检查交错和重叠耗尽区间。",
+      "source": "examples/cxl_native/staggered_slots/traffic.csv",
+      "source_sha256": "f942377c885b0b081e776bee9c02a9c0be0aea3bcc268db10be3545343faa189",
+      "directory": "pvkit/examples/cxl_native/staggered_slots"
+    },
+    {
+      "protocol": "cxl_native",
+      "slug": "independent_channels",
+      "title": "独立 channel 反复 EMPTY",
+      "description": "检查四条读写 channel 的独立耗尽模式。",
+      "source": "examples/cxl_native/independent_channels/traffic.csv",
+      "source_sha256": "44868b9bb0bb2c18014590b2737c57fb66cdbbcf0120bd07e950f8ca004e4ab2",
+      "directory": "pvkit/examples/cxl_native/independent_channels"
+    },
+    {
+      "protocol": "cxl_native",
+      "slug": "short_pulses",
+      "title": "长时间域中的短脉冲",
+      "description": "缩放长 capture，检查短 credit EMPTY 脉冲。",
+      "source": "examples/cxl_native/short_pulses/traffic.csv",
+      "source_sha256": "4f0bf93ea2e90040472f027ccae80b116c3c8c4bb4fdd459092c98ed6774098f",
+      "directory": "pvkit/examples/cxl_native/short_pulses"
+    }
+  ]
+}

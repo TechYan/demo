@@ -1,0 +1,77 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                         CXL Native / CSV cxl-native-1.0
+──────────────────────────────────────────────────────────────────────────────
+200.00 µs  ·  4,254 rows  ·  integrity OK
+
+ACTIVITY           10.12%                   idle 179.75 µs                     
+BANDWIDTH          total 5.69 GB/s                                             
+                   read 3.10 GB/s                                              
+                   write 2.59 GB/s                                             
+                   peak 0.64 GB/s                                              
+OUTSTANDING        avg 0.36                 peak 4                             
+CREDIT EMPTY       worst 0.24%              M2S_RWD[0] · 160 interval(s)       
+Partial write: 0.00% (0 / 820 known messages; 0 unknown) [partial-write opcode]
+
+ TRAFFIC
+ ─────────────────────────────────────────────────────────────────────────────
+Write     transactions    820  /  52,480 B useful payload
+Read      transactions    980  /  62,720 B useful payload
+          partial BE                     0 / 820  (0.00%)
+
+CHANNEL        MESSAGES           RATE  TOP OPCODES
+M2S_REQ             980    4.90 Mmsg/s  MemRd 980  
+M2S_RWD             820    4.10 Mmsg/s  MemWr 820  
+S2M_NDR             820    4.10 Mmsg/s  Cmp 820    
+S2M_DRC             980    4.90 Mmsg/s  MemData 980
+
+ LATENCY
+ ─────────────────────────────────────────────────────────────────────────────
+Write    avg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+Read     avg 40.16 ns  p50 40.00 ns  p95 41.00 ns  max 41.00 ns
+
+ INITIALIZATION
+ ─────────────────────────────────────────────────────────────────────────────
+mem_mst     IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+            199.96 µs  ·  DEINIT 199.96 µs → 199.98 µs  ·  IDLE 199.98 µs →    
+            200.00 µs                                                          
+mem_slv     IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+            199.96 µs  ·  DEINIT 199.96 µs → 199.98 µs  ·  IDLE 199.98 µs →    
+            200.00 µs                                                          
+
+ MESSAGE SLOT USAGE
+ ─────────────────────────────────────────────────────────────────────────────
+ Channel      Messages      Used / configured         Peak simultaneous        
+ M2S_REQ      980           2 / 4                     2                        
+ M2S_RWD      820           2 / 2                     2                        
+ S2M_NDR      820           6 / 6                     2                        
+ S2M_DRC      980           2 / 2                     2                        
+Issued messages in the statistics window; peak counts distinct slots at one 
+timestamp. These are message slots, not inferred buffer lifetimes.
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────
+Read BW   ███████████████▇█████████████████▇██████████████  avg 3.10 GB/s
+                                                                         
+Write BW  ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇█  avg 2.59 GB/s
+                                                                         
+Read OS   ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁▁▁▁▁▁▁  avg 0.20     
+                                                                         
+Write OS  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▅█▅▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁▁▁▁▁▁▁  avg 0.16     
+
+ CREDIT EMPTY
+ ─────────────────────────────────────────────────────────────────────────────
+M2S_RWD[0]     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░··    0.24%
+S2M_DRC[1]     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░··    0.24%
+density        low ░▒▓█ high                                            
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────
+Active window  20.00 ns → 195.66 µs  ·  auto-active  ·  490 regions
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: 
+capture
+HTML report    pvkit/examples/cxl_native/short_pulses/traffic.pv.html          
+Tracker log    pvkit/examples/cxl_native/short_pulses/traffic.tracker.log      
+Analyze log    pvkit/examples/cxl_native/short_pulses/traffic.analyze.log      

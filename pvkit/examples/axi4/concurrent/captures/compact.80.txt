@@ -1,0 +1,44 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                                           AXI / CSV 2.0
+──────────────────────────────────────────────────────────────────────────────
+24.00 µs  ·  1,698 rows  ·  integrity OK
+
+ACTIVITY                 89.76%                            idle 2.46 µs        
+BANDWIDTH                total 0.92 GB/s                                       
+                         read 0.51 GB/s                                        
+                         write 0.42 GB/s                                       
+                         peak 2.35 GB/s                                        
+OUTSTANDING              avg 4.51                          peak 6              
+Partial write: 0.00% (0 / 280 known beats; 0 unknown) [WSTRB]
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────
+Read BW   ▁▇▄▇▇▇▄█▄▇▇▄▇▇▇▅▇▄▇▇▄▇▇▅▇▇▄█▅▅█▃▇▆▇▇▇▄▇▅▇▇▄▇▇▇▄█  avg 0.51 GB/s
+                                                                         
+Write BW  ▇▄▇▄▇▄▇▃▇▄▇▄▇▄▇▃▇▄▇▄▇▄▇▃▇▄▇▄▇▄▇▃▇▄▇▄▇▄▇▃▇▄▇▄▇▄▄▁  avg 0.42 GB/s
+                                                                         
+Read OS   ███████████████████████████████████████████████▆  avg 2.38     
+                                                                         
+Write OS  ▆██████████████████████████████████████████████▆  avg 2.13     
+
+ BACKPRESSURE
+ ─────────────────────────────────────────────────────────────────────────────
+AW        ················································    0.00%
+W         ······························░·················   24.26%
+B         ················································    0.00%
+                                                                   
+AR        ························░·······················   58.25%
+R         ················································    0.00%
+density   low ░▒▓█ high                                            
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────
+Active window  1.07 µs → 22.61 µs  ·  auto-active  ·  1 region
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: 
+capture
+HTML report      pvkit/examples/axi4/concurrent/traffic.pv.html                
+Tracker log      pvkit/examples/axi4/concurrent/traffic.tracker.log            
+Analyze log      pvkit/examples/axi4/concurrent/traffic.analyze.log            

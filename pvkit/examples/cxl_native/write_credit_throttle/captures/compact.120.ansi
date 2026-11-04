@@ -1,0 +1,34 @@
+[1mXPVKIT[0m[2m  ·  [0m[1;92mPV SUMMARY[0m
+traffic               [2m                                                                  CXL Native / CSV cxl-native-1.0[0m
+[2m──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+1.06 µs[2m  ·  [0m3,216 rows[2m  ·  [0m[32mintegrity OK[0m
+
+[1mACTIVITY                    [0m[1m  [0m[1mBANDWIDTH                   [0m[1m  [0m[1mOUTSTANDING                 [0m[1m  [0m[1mCREDIT EMPTY                 [0m
+[2m─────────                   [0m[2m  [0m[2m─────────                   [0m[2m  [0m[2m───────────                 [0m[2m  [0m[2m────────────                 [0m
+[1;92m86.79%                      [0m  [1;92mtotal 111.30 GB/s           [0m  [1;92mavg 60.38                   [0m  [1;92mworst 11.32%                 [0m
+[2midle 140.00 ns              [0m  [1;95mW 111.30[0m[2m GB/s[0m                 [2mpeak 80                     [0m  [2mM2S_RWD[0] · 1 interval(s)   [0m
+                              [2mpeak 128.00 GB/s            [0m                                                             
+Partial write: 0.00% (0 / 1,600 known messages; 0 unknown) [partial-write opcode]
+
+[1m PV TREND[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[37mWrite BW [0m [37m███████████████████████████████▅▁▁▁▁▁▁▁▁▁███████████████████████████████[0m[2;37m  avg [0m[37m111.30 GB/s[0m
+                                                                                                   
+[37mWrite OS [0m [37m▃▅▇█████████████████████████████▅▄▁▁▁▁▁▁▁▄▅█████████████████████████████[0m[2;37m  avg [0m[37m60.38      [0m
+
+[1m CREDIT EMPTY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[37mM2S_RWD[0]    [0m [37m····························▒███████▓···································[0m[2;37m  [0m[37m 11.32%[0m
+[37mM2S_RWD[1]    [0m [37m····························▒███████▓···································[0m[2;37m  [0m[37m 11.32%[0m
+[2mdensity       [0m [2mlow ░▒▓█ high                                                                    [0m
+
+[1m INTEGRITY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[2mProtocol checks  [0m[2;32mOK[0m[2m  no structural or transaction-matching issues detected[0m
+
+[2m──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[2mActive window  20.00 ns → 940.00 ns  ·  auto-active  ·  1 region[0m
+[2mBandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture[0m
+[2mHTML report        [0m[2m [0mpvkit/examples/cxl_native/write_credit_throttle/traffic.pv.html                                    
+[2mTracker log        [0m[2m [0mpvkit/examples/cxl_native/write_credit_throttle/traffic.tracker.log                                
+[2mAnalyze log        [0m[2m [0mpvkit/examples/cxl_native/write_credit_throttle/traffic.analyze.log                                

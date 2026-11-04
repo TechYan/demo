@@ -1,0 +1,39 @@
+XPVKIT  ·  PV SUMMARY
+traffic
+AXI / CSV 2.0
+──────────────────────────────────────────────────────────
+20.00 µs  ·  365 rows  ·  integrity OK
+
+ACTIVITY           87.56%                   idle 2.49 µs   
+BANDWIDTH          total 0.26 GB/s                         
+                   read 0.26 GB/s                          
+                   peak 0.70 GB/s                          
+OUTSTANDING        avg 0.24                 peak 1         
+Partial write: n/a (0 / 0 known beats; 0 unknown) [WSTRB]
+
+ PV TREND
+ ─────────────────────────────────────────────────────────
+Read BW   █▅▄▅▆▅▄▅▅▆▅▄▇▄▅▅▆▅▄▅▆▄▅▅▆▄▅▆  avg 0.26 GB/s
+                                                     
+Read OS   ▁▁████████▁█▁▁████████▁█▁███  avg 0.24     
+
+ BACKPRESSURE
+ ─────────────────────────────────────────────────────────
+                                               
+AR        ····························    0.00%
+R         ·············░··············   45.28%
+density   low ░▒▓█ high                        
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching 
+issues detected
+
+──────────────────────────────────────────────────────────
+Active window  580.00 ns → 18.09 µs  ·  auto-active  ·  1 
+region
+Bandwidth: accepted-data; transactions / latency / 
+outstanding / backpressure: capture
+HTML repo… pvkit/examples/axi4/read_only/traffic.pv.html   
+Tracker l… pvkit/examples/axi4/read_only/traffic.tracker.l…
+Analyze l… pvkit/examples/axi4/read_only/traffic.analyze.l…

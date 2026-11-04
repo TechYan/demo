@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AXI4 · 高并发请求 · TUI</title><link rel="stylesheet" href="../../../../assets/site.css"></head>
+<body data-command="python xpv.pyz analyze pvkit/examples/axi4/high_outstanding/traffic.csv"><main><nav><a href="../../../index.html">← PVKit 场景目录</a></nav>
+<h1>AXI4 · 高并发请求</h1><div class="eyebrow">ACTUAL TUI CAPTURE · XPVKIT 0.5.5</div>
+<p>观察 1024 outstanding 场景的趋势与事务查询。 以下内容由同一份 CSV 经 release 工具实际打印，网页仅回放终端输出。</p>
+<div class="links"><a href="traffic.pv.html">交互 HTML 报告</a><a href="traffic.analyze.log">分析日志</a><a href="traffic.tracker.log">Tracker 日志</a><a href="traffic.csv" download>原始 CSV</a></div>
+<div class="controls"><label>报告模式 <select id="mode"><option value="standard">standard / 概览</option><option value="full">full / 协议详情</option><option value="compact">compact / 摘要</option></select></label>
+<label>终端列数 <select id="width"><option>120</option><option>80</option><option>60</option></select></label></div>
+<div class="terminal"><div class="panel" data-mode="standard" data-width="120"><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic                                   <span style="color: #727272; text-decoration-color: #727272">                                                                AXI / CSV 2.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+5.00 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>26,977 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY                                BANDWIDTH                               OUTSTANDING                            </span>
+<span style="color: #727272; text-decoration-color: #727272">─────────                               ─────────                               ───────────                            </span>
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">66.24%                                </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 208.70 GB/s                     </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 560.94                             </span>
+<span style="color: #727272; text-decoration-color: #727272">idle 1.69 µs                          </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">R 105.12</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">W 103.57</span><span style="color: #727272; text-decoration-color: #727272"> GB/s</span>              <span style="color: #727272; text-decoration-color: #727272">peak 1,024                             </span>
+                                        <span style="color: #727272; text-decoration-color: #727272">peak 256.00 GB/s                      </span>                                         
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) [WSTRB]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write</span>
+    <span style="color: #727272; text-decoration-color: #727272">transactions    </span>       2,680  <span style="color: #727272; text-decoration-color: #727272">burst size      </span>128 B             
+    <span style="color: #727272; text-decoration-color: #727272">beats / txn     </span>           1  <span style="color: #727272; text-decoration-color: #727272">WSTRB partial   </span>0 / 2,680  (0.00%)
+
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read</span>
+    <span style="color: #727272; text-decoration-color: #727272">transactions    </span>       2,720  <span style="color: #727272; text-decoration-color: #727272">burst size      </span>128 B
+    <span style="color: #727272; text-decoration-color: #727272">beats / txn     </span>           1  <span style="color: #727272; text-decoration-color: #727272">                </span>     
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 526.60 ns  p50 512.00 ns  p95 572.00 ns  max 632.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 512.28 ns  p50 512.00 ns  p95 512.00 ns  max 576.00 ns
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▁▁▁▁▁▁▁▁▁▁▇███████████████████████████████████▇▁▄██████████████████████</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">105.12 GB/s</span>
+                                                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">██████████████████████████▂▅██████▅█████████▇▃███████████████▁▁▁▁▁▁▁▁▁▁▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">103.57 GB/s</span>
+                                                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▂▃▃▄▅▅▆▇▇████████████████████████████▇▇▇▇▇▇▇▇▇▇██████████████▇▇▆▅▅▄▃▃▂▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">278.68     </span>
+                                                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▂▃▃▄▅▅▆▇▇████████████████████████▇▇▇▇████████████████████████▇▇▆▅▅▄▃▃▂▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">282.26     </span>
+
+<span style="font-weight: bold"> BACKPRESSURE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AW       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····································█░··································</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.90%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">W        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·······························░▒·······································</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">B        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···········································░▒···························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+                                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AR       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">······································░█░·······························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.86%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">R        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··············································▓░························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.30%</span>
+<span style="color: #727272; text-decoration-color: #727272">density  </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                                                    </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report            </span>pvkit/examples/axi4/high_outstanding/traffic.pv.html                                            
+<span style="color: #727272; text-decoration-color: #727272">Tracker log            </span>pvkit/examples/axi4/high_outstanding/traffic.tracker.log                                        
+<span style="color: #727272; text-decoration-color: #727272">Analyze log            </span>pvkit/examples/axi4/high_outstanding/traffic.analyze.log                                        
+</pre></div><div class="panel" data-mode="full" data-width="120" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic                                   <span style="color: #727272; text-decoration-color: #727272">                                                                AXI / CSV 2.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+5.00 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>26,977 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY                                BANDWIDTH                               OUTSTANDING                            </span>
+<span style="color: #727272; text-decoration-color: #727272">─────────                               ─────────                               ───────────                            </span>
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">66.24%                                </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 208.70 GB/s                     </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 560.94                             </span>
+<span style="color: #727272; text-decoration-color: #727272">idle 1.69 µs                          </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">R 105.12</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">W 103.57</span><span style="color: #727272; text-decoration-color: #727272"> GB/s</span>              <span style="color: #727272; text-decoration-color: #727272">peak 1,024                             </span>
+                                        <span style="color: #727272; text-decoration-color: #727272">peak 256.00 GB/s                      </span>                                         
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) [WSTRB]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write</span>
+    <span style="color: #727272; text-decoration-color: #727272">transactions    </span>       2,680  <span style="color: #727272; text-decoration-color: #727272">burst size      </span>128 B             
+    <span style="color: #727272; text-decoration-color: #727272">beats / txn     </span>           1  <span style="color: #727272; text-decoration-color: #727272">WSTRB partial   </span>0 / 2,680  (0.00%)
+
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read</span>
+    <span style="color: #727272; text-decoration-color: #727272">transactions    </span>       2,720  <span style="color: #727272; text-decoration-color: #727272">burst size      </span>128 B
+    <span style="color: #727272; text-decoration-color: #727272">beats / txn     </span>           1  <span style="color: #727272; text-decoration-color: #727272">                </span>     
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 526.60 ns  p50 512.00 ns  p95 572.00 ns  max 632.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 512.28 ns  p50 512.00 ns  p95 512.00 ns  max 576.00 ns
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▁▁▁▁▁▁▁▁▁▁▇███████████████████████████████████▇▁▄██████████████████████</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">105.12 GB/s</span>
+                                                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">██████████████████████████▂▅██████▅█████████▇▃███████████████▁▁▁▁▁▁▁▁▁▁▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">103.57 GB/s</span>
+                                                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▂▃▃▄▅▅▆▇▇████████████████████████████▇▇▇▇▇▇▇▇▇▇██████████████▇▇▆▅▅▄▃▃▂▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">278.68     </span>
+                                                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▂▃▃▄▅▅▆▇▇████████████████████████▇▇▇▇████████████████████████▇▇▆▅▅▄▃▃▂▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">282.26     </span>
+
+<span style="font-weight: bold"> BACKPRESSURE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AW       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····································█░··································</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.90%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">W        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·······························░▒·······································</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">B        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···········································░▒···························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+                                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AR       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">······································░█░·······························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.86%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">R        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··············································▓░························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.30%</span>
+<span style="color: #727272; text-decoration-color: #727272">density  </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                                                    </span>
+
+<span style="font-weight: bold"> DETAILS</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">measurement window    </span>0.00 ps → 5.00 µs · 5.00 µs                             
+<span style="color: #727272; text-decoration-color: #727272">bandwidth window      </span>1.00 µs → 4.31 µs · 3.31 µs · auto-active               
+<span style="color: #727272; text-decoration-color: #727272">transaction scope     </span>capture (latency / outstanding / backpressure)          
+<span style="color: #727272; text-decoration-color: #727272">rows                  </span>26,977 total · 26,975 analyzed                          
+<span style="color: #727272; text-decoration-color: #727272">bandwidth peak        </span>total 256.00 GB/s · read 128.00 GB/s · write 128.00 GB/s
+<span style="color: #727272; text-decoration-color: #727272">full-window bandwid…  </span>138.24 GB/s                                             
+<span style="color: #727272; text-decoration-color: #727272">WSTRB                 </span>2,680 known · 0 partial · 0 unknown · 128 bits          
+
+<span style="font-weight: bold"> REQUEST / RESPONSE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Showing first 6 of 5,400 transactions with evidence in the window.</span>
+<span style="font-weight: bold">READ  ID=0x0  address=0xa0000000  beats=1  COMPLETED</span>
+  AR 1.00 µs  CSV line 3, seq 2, cycle 1000
+  R first 1.51 µs  CSV line 3075, seq 3074, cycle 1512
+  R response 1.51 µs  CSV line 3075, seq 3074, cycle 1512
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">WRITE  ID=0x0  address=0xb0000000  beats=1  COMPLETED</span>
+  AW 1.00 µs  CSV line 4, seq 3, cycle 1000
+  W first 1.00 µs  CSV line 5, seq 4, cycle 1000
+  B response 1.51 µs  CSV line 3076, seq 3075, cycle 1512
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">READ  ID=0x1  address=0xa0000080  beats=1  COMPLETED</span>
+  AR 1.00 µs  CSV line 9, seq 8, cycle 1001
+  R first 1.51 µs  CSV line 3085, seq 3084, cycle 1513
+  R response 1.51 µs  CSV line 3085, seq 3084, cycle 1513
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">WRITE  ID=0x1  address=0xb0000080  beats=1  COMPLETED</span>
+  AW 1.00 µs  CSV line 10, seq 9, cycle 1001
+  W first 1.00 µs  CSV line 11, seq 10, cycle 1001
+  B response 1.51 µs  CSV line 3086, seq 3085, cycle 1513
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">READ  ID=0x2  address=0xa0000100  beats=1  COMPLETED</span>
+  AR 1.00 µs  CSV line 15, seq 14, cycle 1002
+  R first 1.51 µs  CSV line 3095, seq 3094, cycle 1514
+  R response 1.51 µs  CSV line 3095, seq 3094, cycle 1514
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">WRITE  ID=0x2  address=0xb0000100  beats=1  COMPLETED</span>
+  AW 1.00 µs  CSV line 16, seq 15, cycle 1002
+  W first 1.00 µs  CSV line 17, seq 16, cycle 1002
+  B response 1.51 µs  CSV line 3096, seq 3095, cycle 1514
+  latency=512.00 ns  response=0
+
+<span style="color: #727272; text-decoration-color: #727272">Pairs and fields are existing analyzer evidence. Additional facts and links are in JSON / HTML.</span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report            </span>pvkit/examples/axi4/high_outstanding/traffic.pv.html                                            
+<span style="color: #727272; text-decoration-color: #727272">Tracker log            </span>pvkit/examples/axi4/high_outstanding/traffic.tracker.log                                        
+<span style="color: #727272; text-decoration-color: #727272">Analyze log            </span>pvkit/examples/axi4/high_outstanding/traffic.analyze.log                                        
+</pre></div><div class="panel" data-mode="compact" data-width="120" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic                                   <span style="color: #727272; text-decoration-color: #727272">                                                                AXI / CSV 2.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+5.00 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>26,977 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY                                BANDWIDTH                               OUTSTANDING                            </span>
+<span style="color: #727272; text-decoration-color: #727272">─────────                               ─────────                               ───────────                            </span>
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">66.24%                                </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 208.70 GB/s                     </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 560.94                             </span>
+<span style="color: #727272; text-decoration-color: #727272">idle 1.69 µs                          </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">R 105.12</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">W 103.57</span><span style="color: #727272; text-decoration-color: #727272"> GB/s</span>              <span style="color: #727272; text-decoration-color: #727272">peak 1,024                             </span>
+                                        <span style="color: #727272; text-decoration-color: #727272">peak 256.00 GB/s                      </span>                                         
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) [WSTRB]
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▁▁▁▁▁▁▁▁▁▁▇███████████████████████████████████▇▁▄██████████████████████</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">105.12 GB/s</span>
+                                                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">██████████████████████████▂▅██████▅█████████▇▃███████████████▁▁▁▁▁▁▁▁▁▁▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">103.57 GB/s</span>
+                                                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▂▃▃▄▅▅▆▇▇████████████████████████████▇▇▇▇▇▇▇▇▇▇██████████████▇▇▆▅▅▄▃▃▂▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">278.68     </span>
+                                                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▂▃▃▄▅▅▆▇▇████████████████████████▇▇▇▇████████████████████████▇▇▆▅▅▄▃▃▂▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">282.26     </span>
+
+<span style="font-weight: bold"> BACKPRESSURE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AW       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····································█░··································</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.90%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">W        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·······························░▒·······································</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">B        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···········································░▒···························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+                                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AR       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">······································░█░·······························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.86%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">R        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··············································▓░························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.30%</span>
+<span style="color: #727272; text-decoration-color: #727272">density  </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                                                    </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report            </span>pvkit/examples/axi4/high_outstanding/traffic.pv.html                                            
+<span style="color: #727272; text-decoration-color: #727272">Tracker log            </span>pvkit/examples/axi4/high_outstanding/traffic.tracker.log                                        
+<span style="color: #727272; text-decoration-color: #727272">Analyze log            </span>pvkit/examples/axi4/high_outstanding/traffic.analyze.log                                        
+</pre></div><div class="panel" data-mode="standard" data-width="80" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic                     <span style="color: #727272; text-decoration-color: #727272">                                      AXI / CSV 2.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+5.00 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>26,977 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY                 </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">66.24%                           </span> <span style="color: #727272; text-decoration-color: #727272">idle 1.69 µs        </span>
+<span style="font-weight: bold">BANDWIDTH                </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 208.70 GB/s                </span>                     
+<span style="font-weight: bold">                         </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 105.12 GB/s                 </span>                     
+<span style="font-weight: bold">                         </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 103.57 GB/s                </span>                     
+<span style="font-weight: bold">                         </span><span style="color: #727272; text-decoration-color: #727272">peak 256.00 GB/s                 </span>                     
+<span style="font-weight: bold">OUTSTANDING              </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 560.94                       </span> <span style="color: #727272; text-decoration-color: #727272">peak 1,024          </span>
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) [WSTRB]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write</span>
+   <span style="color: #727272; text-decoration-color: #727272">transactions   </span>2,680             
+   <span style="color: #727272; text-decoration-color: #727272">burst size     </span>128 B             
+   <span style="color: #727272; text-decoration-color: #727272">beats / txn    </span>1                 
+   <span style="color: #727272; text-decoration-color: #727272">WSTRB partial  </span>0 / 2,680  (0.00%)
+
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read</span>
+   <span style="color: #727272; text-decoration-color: #727272">transactions   </span>2,720
+   <span style="color: #727272; text-decoration-color: #727272">burst size     </span>128 B
+   <span style="color: #727272; text-decoration-color: #727272">beats / txn    </span>1    
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 526.60 ns  p50 512.00 ns  p95 572.00 ns  max 632.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 512.28 ns  p50 512.00 ns  p95 512.00 ns  max 576.00 ns
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▁▁▁▁▁▁▅███████████████████████▇▂▆██████████████</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">105.12 GB/s</span>
+                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">█████████████████▄▆███▆██████▇▅█████████▅▁▁▁▁▁▁▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">103.57 GB/s</span>
+                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▃▄▅▆▇████████████████████▇▇▇▇▇▇██████████▇▆▅▄▃▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">278.68     </span>
+                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▃▄▅▆▇█████████████████▇▇█████████████████▇▆▅▄▃▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">282.26     </span>
+
+<span style="font-weight: bold"> BACKPRESSURE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AW       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">························▓·······················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.90%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">W        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·····················▒··························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">B        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·····························▒··················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AR       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·························░▓·····················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.86%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">R        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">······························░░················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.30%</span>
+<span style="color: #727272; text-decoration-color: #727272">density  </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                            </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: </span>
+<span style="color: #727272; text-decoration-color: #727272">capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report    </span>pvkit/examples/axi4/high_outstanding/traffic.pv.html            
+<span style="color: #727272; text-decoration-color: #727272">Tracker log    </span>pvkit/examples/axi4/high_outstanding/traffic.tracker.log        
+<span style="color: #727272; text-decoration-color: #727272">Analyze log    </span>pvkit/examples/axi4/high_outstanding/traffic.analyze.log        
+</pre></div><div class="panel" data-mode="full" data-width="80" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic                     <span style="color: #727272; text-decoration-color: #727272">                                      AXI / CSV 2.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+5.00 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>26,977 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY                 </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">66.24%                           </span> <span style="color: #727272; text-decoration-color: #727272">idle 1.69 µs        </span>
+<span style="font-weight: bold">BANDWIDTH                </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 208.70 GB/s                </span>                     
+<span style="font-weight: bold">                         </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 105.12 GB/s                 </span>                     
+<span style="font-weight: bold">                         </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 103.57 GB/s                </span>                     
+<span style="font-weight: bold">                         </span><span style="color: #727272; text-decoration-color: #727272">peak 256.00 GB/s                 </span>                     
+<span style="font-weight: bold">OUTSTANDING              </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 560.94                       </span> <span style="color: #727272; text-decoration-color: #727272">peak 1,024          </span>
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) [WSTRB]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write</span>
+   <span style="color: #727272; text-decoration-color: #727272">transactions   </span>2,680             
+   <span style="color: #727272; text-decoration-color: #727272">burst size     </span>128 B             
+   <span style="color: #727272; text-decoration-color: #727272">beats / txn    </span>1                 
+   <span style="color: #727272; text-decoration-color: #727272">WSTRB partial  </span>0 / 2,680  (0.00%)
+
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read</span>
+   <span style="color: #727272; text-decoration-color: #727272">transactions   </span>2,720
+   <span style="color: #727272; text-decoration-color: #727272">burst size     </span>128 B
+   <span style="color: #727272; text-decoration-color: #727272">beats / txn    </span>1    
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 526.60 ns  p50 512.00 ns  p95 572.00 ns  max 632.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 512.28 ns  p50 512.00 ns  p95 512.00 ns  max 576.00 ns
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▁▁▁▁▁▁▅███████████████████████▇▂▆██████████████</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">105.12 GB/s</span>
+                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">█████████████████▄▆███▆██████▇▅█████████▅▁▁▁▁▁▁▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">103.57 GB/s</span>
+                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▃▄▅▆▇████████████████████▇▇▇▇▇▇██████████▇▆▅▄▃▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">278.68     </span>
+                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▃▄▅▆▇█████████████████▇▇█████████████████▇▆▅▄▃▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">282.26     </span>
+
+<span style="font-weight: bold"> BACKPRESSURE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AW       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">························▓·······················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.90%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">W        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·····················▒··························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">B        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·····························▒··················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AR       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·························░▓·····················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.86%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">R        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">······························░░················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.30%</span>
+<span style="color: #727272; text-decoration-color: #727272">density  </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                            </span>
+
+<span style="font-weight: bold"> DETAILS</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">measurement window    </span>0.00 ps → 5.00 µs · 5.00 µs                             
+<span style="color: #727272; text-decoration-color: #727272">bandwidth window      </span>1.00 µs → 4.31 µs · 3.31 µs · auto-active               
+<span style="color: #727272; text-decoration-color: #727272">transaction scope     </span>capture (latency / outstanding / backpressure)          
+<span style="color: #727272; text-decoration-color: #727272">rows                  </span>26,977 total · 26,975 analyzed                          
+<span style="color: #727272; text-decoration-color: #727272">bandwidth peak        </span>total 256.00 GB/s · read 128.00 GB/s · write 128.00 GB/s
+<span style="color: #727272; text-decoration-color: #727272">full-window bandwid…  </span>138.24 GB/s                                             
+<span style="color: #727272; text-decoration-color: #727272">WSTRB                 </span>2,680 known · 0 partial · 0 unknown · 128 bits          
+
+<span style="font-weight: bold"> REQUEST / RESPONSE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Showing first 6 of 5,400 transactions with evidence in the window.</span>
+<span style="font-weight: bold">READ  ID=0x0  address=0xa0000000  beats=1  COMPLETED</span>
+  AR 1.00 µs  CSV line 3, seq 2, cycle 1000
+  R first 1.51 µs  CSV line 3075, seq 3074, cycle 1512
+  R response 1.51 µs  CSV line 3075, seq 3074, cycle 1512
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">WRITE  ID=0x0  address=0xb0000000  beats=1  COMPLETED</span>
+  AW 1.00 µs  CSV line 4, seq 3, cycle 1000
+  W first 1.00 µs  CSV line 5, seq 4, cycle 1000
+  B response 1.51 µs  CSV line 3076, seq 3075, cycle 1512
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">READ  ID=0x1  address=0xa0000080  beats=1  COMPLETED</span>
+  AR 1.00 µs  CSV line 9, seq 8, cycle 1001
+  R first 1.51 µs  CSV line 3085, seq 3084, cycle 1513
+  R response 1.51 µs  CSV line 3085, seq 3084, cycle 1513
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">WRITE  ID=0x1  address=0xb0000080  beats=1  COMPLETED</span>
+  AW 1.00 µs  CSV line 10, seq 9, cycle 1001
+  W first 1.00 µs  CSV line 11, seq 10, cycle 1001
+  B response 1.51 µs  CSV line 3086, seq 3085, cycle 1513
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">READ  ID=0x2  address=0xa0000100  beats=1  COMPLETED</span>
+  AR 1.00 µs  CSV line 15, seq 14, cycle 1002
+  R first 1.51 µs  CSV line 3095, seq 3094, cycle 1514
+  R response 1.51 µs  CSV line 3095, seq 3094, cycle 1514
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">WRITE  ID=0x2  address=0xb0000100  beats=1  COMPLETED</span>
+  AW 1.00 µs  CSV line 16, seq 15, cycle 1002
+  W first 1.00 µs  CSV line 17, seq 16, cycle 1002
+  B response 1.51 µs  CSV line 3096, seq 3095, cycle 1514
+  latency=512.00 ns  response=0
+
+<span style="color: #727272; text-decoration-color: #727272">Pairs and fields are existing analyzer evidence. Additional facts and links are</span>
+<span style="color: #727272; text-decoration-color: #727272">in JSON / HTML.</span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: </span>
+<span style="color: #727272; text-decoration-color: #727272">capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report    </span>pvkit/examples/axi4/high_outstanding/traffic.pv.html            
+<span style="color: #727272; text-decoration-color: #727272">Tracker log    </span>pvkit/examples/axi4/high_outstanding/traffic.tracker.log        
+<span style="color: #727272; text-decoration-color: #727272">Analyze log    </span>pvkit/examples/axi4/high_outstanding/traffic.analyze.log        
+</pre></div><div class="panel" data-mode="compact" data-width="80" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic                     <span style="color: #727272; text-decoration-color: #727272">                                      AXI / CSV 2.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+5.00 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>26,977 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY                 </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">66.24%                           </span> <span style="color: #727272; text-decoration-color: #727272">idle 1.69 µs        </span>
+<span style="font-weight: bold">BANDWIDTH                </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 208.70 GB/s                </span>                     
+<span style="font-weight: bold">                         </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 105.12 GB/s                 </span>                     
+<span style="font-weight: bold">                         </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 103.57 GB/s                </span>                     
+<span style="font-weight: bold">                         </span><span style="color: #727272; text-decoration-color: #727272">peak 256.00 GB/s                 </span>                     
+<span style="font-weight: bold">OUTSTANDING              </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 560.94                       </span> <span style="color: #727272; text-decoration-color: #727272">peak 1,024          </span>
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) [WSTRB]
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▁▁▁▁▁▁▅███████████████████████▇▂▆██████████████</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">105.12 GB/s</span>
+                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">█████████████████▄▆███▆██████▇▅█████████▅▁▁▁▁▁▁▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">103.57 GB/s</span>
+                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▃▄▅▆▇████████████████████▇▇▇▇▇▇██████████▇▆▅▄▃▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">278.68     </span>
+                                                                           
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▂▃▄▅▆▇█████████████████▇▇█████████████████▇▆▅▄▃▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">282.26     </span>
+
+<span style="font-weight: bold"> BACKPRESSURE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AW       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">························▓·······················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.90%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">W        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·····················▒··························</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">B        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·····························▒··················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+                                                                   
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AR       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·························░▓·····················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.86%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">R        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">······························░░················</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.30%</span>
+<span style="color: #727272; text-decoration-color: #727272">density  </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                            </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: </span>
+<span style="color: #727272; text-decoration-color: #727272">capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report    </span>pvkit/examples/axi4/high_outstanding/traffic.pv.html            
+<span style="color: #727272; text-decoration-color: #727272">Tracker log    </span>pvkit/examples/axi4/high_outstanding/traffic.tracker.log        
+<span style="color: #727272; text-decoration-color: #727272">Analyze log    </span>pvkit/examples/axi4/high_outstanding/traffic.analyze.log        
+</pre></div><div class="panel" data-mode="standard" data-width="60" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic
+<span style="color: #727272; text-decoration-color: #727272">AXI / CSV 2.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+5.00 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>26,977 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY           </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">66.24%                  </span> <span style="color: #727272; text-decoration-color: #727272">idle 1.69 µs   </span>
+<span style="font-weight: bold">BANDWIDTH          </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 208.70 GB/s       </span>                
+<span style="font-weight: bold">                   </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 105.12 GB/s        </span>                
+<span style="font-weight: bold">                   </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 103.57 GB/s       </span>                
+<span style="font-weight: bold">                   </span><span style="color: #727272; text-decoration-color: #727272">peak 256.00 GB/s        </span>                
+<span style="font-weight: bold">OUTSTANDING        </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 560.94              </span> <span style="color: #727272; text-decoration-color: #727272">peak 1,024     </span>
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) 
+[WSTRB]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write</span>
+   <span style="color: #727272; text-decoration-color: #727272">transactions   </span>2,680             
+   <span style="color: #727272; text-decoration-color: #727272">burst size     </span>128 B             
+   <span style="color: #727272; text-decoration-color: #727272">beats / txn    </span>1                 
+   <span style="color: #727272; text-decoration-color: #727272">WSTRB partial  </span>0 / 2,680  (0.00%)
+
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read</span>
+   <span style="color: #727272; text-decoration-color: #727272">transactions   </span>2,720
+   <span style="color: #727272; text-decoration-color: #727272">burst size     </span>128 B
+   <span style="color: #727272; text-decoration-color: #727272">beats / txn    </span>1    
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 526.60 ns  p50 512.00 ns
+<span style="font-weight: bold">         </span>p95 572.00 ns  max 632.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 512.28 ns  p50 512.00 ns
+<span style="font-weight: bold">         </span>p95 512.00 ns  max 576.00 ns
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▁▁▁▅█████████████▅▆████████</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">105.12 GB/s</span>
+                                                       
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">██████████▄██▇███▆█████▆▁▁▁▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">103.57 GB/s</span>
+                                                       
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▃▄▆▇███████████▇▇▇██████▇▆▄▃</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">278.68     </span>
+                                                       
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▃▄▆▇█████████▇██████████▇▆▄▃</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">282.26     </span>
+
+<span style="font-weight: bold"> BACKPRESSURE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AW       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··············▒·············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.90%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">W        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">············░···············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">B        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·················░··········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+                                               
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AR       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···············▒············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.86%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">R        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·················░░·········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.30%</span>
+<span style="color: #727272; text-decoration-color: #727272">density  </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                        </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching </span>
+<span style="color: #727272; text-decoration-color: #727272">issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 </span>
+<span style="color: #727272; text-decoration-color: #727272">region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / </span>
+<span style="color: #727272; text-decoration-color: #727272">outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML r… </span>pvkit/examples/axi4/high_outstanding/traffic.pv.ht…
+<span style="color: #727272; text-decoration-color: #727272">Tracke… </span>pvkit/examples/axi4/high_outstanding/traffic.track…
+<span style="color: #727272; text-decoration-color: #727272">Analyz… </span>pvkit/examples/axi4/high_outstanding/traffic.analy…
+</pre></div><div class="panel" data-mode="full" data-width="60" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic
+<span style="color: #727272; text-decoration-color: #727272">AXI / CSV 2.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+5.00 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>26,977 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY           </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">66.24%                  </span> <span style="color: #727272; text-decoration-color: #727272">idle 1.69 µs   </span>
+<span style="font-weight: bold">BANDWIDTH          </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 208.70 GB/s       </span>                
+<span style="font-weight: bold">                   </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 105.12 GB/s        </span>                
+<span style="font-weight: bold">                   </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 103.57 GB/s       </span>                
+<span style="font-weight: bold">                   </span><span style="color: #727272; text-decoration-color: #727272">peak 256.00 GB/s        </span>                
+<span style="font-weight: bold">OUTSTANDING        </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 560.94              </span> <span style="color: #727272; text-decoration-color: #727272">peak 1,024     </span>
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) 
+[WSTRB]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write</span>
+   <span style="color: #727272; text-decoration-color: #727272">transactions   </span>2,680             
+   <span style="color: #727272; text-decoration-color: #727272">burst size     </span>128 B             
+   <span style="color: #727272; text-decoration-color: #727272">beats / txn    </span>1                 
+   <span style="color: #727272; text-decoration-color: #727272">WSTRB partial  </span>0 / 2,680  (0.00%)
+
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read</span>
+   <span style="color: #727272; text-decoration-color: #727272">transactions   </span>2,720
+   <span style="color: #727272; text-decoration-color: #727272">burst size     </span>128 B
+   <span style="color: #727272; text-decoration-color: #727272">beats / txn    </span>1    
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 526.60 ns  p50 512.00 ns
+<span style="font-weight: bold">         </span>p95 572.00 ns  max 632.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 512.28 ns  p50 512.00 ns
+<span style="font-weight: bold">         </span>p95 512.00 ns  max 576.00 ns
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▁▁▁▅█████████████▅▆████████</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">105.12 GB/s</span>
+                                                       
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">██████████▄██▇███▆█████▆▁▁▁▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">103.57 GB/s</span>
+                                                       
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▃▄▆▇███████████▇▇▇██████▇▆▄▃</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">278.68     </span>
+                                                       
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▃▄▆▇█████████▇██████████▇▆▄▃</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">282.26     </span>
+
+<span style="font-weight: bold"> BACKPRESSURE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AW       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··············▒·············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.90%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">W        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">············░···············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">B        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·················░··········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+                                               
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AR       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···············▒············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.86%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">R        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·················░░·········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.30%</span>
+<span style="color: #727272; text-decoration-color: #727272">density  </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                        </span>
+
+<span style="font-weight: bold"> DETAILS</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">measurement window    </span>0.00 ps → 5.00 µs · 5.00 µs          
+<span style="color: #727272; text-decoration-color: #727272">bandwidth window      </span>1.00 µs → 4.31 µs · 3.31 µs ·        
+<span style="color: #727272; text-decoration-color: #727272">                      </span>auto-active                          
+<span style="color: #727272; text-decoration-color: #727272">transaction scope     </span>capture (latency / outstanding /     
+<span style="color: #727272; text-decoration-color: #727272">                      </span>backpressure)                        
+<span style="color: #727272; text-decoration-color: #727272">rows                  </span>26,977 total · 26,975 analyzed       
+<span style="color: #727272; text-decoration-color: #727272">bandwidth peak        </span>total 256.00 GB/s · read 128.00 GB/s 
+<span style="color: #727272; text-decoration-color: #727272">                      </span>· write 128.00 GB/s                  
+<span style="color: #727272; text-decoration-color: #727272">full-window bandwid…  </span>138.24 GB/s                          
+<span style="color: #727272; text-decoration-color: #727272">WSTRB                 </span>2,680 known · 0 partial · 0 unknown ·
+<span style="color: #727272; text-decoration-color: #727272">                      </span>128 bits                             
+
+<span style="font-weight: bold"> REQUEST / RESPONSE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Showing first 6 of 5,400 transactions with evidence in the </span>
+<span style="color: #727272; text-decoration-color: #727272">window.</span>
+<span style="font-weight: bold">READ  ID=0x0  address=0xa0000000  beats=1  COMPLETED</span>
+  AR 1.00 µs  CSV line 3, seq 2, cycle 1000
+  R first 1.51 µs  CSV line 3075, seq 3074, cycle 1512
+  R response 1.51 µs  CSV line 3075, seq 3074, cycle 1512
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">WRITE  ID=0x0  address=0xb0000000  beats=1  COMPLETED</span>
+  AW 1.00 µs  CSV line 4, seq 3, cycle 1000
+  W first 1.00 µs  CSV line 5, seq 4, cycle 1000
+  B response 1.51 µs  CSV line 3076, seq 3075, cycle 1512
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">READ  ID=0x1  address=0xa0000080  beats=1  COMPLETED</span>
+  AR 1.00 µs  CSV line 9, seq 8, cycle 1001
+  R first 1.51 µs  CSV line 3085, seq 3084, cycle 1513
+  R response 1.51 µs  CSV line 3085, seq 3084, cycle 1513
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">WRITE  ID=0x1  address=0xb0000080  beats=1  COMPLETED</span>
+  AW 1.00 µs  CSV line 10, seq 9, cycle 1001
+  W first 1.00 µs  CSV line 11, seq 10, cycle 1001
+  B response 1.51 µs  CSV line 3086, seq 3085, cycle 1513
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">READ  ID=0x2  address=0xa0000100  beats=1  COMPLETED</span>
+  AR 1.00 µs  CSV line 15, seq 14, cycle 1002
+  R first 1.51 µs  CSV line 3095, seq 3094, cycle 1514
+  R response 1.51 µs  CSV line 3095, seq 3094, cycle 1514
+  latency=512.00 ns  response=0
+
+<span style="font-weight: bold">WRITE  ID=0x2  address=0xb0000100  beats=1  COMPLETED</span>
+  AW 1.00 µs  CSV line 16, seq 15, cycle 1002
+  W first 1.00 µs  CSV line 17, seq 16, cycle 1002
+  B response 1.51 µs  CSV line 3096, seq 3095, cycle 1514
+  latency=512.00 ns  response=0
+
+<span style="color: #727272; text-decoration-color: #727272">Pairs and fields are existing analyzer evidence. Additional</span>
+<span style="color: #727272; text-decoration-color: #727272">facts and links are in JSON / HTML.</span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching </span>
+<span style="color: #727272; text-decoration-color: #727272">issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 </span>
+<span style="color: #727272; text-decoration-color: #727272">region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / </span>
+<span style="color: #727272; text-decoration-color: #727272">outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML r… </span>pvkit/examples/axi4/high_outstanding/traffic.pv.ht…
+<span style="color: #727272; text-decoration-color: #727272">Tracke… </span>pvkit/examples/axi4/high_outstanding/traffic.track…
+<span style="color: #727272; text-decoration-color: #727272">Analyz… </span>pvkit/examples/axi4/high_outstanding/traffic.analy…
+</pre></div><div class="panel" data-mode="compact" data-width="60" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic
+<span style="color: #727272; text-decoration-color: #727272">AXI / CSV 2.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+5.00 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>26,977 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY           </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">66.24%                  </span> <span style="color: #727272; text-decoration-color: #727272">idle 1.69 µs   </span>
+<span style="font-weight: bold">BANDWIDTH          </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 208.70 GB/s       </span>                
+<span style="font-weight: bold">                   </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 105.12 GB/s        </span>                
+<span style="font-weight: bold">                   </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 103.57 GB/s       </span>                
+<span style="font-weight: bold">                   </span><span style="color: #727272; text-decoration-color: #727272">peak 256.00 GB/s        </span>                
+<span style="font-weight: bold">OUTSTANDING        </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 560.94              </span> <span style="color: #727272; text-decoration-color: #727272">peak 1,024     </span>
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) 
+[WSTRB]
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▁▁▁▅█████████████▅▆████████</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">105.12 GB/s</span>
+                                                       
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">██████████▄██▇███▆█████▆▁▁▁▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">103.57 GB/s</span>
+                                                       
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▃▄▆▇███████████▇▇▇██████▇▆▄▃</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">278.68     </span>
+                                                       
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▃▄▆▇█████████▇██████████▇▆▄▃</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">282.26     </span>
+
+<span style="font-weight: bold"> BACKPRESSURE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AW       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··············▒·············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.90%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">W        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">············░···············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">B        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·················░··········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.19%</span>
+                                               
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">AR       </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···············▒············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.86%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">R        </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·················░░·········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  2.30%</span>
+<span style="color: #727272; text-decoration-color: #727272">density  </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                        </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching </span>
+<span style="color: #727272; text-decoration-color: #727272">issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 </span>
+<span style="color: #727272; text-decoration-color: #727272">region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / </span>
+<span style="color: #727272; text-decoration-color: #727272">outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML r… </span>pvkit/examples/axi4/high_outstanding/traffic.pv.ht…
+<span style="color: #727272; text-decoration-color: #727272">Tracke… </span>pvkit/examples/axi4/high_outstanding/traffic.track…
+<span style="color: #727272; text-decoration-color: #727272">Analyz… </span>pvkit/examples/axi4/high_outstanding/traffic.analy…
+</pre></div></div>
+<div class="links"><a id="txt" href="captures/standard.120.txt">当前输出纯文本</a><a id="ansi" href="captures/standard.120.ansi" download>下载 ANSI</a></div>
+<p>使用已有的 xpvkit 0.5.5 工具，从仓库根目录复现（Rich 为彩色 TUI 的可选依赖）：</p>
+<pre class="command" id="command">python xpv.pyz analyze pvkit/examples/axi4/high_outstanding/traffic.csv --report-mode standard --trend all</pre>
+<p>默认带宽按实际数据活动窗口计算；事务、延迟与诊断保留完整 capture 范围。TUI 是输出式报告，鼠标选窗与事务查询请打开交互 HTML。</p><footer>PVKit demo · xpvkit 0.5.5 · 合成示例数据</footer></main><script src="../../../../assets/tui.js"></script></body></html>

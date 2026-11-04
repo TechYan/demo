@@ -1,0 +1,38 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                                                                 CXL Native / CSV cxl-native-1.0
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+200.00 µs  ·  4,254 rows  ·  integrity OK
+
+ACTIVITY                      BANDWIDTH                     OUTSTANDING                   CREDIT EMPTY                 
+─────────                     ─────────                     ───────────                   ────────────                 
+10.12%                        total 5.69 GB/s               avg 0.36                      worst 0.24%                  
+idle 179.75 µs                R 3.10  ·  W 2.59 GB/s        peak 4                        M2S_RWD[0] · 160 interval(s) 
+                              peak 0.64 GB/s                                                                           
+Partial write: 0.00% (0 / 820 known messages; 0 unknown) [partial-write opcode]
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Read BW   ███████████████████████▇█████████████████████████▇██████████████████████  avg 3.10 GB/s
+                                                                                                 
+Write BW  ▇▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇▇█  avg 2.59 GB/s
+                                                                                                 
+Read OS   ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  avg 0.20     
+                                                                                                 
+Write OS  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▅██▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  avg 0.16     
+
+ CREDIT EMPTY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+M2S_RWD[0]     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░···    0.24%
+S2M_DRC[1]     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░···    0.24%
+density        low ░▒▓█ high                                                                    
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Active window  20.00 ns → 195.66 µs  ·  auto-active  ·  490 regions
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture
+HTML report           pvkit/examples/cxl_native/short_pulses/traffic.pv.html                                           
+Tracker log           pvkit/examples/cxl_native/short_pulses/traffic.tracker.log                                       
+Analyze log           pvkit/examples/cxl_native/short_pulses/traffic.analyze.log                                       

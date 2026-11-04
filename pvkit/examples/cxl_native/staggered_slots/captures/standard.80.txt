@@ -1,0 +1,75 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                         CXL Native / CSV cxl-native-1.0
+──────────────────────────────────────────────────────────────────────────────
+1.50 µs  ·  2,598 rows  ·  integrity OK
+
+ACTIVITY           87.60%                    idle 186.00 ns                    
+BANDWIDTH          total 62.34 GB/s                                            
+                   read 31.17 GB/s                                             
+                   write 31.17 GB/s                                            
+                   peak 98.91 GB/s                                             
+OUTSTANDING        avg 35.79                 peak 58                           
+CREDIT EMPTY       worst 24.00%              S2M_DRC[0] · 6 interval(s)        
+Partial write: 0.00% (0 / 640 known messages; 0 unknown) [partial-write opcode]
+
+ TRAFFIC
+ ─────────────────────────────────────────────────────────────────────────────
+Write     transactions    640  /  40,960 B useful payload
+Read      transactions    640  /  40,960 B useful payload
+          partial BE                     0 / 640  (0.00%)
+
+CHANNEL        MESSAGES           RATE  TOP OPCODES
+M2S_REQ             640  426.67 Mmsg/s  MemRd 640  
+M2S_RWD             640  426.67 Mmsg/s  MemWr 640  
+S2M_NDR             640  426.67 Mmsg/s  Cmp 640    
+S2M_DRC             640  426.67 Mmsg/s  MemData 640
+
+ LATENCY
+ ─────────────────────────────────────────────────────────────────────────────
+Write    avg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+Read     avg 43.88 ns  p50 41.00 ns  p95 61.00 ns  max 68.00 ns
+
+ INITIALIZATION
+ ─────────────────────────────────────────────────────────────────────────────
+mem_mst     IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+            1.46 µs  ·  DEINIT 1.46 µs → 1.48 µs  ·  IDLE 1.48 µs → 1.50 µs    
+mem_slv     IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+            1.46 µs  ·  DEINIT 1.46 µs → 1.48 µs  ·  IDLE 1.48 µs → 1.50 µs    
+
+ MESSAGE SLOT USAGE
+ ─────────────────────────────────────────────────────────────────────────────
+ Channel      Messages      Used / configured         Peak simultaneous        
+ M2S_REQ      640           4 / 4                     4                        
+ M2S_RWD      640           2 / 2                     2                        
+ S2M_NDR      638           6 / 6                     2                        
+ S2M_DRC      640           2 / 2                     2                        
+Issued messages in the statistics window; peak counts distinct slots at one 
+timestamp. These are message slots, not inferred buffer lifetimes.
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────
+Read BW   ▁▃▅▅▅▄▄▇▅▅▅▅▂▇▅▅▅▅▅▃█▅▅▅▅▂▇▇▄▅▅▅▂█▅▅▅▅▂▆▇▅▅▅▄▅▅▅  avg 31.17 GB/s
+                                                                          
+Write BW  ▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▃▁  avg 31.17 GB/s
+                                                                          
+Read OS   ▄▅▅▆▆▆█▆▅▆▅▅██▅▆▅▅▅█▆▅▆▅▅█▇▅▆▅▅▆▇▇▅▆▅▅▇█▅▆▅▅▆▅▅▃  avg 18.72     
+                                                                          
+Write OS  ▄▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▃  avg 17.07     
+
+ CREDIT EMPTY
+ ─────────────────────────────────────────────────────────────────────────────
+S2M_DRC[0]     ····▒█▒···▓█░···█▓···░█▓···▒█▒···▓█░············   24.00%
+S2M_DRC[1]     ·····▒█▒···▒█░···▓█░··░█▓···▒█▒···▒█░···········   24.00%
+density        low ░▒▓█ high                                            
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────
+Active window  20.00 ns → 1.33 µs  ·  auto-active  ·  1 region
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: 
+capture
+HTML report   pvkit/examples/cxl_native/staggered_slots/traffic.pv.html        
+Tracker log   pvkit/examples/cxl_native/staggered_slots/traffic.tracker.log    
+Analyze log   pvkit/examples/cxl_native/staggered_slots/traffic.analyze.log    

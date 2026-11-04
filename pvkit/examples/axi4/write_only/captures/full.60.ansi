@@ -1,0 +1,117 @@
+[1mXPVKIT[0m[2m  ·  [0m[1;92mPV SUMMARY[0m
+traffic
+[2mAXI / CSV 2.0[0m
+[2m──────────────────────────────────────────────────────────[0m
+20.00 µs[2m  ·  [0m473 rows[2m  ·  [0m[32mintegrity OK[0m
+
+[1mACTIVITY          [0m[1m [0m[1;92m85.56%                  [0m [2midle 2.89 µs   [0m
+[1mBANDWIDTH         [0m[1m [0m[1;92mtotal 0.29 GB/s         [0m                
+[1m                  [0m[1m [0m[1;95mwrite 0.29 GB/s         [0m                
+[1m                  [0m[1m [0m[2mpeak 0.74 GB/s          [0m                
+[1mOUTSTANDING       [0m[1m [0m[1;92mavg 0.29                [0m [2mpeak 1         [0m
+Partial write: 0.00% (0 / 156 known beats; 0 unknown) 
+[WSTRB]
+
+[1m TRAFFIC[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[1;95mWrite[0m
+   [2mtransactions  [0m[2m [0m39              
+   [2mburst size    [0m[2m [0m128 B           
+   [2mbeats / txn   [0m[2m [0m4               
+   [2mWSTRB partial [0m[2m [0m0 / 156  (0.00%)
+
+[1m LATENCY[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[1;95mWrite  [0m[1m  [0mavg 148.54 ns  p50 137.00 ns
+[1m       [0m[1m  [0mp95 187.00 ns  max 187.00 ns
+
+[1m PV TREND[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[37mWrite BW [0m [37m█▄▅▆▅▆▅▄▅▆▅▆▅▄▆▅▆▅▄▅▆▅▆▅▄▅▆▆[0m[2;37m  avg [0m[37m0.29 GB/s[0m
+                                                     
+[37mWrite OS [0m [37m████████████▁████▁█████▁████[0m[2;37m  avg [0m[37m0.29     [0m
+
+[1m BACKPRESSURE[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[37mAW       [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[37mW        [0m [37m·············░··············[0m[2;37m  [0m[37m 47.14%[0m
+[37mB        [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[2mdensity  [0m [2mlow ░▒▓█ high                        [0m
+
+[1m DETAILS[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[2mmeasurement window  [0m[2m  [0m0.00 ps → 20.00 µs · 20.00 µs        
+[2mbandwidth window    [0m[2m  [0m520.00 ns → 17.63 µs · 17.11 µs ·    
+[2m                      [0mauto-active                          
+[2mtransaction scope   [0m[2m  [0mcapture (latency / outstanding /     
+[2m                      [0mbackpressure)                        
+[2mrows                [0m[2m  [0m473 total · 467 analyzed             
+[2mbandwidth peak      [0m[2m  [0mtotal 0.74 GB/s · read 0.00 GB/s ·   
+[2m                      [0mwrite 0.74 GB/s                      
+[2mfull-window bandwid…[0m[2m  [0m0.25 GB/s                            
+[2mWSTRB               [0m[2m  [0m156 known · 0 partial · 0 unknown ·  
+[2m                      [0m32 bits                              
+
+[1m REQUEST / RESPONSE[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[2mShowing first 6 of 39 transactions with evidence in the [0m
+[2mwindow.[0m
+[1mWRITE  ID=0x0  address=0x90003e80  beats=4  COMPLETED[0m
+  AW 500.00 ns  CSV line 3, seq 2, cycle 500 
+(outside-window context)
+  W first 520.00 ns  CSV line 5, seq 4, cycle 520
+  W last 532.00 ns  CSV line 11, seq 10, cycle 532
+  B response 612.00 ns  CSV line 13, seq 12, cycle 612
+  latency=112.00 ns  response=0
+
+[1mWRITE  ID=0x1  address=0x900086c0  beats=4  COMPLETED[0m
+  AW 950.00 ns  CSV line 15, seq 14, cycle 950
+  W first 970.00 ns  CSV line 17, seq 16, cycle 970
+  W last 982.00 ns  CSV line 23, seq 22, cycle 982
+  B response 1.09 µs  CSV line 25, seq 24, cycle 1087
+  latency=137.00 ns  response=0
+
+[1mWRITE  ID=0x2  address=0x9000cf00  beats=4  COMPLETED[0m
+  AW 1.40 µs  CSV line 27, seq 26, cycle 1400
+  W first 1.42 µs  CSV line 29, seq 28, cycle 1420
+  W last 1.43 µs  CSV line 35, seq 34, cycle 1432
+  B response 1.56 µs  CSV line 37, seq 36, cycle 1562
+  latency=162.00 ns  response=0
+
+[1mWRITE  ID=0x3  address=0x90011740  beats=4  COMPLETED[0m
+  AW 1.85 µs  CSV line 39, seq 38, cycle 1850
+  W first 1.87 µs  CSV line 41, seq 40, cycle 1870
+  W last 1.88 µs  CSV line 47, seq 46, cycle 1882
+  B response 2.04 µs  CSV line 49, seq 48, cycle 2037
+  latency=187.00 ns  response=0
+
+[1mWRITE  ID=0x4  address=0x90015f80  beats=4  COMPLETED[0m
+  AW 2.30 µs  CSV line 51, seq 50, cycle 2300
+  W first 2.32 µs  CSV line 53, seq 52, cycle 2320
+  W last 2.33 µs  CSV line 59, seq 58, cycle 2332
+  B response 2.41 µs  CSV line 61, seq 60, cycle 2412
+  latency=112.00 ns  response=0
+
+[1mWRITE  ID=0x5  address=0x9001a7c0  beats=4  COMPLETED[0m
+  AW 2.75 µs  CSV line 63, seq 62, cycle 2750
+  W first 2.77 µs  CSV line 65, seq 64, cycle 2770
+  W last 2.78 µs  CSV line 71, seq 70, cycle 2782
+  B response 2.89 µs  CSV line 73, seq 72, cycle 2887
+  latency=137.00 ns  response=0
+
+[2mPairs and fields are existing analyzer evidence. Additional[0m
+[2mfacts and links are in JSON / HTML.[0m
+
+[1m INTEGRITY[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[2mProtocol checks  [0m[2;32mOK[0m[2m  no structural or transaction-matching [0m
+[2missues detected[0m
+
+[2m──────────────────────────────────────────────────────────[0m
+[2mActive window  520.00 ns → 17.63 µs  ·  auto-active  ·  1 [0m
+[2mregion[0m
+[2mBandwidth: accepted-data; transactions / latency / [0m
+[2moutstanding / backpressure: capture[0m
+[2mHTML repo…[0m[2m [0mpvkit/examples/axi4/write_only/traffic.pv.html  
+[2mTracker l…[0m[2m [0mpvkit/examples/axi4/write_only/traffic.tracker.…
+[2mAnalyze l…[0m[2m [0mpvkit/examples/axi4/write_only/traffic.analyze.…

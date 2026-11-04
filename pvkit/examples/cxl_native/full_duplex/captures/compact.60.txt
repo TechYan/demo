@@ -1,0 +1,39 @@
+XPVKIT  ·  PV SUMMARY
+traffic
+CXL Native / CSV cxl-native-1.0
+──────────────────────────────────────────────────────────
+940.00 ns  ·  6,412 rows  ·  integrity OK
+
+ACTIVITY        89.36%              idle 100.00 ns         
+BANDWIDTH       total 243.81 GB/s                          
+                read 121.90 GB/s                           
+                write 121.90 GB/s                          
+                peak 256.00 GB/s                           
+OUTSTANDING     avg 136.17          peak 160               
+CREDIT EMPTY    worst 0.00%         no exhaustion recorded 
+Partial write: 0.00% (0 / 1,600 known messages; 0 unknown) 
+[partial-write opcode]
+
+ PV TREND
+ ─────────────────────────────────────────────────────────
+Read BW   ▁▅██████████████████████████  avg 121.90 GB/s
+                                                       
+Write BW  ██████████████████████████▇▁  avg 121.90 GB/s
+                                                       
+Read OS   ▆██████████████████████████▆  avg 68.09      
+                                                       
+Write OS  ▆██████████████████████████▆  avg 68.09      
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching 
+issues detected
+
+──────────────────────────────────────────────────────────
+Active window  20.00 ns → 860.00 ns  ·  auto-active  ·  1 
+region
+Bandwidth: accepted-data; transactions / latency / 
+outstanding / backpressure: capture
+HTML … pvkit/examples/cxl_native/full_duplex/traffic.pv.ht…
+Track… pvkit/examples/cxl_native/full_duplex/traffic.track…
+Analy… pvkit/examples/cxl_native/full_duplex/traffic.analy…

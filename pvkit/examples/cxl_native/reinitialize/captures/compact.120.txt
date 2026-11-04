@@ -1,0 +1,32 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                                                                 CXL Native / CSV cxl-native-1.0
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+960.00 ns  ·  2,428 rows  ·  integrity OK
+
+ACTIVITY                      BANDWIDTH                     OUTSTANDING                   CREDIT EMPTY                 
+─────────                     ─────────                     ───────────                   ────────────                 
+41.67%                        total 192.00 GB/s             avg 25.00                     worst 0.00%                  
+idle 560.00 ns                R 96.00  ·  W 96.00 GB/s      peak 80                       no exhaustion recorded       
+                              peak 256.00 GB/s                                                                         
+Partial write: 0.00% (0 / 600 known messages; 0 unknown) [partial-write opcode]
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Read BW   ▁▃█████▁▁▁▁▁▁▁▁▁▁▁▆████▁▁▁▁▁▁▁▁▁▁▁▃████▅▁▁▁▁▁▁▁▁▁▁▁▆████▁▁▁▁▁▁▁▁▁▁▁▅████  avg 96.00 GB/s
+                                                                                                  
+Write BW  █████▃▁▁▁▁▁▁▁▁▁▁▁████▅▁▁▁▁▁▁▁▁▁▁▁████▆▁▁▁▁▁▁▁▁▁▁▁▅████▃▁▁▁▁▁▁▁▁▁▁▁████▆▁  avg 96.00 GB/s
+                                                                                                  
+Read OS   ▄████▆▁▁▁▁▁▁▁▁▁▁▁▇███▆▃▁▁▁▁▁▁▁▁▁▁▄████▃▁▁▁▁▁▁▁▁▁▁▄▇███▆▁▁▁▁▁▁▁▁▁▁▁▇████▃  avg 12.50     
+                                                                                                  
+Write OS  ▄████▆▁▁▁▁▁▁▁▁▁▁▁▇███▆▃▁▁▁▁▁▁▁▁▁▁▄████▃▁▁▁▁▁▁▁▁▁▁▄▇███▆▁▁▁▁▁▁▁▁▁▁▁▇████▃  avg 12.50     
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Active window  20.00 ns → 900.00 ns  ·  auto-active  ·  5 regions
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture
+HTML report           pvkit/examples/cxl_native/reinitialize/traffic.pv.html                                           
+Tracker log           pvkit/examples/cxl_native/reinitialize/traffic.tracker.log                                       
+Analyze log           pvkit/examples/cxl_native/reinitialize/traffic.analyze.log                                       

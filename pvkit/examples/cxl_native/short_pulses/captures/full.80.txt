@@ -1,0 +1,162 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                         CXL Native / CSV cxl-native-1.0
+──────────────────────────────────────────────────────────────────────────────
+200.00 µs  ·  4,254 rows  ·  integrity OK
+
+ACTIVITY           10.12%                   idle 179.75 µs                     
+BANDWIDTH          total 5.69 GB/s                                             
+                   read 3.10 GB/s                                              
+                   write 2.59 GB/s                                             
+                   peak 0.64 GB/s                                              
+OUTSTANDING        avg 0.36                 peak 4                             
+CREDIT EMPTY       worst 0.24%              M2S_RWD[0] · 160 interval(s)       
+Partial write: 0.00% (0 / 820 known messages; 0 unknown) [partial-write opcode]
+
+ TRAFFIC
+ ─────────────────────────────────────────────────────────────────────────────
+Write     transactions    820  /  52,480 B useful payload
+Read      transactions    980  /  62,720 B useful payload
+          partial BE                     0 / 820  (0.00%)
+
+CHANNEL        MESSAGES           RATE  TOP OPCODES
+M2S_REQ             980    4.90 Mmsg/s  MemRd 980  
+M2S_RWD             820    4.10 Mmsg/s  MemWr 820  
+S2M_NDR             820    4.10 Mmsg/s  Cmp 820    
+S2M_DRC             980    4.90 Mmsg/s  MemData 980
+
+ LATENCY
+ ─────────────────────────────────────────────────────────────────────────────
+Write    avg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+Read     avg 40.16 ns  p50 40.00 ns  p95 41.00 ns  max 41.00 ns
+
+ INITIALIZATION
+ ─────────────────────────────────────────────────────────────────────────────
+mem_mst     IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+            199.96 µs  ·  DEINIT 199.96 µs → 199.98 µs  ·  IDLE 199.98 µs →    
+            200.00 µs                                                          
+mem_slv     IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+            199.96 µs  ·  DEINIT 199.96 µs → 199.98 µs  ·  IDLE 199.98 µs →    
+            200.00 µs                                                          
+
+ MESSAGE SLOT USAGE
+ ─────────────────────────────────────────────────────────────────────────────
+ Channel      Messages      Used / configured         Peak simultaneous        
+ M2S_REQ      980           2 / 4                     2                        
+ M2S_RWD      820           2 / 2                     2                        
+ S2M_NDR      820           6 / 6                     2                        
+ S2M_DRC      980           2 / 2                     2                        
+M2S_REQ  S0=490  S1=490  S2=0  S3=0
+M2S_RWD  S0=330  S1=490
+S2M_NDR  S0=137  S1=137  S2=137  S3=137  S4=136  S5=136
+S2M_DRC  S0=618  S1=362
+Issued messages in the statistics window; peak counts distinct slots at one 
+timestamp. These are message slots, not inferred buffer lifetimes.
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────
+Read BW   ███████████████▇█████████████████▇██████████████  avg 3.10 GB/s
+                                                                         
+Write BW  ▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇█  avg 2.59 GB/s
+                                                                         
+Read OS   ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁▁▁▁▁▁▁  avg 0.20     
+                                                                         
+Write OS  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▅█▅▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁▁▁▁▁▁▁  avg 0.16     
+
+ CREDIT EMPTY
+ ─────────────────────────────────────────────────────────────────────────────
+M2S_RWD[0]     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░··    0.24%
+S2M_DRC[1]     ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░··    0.24%
+density        low ░▒▓█ high                                            
+
+ DETAILS
+ ─────────────────────────────────────────────────────────────────────────────
+measurement window    0.00 ps → 200.00 µs · 200.00 µs                          
+bandwidth window      20.00 ns → 195.66 µs · 20.25 µs · auto-active            
+transaction scope     capture (latency / outstanding / backpressure)           
+rows                  4,254 total · 4,144 analyzed                             
+profile               cxl3_256b_non_pbr_1024                                   
+message slots         M2S_REQ 4 · M2S_RWD 2 · S2M_NDR 6 · S2M_DRC 2 · M2S_BIRSP
+                      0 · S2M_BISNP 0                                          
+bandwidth peak        total 0.64 GB/s · read 0.32 GB/s · write 0.32 GB/s       
+full-window bandwid…  0.58 GB/s                                                
+byte enable           820 known · 0 partial · 0 unknown · 64 bits              
+
+ REQUEST / RESPONSE
+ ─────────────────────────────────────────────────────────────────────────────
+Showing first 6 of 1,800 request groups intersecting the window.
+REQ M2S_REQ[0]  MemRd  20.00 ns
+  opcode_raw=0x1  tag=0x1000  ld_id=0x0  ckid=0x0  tc=0x0  address=0x40000000  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  data_xz=0
+  CSV line 9, seq 8, cycle 20; MemRd 64 B
+RSP S2M_DRC[0]  MemData  60.00 ns
+  opcode_raw=0x0  tag=0x1000  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+poison=0  trp=0  devload=0x0  data_xz=0
+  CSV line 13, seq 12, cycle 60; MemData 64 B
+  relation=drs  latency=40.00 ns
+
+REQ M2S_REQ[1]  MemRd  20.00 ns
+  opcode_raw=0x1  tag=0x1001  ld_id=0x0  ckid=0x1  tc=0x1  address=0x40000040  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  data_xz=0
+  CSV line 10, seq 9, cycle 20; MemRd 64 B
+RSP S2M_DRC[1]  MemData  60.00 ns
+  opcode_raw=0x0  tag=0x1001  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+poison=0  trp=0  devload=0x1  data_xz=0
+  CSV line 14, seq 13, cycle 60; MemData 64 B
+  relation=drs  latency=40.00 ns
+
+REQ M2S_RWD[0]  MemWr  20.00 ns
+  opcode_raw=0x1  tag=0x8000  ld_id=0x0  ckid=0x0  tc=0x0  address=0x80000000  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  byte_enable=0xffffffffffffffff  
+poison=0  trp=0  data_xz=0
+  CSV line 11, seq 10, cycle 20; MemWr 64 B
+RSP S2M_NDR[0]  Cmp  60.00 ns
+  opcode_raw=0x0  tag=0x8000  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+devload=0x0  data_xz=0
+  CSV line 15, seq 14, cycle 60; Cmp
+  relation=ndr  latency=40.00 ns
+
+REQ M2S_RWD[1]  MemWr  20.00 ns
+  opcode_raw=0x1  tag=0x8001  ld_id=0x0  ckid=0x1  tc=0x1  address=0x80000040  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  byte_enable=0xffffffffffffffff  
+poison=0  trp=0  data_xz=0
+  CSV line 12, seq 11, cycle 20; MemWr 64 B
+RSP S2M_NDR[1]  Cmp  60.00 ns
+  opcode_raw=0x0  tag=0x8001  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+devload=0x1  data_xz=0
+  CSV line 16, seq 15, cycle 60; Cmp
+  relation=ndr  latency=40.00 ns
+
+REQ M2S_REQ[0]  MemRd  420.00 ns
+  opcode_raw=0x1  tag=0x1002  ld_id=0x0  ckid=0x2  tc=0x2  address=0x40000080  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  data_xz=0
+  CSV line 20, seq 19, cycle 420; MemRd 64 B
+RSP S2M_DRC[0]  MemData  460.00 ns
+  opcode_raw=0x0  tag=0x1002  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+poison=0  trp=0  devload=0x2  data_xz=0
+  CSV line 24, seq 23, cycle 460; MemData 64 B
+  relation=drs  latency=40.00 ns
+
+REQ M2S_REQ[1]  MemRd  420.00 ns
+  opcode_raw=0x1  tag=0x1003  ld_id=0x0  ckid=0x3  tc=0x3  address=0x400000c0  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  data_xz=0
+  CSV line 21, seq 20, cycle 420; MemRd 64 B
+RSP S2M_DRC[1]  MemData  460.00 ns
+  opcode_raw=0x0  tag=0x1003  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+poison=0  trp=0  devload=0x3  data_xz=0
+  CSV line 25, seq 24, cycle 460; MemData 64 B
+  relation=drs  latency=40.00 ns
+
+Pairs and fields are existing analyzer evidence. Additional facts and links are
+in JSON / HTML.
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────
+Active window  20.00 ns → 195.66 µs  ·  auto-active  ·  490 regions
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: 
+capture
+HTML report    pvkit/examples/cxl_native/short_pulses/traffic.pv.html          
+Tracker log    pvkit/examples/cxl_native/short_pulses/traffic.tracker.log      
+Analyze log    pvkit/examples/cxl_native/short_pulses/traffic.analyze.log      

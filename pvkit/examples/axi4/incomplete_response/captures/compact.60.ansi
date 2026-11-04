@@ -1,0 +1,48 @@
+[1mXPVKIT[0m[2m  ·  [0m[1;92mPV SUMMARY[0m
+traffic
+[2mAXI / CSV 2.0[0m
+[2m──────────────────────────────────────────────────────────[0m
+5.00 µs[2m  ·  [0m28 rows[2m  ·  [0m[31mintegrity 2 issues[0m
+
+[1mACTIVITY          [0m[1m [0m[1;92m0.40%                   [0m [2midle 4.98 µs   [0m
+[1mBANDWIDTH         [0m[1m [0m[1;92mtotal 12.80 GB/s        [0m                
+[1m                  [0m[1m [0m[1;92mread 6.40 GB/s          [0m                
+[1m                  [0m[1m [0m[1;95mwrite 6.40 GB/s         [0m                
+[1m                  [0m[1m [0m[2mpeak 0.52 GB/s          [0m                
+[1mOUTSTANDING       [0m[1m [0m[1;92mavg 1.00                [0m [2mpeak 2         [0m
+Partial write: 0.00% (0 / 4 known beats; 0 unknown) [WSTRB]
+
+[1m PV TREND[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[37mRead BW  [0m [37m▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█[0m[2;37m  avg [0m[37m6.40 GB/s[0m
+                                                     
+[37mWrite BW [0m [37m██▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁▁[0m[2;37m  avg [0m[37m6.40 GB/s[0m
+                                                     
+[37mRead OS  [0m [37m▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█[0m[2;37m  avg [0m[37m0.42     [0m
+                                                     
+[37mWrite OS [0m [37m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██████████[0m[2;37m  avg [0m[37m0.58     [0m
+
+[1m BACKPRESSURE[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[37mAW       [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[37mW        [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[37mB        [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+                                               
+[37mAR       [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[37mR        [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[2mdensity  [0m [2mlow ░▒▓█ high                        [0m
+
+[1m INTEGRITY[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[31mProtocol checks  2 issues[0m
+[31m  - 1 write transactions remain outstanding at window end[0m
+[31m  - 1 read transactions remain outstanding at window end[0m
+
+[2m──────────────────────────────────────────────────────────[0m
+[2mActive window  420.00 ns → 3.08 µs  ·  auto-active  ·  4 [0m
+[2mregions[0m
+[2mBandwidth: accepted-data; transactions / latency / [0m
+[2moutstanding / backpressure: capture[0m
+[2mHTML …[0m[2m [0mpvkit/examples/axi4/incomplete_response/traffic.pv.…
+[2mTrack…[0m[2m [0mpvkit/examples/axi4/incomplete_response/traffic.tra…
+[2mAnaly…[0m[2m [0mpvkit/examples/axi4/incomplete_response/traffic.ana…

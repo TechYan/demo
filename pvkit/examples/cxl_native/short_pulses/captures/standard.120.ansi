@@ -1,0 +1,72 @@
+[1mXPVKIT[0m[2m  ·  [0m[1;92mPV SUMMARY[0m
+traffic               [2m                                                                  CXL Native / CSV cxl-native-1.0[0m
+[2m──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+200.00 µs[2m  ·  [0m4,254 rows[2m  ·  [0m[32mintegrity OK[0m
+
+[1mACTIVITY                    [0m[1m  [0m[1mBANDWIDTH                   [0m[1m  [0m[1mOUTSTANDING                 [0m[1m  [0m[1mCREDIT EMPTY                 [0m
+[2m─────────                   [0m[2m  [0m[2m─────────                   [0m[2m  [0m[2m───────────                 [0m[2m  [0m[2m────────────                 [0m
+[1;92m10.12%                      [0m  [1;92mtotal 5.69 GB/s             [0m  [1;92mavg 0.36                    [0m  [1;92mworst 0.24%                  [0m
+[2midle 179.75 µs              [0m  [1;92mR 3.10[0m[2m  ·  [0m[1;95mW 2.59[0m[2m GB/s[0m        [2mpeak 4                      [0m  [2mM2S_RWD[0] · 160 interval(s) [0m
+                              [2mpeak 0.64 GB/s              [0m                                                             
+Partial write: 0.00% (0 / 820 known messages; 0 unknown) [partial-write opcode]
+
+[1m TRAFFIC[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;95mWrite   [0m  [2mtransactions  [0m[2m  [0m820  /  52,480 B useful payload
+[1;92mRead    [0m  [2mtransactions  [0m[2m  [0m980  /  62,720 B useful payload
+          [2mpartial BE    [0m[2m  [0m               0 / 820  (0.00%)
+
+[1mCHANNEL    [0m[1m  [0m  MESSAGES  [2m         RATE[0m[2m  [0mTOP OPCODES
+[1mM2S_REQ    [0m[1m  [0m       980  [2m  4.90 Mmsg/s[0m[2m  [0mMemRd 980  
+[1mM2S_RWD    [0m[1m  [0m       820  [2m  4.10 Mmsg/s[0m[2m  [0mMemWr 820  
+[1mS2M_NDR    [0m[1m  [0m       820  [2m  4.10 Mmsg/s[0m[2m  [0mCmp 820    
+[1mS2M_DRC    [0m[1m  [0m       980  [2m  4.90 Mmsg/s[0m[2m  [0mMemData 980
+
+[1m LATENCY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;95mWrite  [0m[1m  [0mavg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+[1;92mRead   [0m[1m  [0mavg 40.16 ns  p50 40.00 ns  p95 41.00 ns  max 41.00 ns
+
+[1m INITIALIZATION[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[1mmem_mst   [0m[1m  [0mIDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 199.96 µs  ·  DEINIT 199.96 µs → 199.98
+[1m            [0mµs  ·  IDLE 199.98 µs → 200.00 µs                                                                          
+[1mmem_slv   [0m[1m  [0mIDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 199.96 µs  ·  DEINIT 199.96 µs → 199.98
+[1m            [0mµs  ·  IDLE 199.98 µs → 200.00 µs                                                                          
+
+[1m MESSAGE SLOT USAGE[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[1m [0m[1mChannel          [0m[1m [0m[1m [0m[1mMessages           [0m[1m [0m[1m [0m[1mUsed / configured                     [0m[1m [0m[1m [0m[1mPeak simultaneous                    [0m[1m [0m
+ M2S_REQ            980                  2 / 4                                   2                                     
+ M2S_RWD            820                  2 / 2                                   2                                     
+ S2M_NDR            820                  6 / 6                                   2                                     
+ S2M_DRC            980                  2 / 2                                   2                                     
+[2mIssued messages in the statistics window; peak counts distinct slots at one timestamp. These are message slots, not [0m
+[2minferred buffer lifetimes.[0m
+
+[1m PV TREND[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[37mRead BW  [0m [37m███████████████████████▇█████████████████████████▇██████████████████████[0m[2;37m  avg [0m[37m3.10 GB/s[0m
+                                                                                                 
+[37mWrite BW [0m [37m▇▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇▇█[0m[2;37m  avg [0m[37m2.59 GB/s[0m
+                                                                                                 
+[37mRead OS  [0m [37m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[2;37m  avg [0m[37m0.20     [0m
+                                                                                                 
+[37mWrite OS [0m [37m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▅██▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁[0m[2;37m  avg [0m[37m0.16     [0m
+
+[1m CREDIT EMPTY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[37mM2S_RWD[0]    [0m [37m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░···[0m[2;37m  [0m[37m  0.24%[0m
+[37mS2M_DRC[1]    [0m [37m░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░···[0m[2;37m  [0m[37m  0.24%[0m
+[2mdensity       [0m [2mlow ░▒▓█ high                                                                    [0m
+
+[1m INTEGRITY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[2mProtocol checks  [0m[2;32mOK[0m[2m  no structural or transaction-matching issues detected[0m
+
+[2m──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[2mActive window  20.00 ns → 195.66 µs  ·  auto-active  ·  490 regions[0m
+[2mBandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture[0m
+[2mHTML report          [0m[2m [0mpvkit/examples/cxl_native/short_pulses/traffic.pv.html                                           
+[2mTracker log          [0m[2m [0mpvkit/examples/cxl_native/short_pulses/traffic.tracker.log                                       
+[2mAnalyze log          [0m[2m [0mpvkit/examples/cxl_native/short_pulses/traffic.analyze.log                                       

@@ -1,0 +1,147 @@
+[1mXPVKIT[0m[2m  ·  [0m[1;92mPV SUMMARY[0m
+traffic               [2m                                                                  CXL Native / CSV cxl-native-1.0[0m
+[2m──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+1.50 µs[2m  ·  [0m2,598 rows[2m  ·  [0m[32mintegrity OK[0m
+
+[1mACTIVITY                    [0m[1m  [0m[1mBANDWIDTH                   [0m[1m  [0m[1mOUTSTANDING                 [0m[1m  [0m[1mCREDIT EMPTY                 [0m
+[2m─────────                   [0m[2m  [0m[2m─────────                   [0m[2m  [0m[2m───────────                 [0m[2m  [0m[2m────────────                 [0m
+[1;92m87.60%                      [0m  [1;92mtotal 62.34 GB/s            [0m  [1;92mavg 35.79                   [0m  [1;92mworst 24.00%                 [0m
+[2midle 186.00 ns              [0m  [1;92mR 31.17[0m[2m  ·  [0m[1;95mW 31.17[0m[2m GB/s[0m      [2mpeak 58                     [0m  [2mS2M_DRC[0] · 6 interval(s)   [0m
+                              [2mpeak 98.91 GB/s             [0m                                                             
+Partial write: 0.00% (0 / 640 known messages; 0 unknown) [partial-write opcode]
+
+[1m TRAFFIC[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;95mWrite   [0m  [2mtransactions  [0m[2m  [0m640  /  40,960 B useful payload
+[1;92mRead    [0m  [2mtransactions  [0m[2m  [0m640  /  40,960 B useful payload
+          [2mpartial BE    [0m[2m  [0m               0 / 640  (0.00%)
+
+[1mCHANNEL    [0m[1m  [0m  MESSAGES  [2m         RATE[0m[2m  [0mTOP OPCODES
+[1mM2S_REQ    [0m[1m  [0m       640  [2m426.67 Mmsg/s[0m[2m  [0mMemRd 640  
+[1mM2S_RWD    [0m[1m  [0m       640  [2m426.67 Mmsg/s[0m[2m  [0mMemWr 640  
+[1mS2M_NDR    [0m[1m  [0m       640  [2m426.67 Mmsg/s[0m[2m  [0mCmp 640    
+[1mS2M_DRC    [0m[1m  [0m       640  [2m426.67 Mmsg/s[0m[2m  [0mMemData 640
+
+[1m LATENCY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[1;95mWrite  [0m[1m  [0mavg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+[1;92mRead   [0m[1m  [0mavg 43.88 ns  p50 41.00 ns  p95 61.00 ns  max 68.00 ns
+
+[1m INITIALIZATION[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[1mmem_mst   [0m[1m  [0mIDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 1.46 µs  ·  DEINIT 1.46 µs → 1.48 µs  ·
+[1m            [0mIDLE 1.48 µs → 1.50 µs                                                                                     
+[1mmem_slv   [0m[1m  [0mIDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 1.46 µs  ·  DEINIT 1.46 µs → 1.48 µs  ·
+[1m            [0mIDLE 1.48 µs → 1.50 µs                                                                                     
+
+[1m MESSAGE SLOT USAGE[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[1m [0m[1mChannel          [0m[1m [0m[1m [0m[1mMessages           [0m[1m [0m[1m [0m[1mUsed / configured                     [0m[1m [0m[1m [0m[1mPeak simultaneous                    [0m[1m [0m
+ M2S_REQ            640                  4 / 4                                   4                                     
+ M2S_RWD            640                  2 / 2                                   2                                     
+ S2M_NDR            638                  6 / 6                                   2                                     
+ S2M_DRC            640                  2 / 2                                   2                                     
+M2S_REQ  S0=160  S1=160  S2=160  S3=160
+M2S_RWD  S0=320  S1=320
+S2M_NDR  S0=107  S1=107  S2=106  S3=106  S4=106  S5=106
+S2M_DRC  S0=356  S1=284
+[2mIssued messages in the statistics window; peak counts distinct slots at one timestamp. These are message slots, not [0m
+[2minferred buffer lifetimes.[0m
+
+[1m PV TREND[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[37mRead BW  [0m [37m▁▁▄▆▄▅▄▅▃▁▇▆▄▅▅▄▅▄▂▂█▅▅▄▆▄▄▅▃▄█▅▅▄▅▅▄▅▁▅█▅▄▅▄▅▄▄▁▅▆▆▄▅▅▄▅▄▁▇▆▅▅▄▅▅▄▅▄▅▅▄[0m[2;37m  avg [0m[37m31.17 GB/s[0m
+                                                                                                  
+[37mWrite BW [0m [37m▅▅▄▅▄▅▅▄▅▄▅▄▅▅▄▅▄▅▅▄▅▄▅▄▅▅▄▅▄▅▅▄▅▄▅▄▅▅▄▅▄▅▅▄▅▄▅▄▅▅▄▅▄▅▅▄▅▄▅▄▅▅▄▅▄▅▅▄▅▄▂▁[0m[2;37m  avg [0m[37m31.17 GB/s[0m
+                                                                                                  
+[37mRead OS  [0m [37m▃▅▅▅▆▅▆▅▆█▇▆▅▅▆▅▅▅▆█▆▅▅▆▅▅▅▅▇█▆▅▅▆▅▅▅▅█▇▇▅▅▆▅▅▅▆▇▇▅▅▆▅▅▅▅▆█▇▅▅▆▅▅▅▅▆▅▅▄▂[0m[2;37m  avg [0m[37m18.72     [0m
+                                                                                                  
+[37mWrite OS [0m [37m▂▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▄▂[0m[2;37m  avg [0m[37m17.07     [0m
+
+[1m CREDIT EMPTY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[37mS2M_DRC[0]    [0m [37m······░██▒·····▒██░·····██▓·····▒██▒·····▓██░····░██▓···················[0m[2;37m  [0m[37m 24.00%[0m
+[37mS2M_DRC[1]    [0m [37m········▒██░·····██▓·····░██▒·····▓██░····░██▓·····▒██▒·················[0m[2;37m  [0m[37m 24.00%[0m
+[2mdensity       [0m [2mlow ░▒▓█ high                                                                    [0m
+
+[1m DETAILS[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[2mmeasurement window  [0m[2m  [0m0.00 ps → 1.50 µs · 1.50 µs                                              
+[2mbandwidth window    [0m[2m  [0m20.00 ns → 1.33 µs · 1.31 µs · auto-active                               
+[2mtransaction scope   [0m[2m  [0mcapture (latency / outstanding / backpressure)                           
+[2mrows                [0m[2m  [0m2,598 total · 2,584 analyzed                                             
+[2mprofile             [0m[2m  [0mcxl3_256b_non_pbr_1024                                                   
+[2mmessage slots       [0m[2m  [0mM2S_REQ 4 · M2S_RWD 2 · S2M_NDR 6 · S2M_DRC 2 · M2S_BIRSP 0 · S2M_BISNP 0
+[2mbandwidth peak      [0m[2m  [0mtotal 98.91 GB/s · read 64.00 GB/s · write 34.91 GB/s                    
+[2mfull-window bandwid…[0m[2m  [0m54.61 GB/s                                                               
+[2mbyte enable         [0m[2m  [0m640 known · 0 partial · 0 unknown · 64 bits                              
+
+[1m REQUEST / RESPONSE[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[2mShowing first 6 of 1,280 request groups intersecting the window.[0m
+[1mREQ M2S_REQ[0]  MemRd  20.00 ns[0m
+  opcode_raw=0x1  tag=0x1000  ld_id=0x0  ckid=0x0  tc=0x0  address=0x40000000  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+[2m  CSV line 9, seq 8, cycle 20; MemRd 64 B[0m
+[1mRSP S2M_DRC[0]  MemData  60.00 ns[0m
+  opcode_raw=0x0  tag=0x1000  ld_id=0x0  meta_field=0x0  meta_value=0x0  poison=0  trp=0  devload=0x0  data_xz=0
+[2m  CSV line 55, seq 54, cycle 60; MemData 64 B[0m
+  relation=drs  latency=40.00 ns
+
+[1mREQ M2S_REQ[1]  MemRd  20.00 ns[0m
+  opcode_raw=0x1  tag=0x1001  ld_id=0x0  ckid=0x1  tc=0x1  address=0x40000040  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+[2m  CSV line 10, seq 9, cycle 20; MemRd 64 B[0m
+[1mRSP S2M_DRC[1]  MemData  60.00 ns[0m
+  opcode_raw=0x0  tag=0x1001  ld_id=0x0  meta_field=0x0  meta_value=0x0  poison=0  trp=0  devload=0x1  data_xz=0
+[2m  CSV line 56, seq 55, cycle 60; MemData 64 B[0m
+  relation=drs  latency=40.00 ns
+
+[1mREQ M2S_REQ[2]  MemRd  20.00 ns[0m
+  opcode_raw=0x1  tag=0x1002  ld_id=0x0  ckid=0x2  tc=0x2  address=0x40000080  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+[2m  CSV line 11, seq 10, cycle 20; MemRd 64 B[0m
+[1mRSP S2M_DRC[0]  MemData  61.00 ns[0m
+  opcode_raw=0x0  tag=0x1002  ld_id=0x0  meta_field=0x0  meta_value=0x0  poison=0  trp=0  devload=0x2  data_xz=0
+[2m  CSV line 59, seq 58, cycle 61; MemData 64 B[0m
+  relation=drs  latency=41.00 ns
+
+[1mREQ M2S_REQ[3]  MemRd  20.00 ns[0m
+  opcode_raw=0x1  tag=0x1003  ld_id=0x0  ckid=0x3  tc=0x3  address=0x400000c0  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+[2m  CSV line 12, seq 11, cycle 20; MemRd 64 B[0m
+[1mRSP S2M_DRC[1]  MemData  61.00 ns[0m
+  opcode_raw=0x0  tag=0x1003  ld_id=0x0  meta_field=0x0  meta_value=0x0  poison=0  trp=0  devload=0x3  data_xz=0
+[2m  CSV line 60, seq 59, cycle 61; MemData 64 B[0m
+  relation=drs  latency=41.00 ns
+
+[1mREQ M2S_RWD[0]  MemWr  20.00 ns[0m
+  opcode_raw=0x1  tag=0x8000  ld_id=0x0  ckid=0x0  tc=0x0  address=0x80000000  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  byte_enable=0xffffffffffffffff  poison=0  trp=0  data_xz=0
+[2m  CSV line 13, seq 12, cycle 20; MemWr 64 B[0m
+[1mRSP S2M_NDR[0]  Cmp  60.00 ns[0m
+  opcode_raw=0x0  tag=0x8000  ld_id=0x0  meta_field=0x0  meta_value=0x0  devload=0x0  data_xz=0
+[2m  CSV line 57, seq 56, cycle 60; Cmp[0m
+  relation=ndr  latency=40.00 ns
+
+[1mREQ M2S_RWD[1]  MemWr  20.00 ns[0m
+  opcode_raw=0x1  tag=0x8001  ld_id=0x0  ckid=0x1  tc=0x1  address=0x80000040  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  byte_enable=0xffffffffffffffff  poison=0  trp=0  data_xz=0
+[2m  CSV line 14, seq 13, cycle 20; MemWr 64 B[0m
+[1mRSP S2M_NDR[1]  Cmp  60.00 ns[0m
+  opcode_raw=0x0  tag=0x8001  ld_id=0x0  meta_field=0x0  meta_value=0x0  devload=0x1  data_xz=0
+[2m  CSV line 58, seq 57, cycle 60; Cmp[0m
+  relation=ndr  latency=40.00 ns
+
+[2mPairs and fields are existing analyzer evidence. Additional facts and links are in JSON / HTML.[0m
+
+[1m INTEGRITY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[2mProtocol checks  [0m[2;32mOK[0m[2m  no structural or transaction-matching issues detected[0m
+
+[2m──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────[0m
+[2mActive window  20.00 ns → 1.33 µs  ·  auto-active  ·  1 region[0m
+[2mBandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture[0m
+[2mHTML report         [0m[2m [0mpvkit/examples/cxl_native/staggered_slots/traffic.pv.html                                         
+[2mTracker log         [0m[2m [0mpvkit/examples/cxl_native/staggered_slots/traffic.tracker.log                                     
+[2mAnalyze log         [0m[2m [0mpvkit/examples/cxl_native/staggered_slots/traffic.analyze.log                                     

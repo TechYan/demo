@@ -1,0 +1,107 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                                                                                   AXI / CSV 2.0
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+20.00 µs  ·  473 rows  ·  integrity OK
+
+ACTIVITY                                BANDWIDTH                               OUTSTANDING                            
+─────────                               ─────────                               ───────────                            
+85.56%                                  total 0.29 GB/s                         avg 0.29                               
+idle 2.89 µs                            W 0.29 GB/s                             peak 1                                 
+                                        peak 0.74 GB/s                                                                 
+Partial write: 0.00% (0 / 156 known beats; 0 unknown) [WSTRB]
+
+ TRAFFIC
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Write
+    transactions              39  burst size      128 B           
+    beats / txn                4  WSTRB partial   0 / 156  (0.00%)
+
+ LATENCY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Write    avg 148.54 ns  p50 137.00 ns  p95 187.00 ns  max 187.00 ns
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Write BW  █▁▅▁█▅▁▅▁▁▅█▁▅▁▅▁█▁█▁▅▁▅█▁▅▁▁▅█▁█▁▅▁█▁█▅▁▁▅█▁▅▁▅▁█▁█▁▅▁▅▁█▅▁▁▅█▁█▁▅▁█▁█▅  avg 0.29 GB/s
+                                                                                                 
+Write OS  ▁▁█▁██▁▁▁█▁█▁█▁█▁██▁▁█▁▁█▁█▁█▁█▁▁▁█▁██▁█▁▁██▁▁▁█▁█▁█▁█▁██▁█▁▁▁█▁█▁█▁█▁▁█  avg 0.29     
+
+ BACKPRESSURE
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+AW        ········································································    0.00%
+W         ·································▒······································   47.14%
+B         ········································································    0.00%
+density   low ░▒▓█ high                                                                    
+
+ DETAILS
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+measurement window    0.00 ps → 20.00 µs · 20.00 µs                     
+bandwidth window      520.00 ns → 17.63 µs · 17.11 µs · auto-active     
+transaction scope     capture (latency / outstanding / backpressure)    
+rows                  473 total · 467 analyzed                          
+bandwidth peak        total 0.74 GB/s · read 0.00 GB/s · write 0.74 GB/s
+full-window bandwid…  0.25 GB/s                                         
+WSTRB                 156 known · 0 partial · 0 unknown · 32 bits       
+
+ REQUEST / RESPONSE
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Showing first 6 of 39 transactions with evidence in the window.
+WRITE  ID=0x0  address=0x90003e80  beats=4  COMPLETED
+  AW 500.00 ns  CSV line 3, seq 2, cycle 500 (outside-window context)
+  W first 520.00 ns  CSV line 5, seq 4, cycle 520
+  W last 532.00 ns  CSV line 11, seq 10, cycle 532
+  B response 612.00 ns  CSV line 13, seq 12, cycle 612
+  latency=112.00 ns  response=0
+
+WRITE  ID=0x1  address=0x900086c0  beats=4  COMPLETED
+  AW 950.00 ns  CSV line 15, seq 14, cycle 950
+  W first 970.00 ns  CSV line 17, seq 16, cycle 970
+  W last 982.00 ns  CSV line 23, seq 22, cycle 982
+  B response 1.09 µs  CSV line 25, seq 24, cycle 1087
+  latency=137.00 ns  response=0
+
+WRITE  ID=0x2  address=0x9000cf00  beats=4  COMPLETED
+  AW 1.40 µs  CSV line 27, seq 26, cycle 1400
+  W first 1.42 µs  CSV line 29, seq 28, cycle 1420
+  W last 1.43 µs  CSV line 35, seq 34, cycle 1432
+  B response 1.56 µs  CSV line 37, seq 36, cycle 1562
+  latency=162.00 ns  response=0
+
+WRITE  ID=0x3  address=0x90011740  beats=4  COMPLETED
+  AW 1.85 µs  CSV line 39, seq 38, cycle 1850
+  W first 1.87 µs  CSV line 41, seq 40, cycle 1870
+  W last 1.88 µs  CSV line 47, seq 46, cycle 1882
+  B response 2.04 µs  CSV line 49, seq 48, cycle 2037
+  latency=187.00 ns  response=0
+
+WRITE  ID=0x4  address=0x90015f80  beats=4  COMPLETED
+  AW 2.30 µs  CSV line 51, seq 50, cycle 2300
+  W first 2.32 µs  CSV line 53, seq 52, cycle 2320
+  W last 2.33 µs  CSV line 59, seq 58, cycle 2332
+  B response 2.41 µs  CSV line 61, seq 60, cycle 2412
+  latency=112.00 ns  response=0
+
+WRITE  ID=0x5  address=0x9001a7c0  beats=4  COMPLETED
+  AW 2.75 µs  CSV line 63, seq 62, cycle 2750
+  W first 2.77 µs  CSV line 65, seq 64, cycle 2770
+  W last 2.78 µs  CSV line 71, seq 70, cycle 2782
+  B response 2.89 µs  CSV line 73, seq 72, cycle 2887
+  latency=137.00 ns  response=0
+
+Pairs and fields are existing analyzer evidence. Additional facts and links are in JSON / HTML.
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Active window  520.00 ns → 17.63 µs  ·  auto-active  ·  1 region
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture
+HTML report     pvkit/examples/axi4/write_only/traffic.pv.html                                                         
+Tracker log     pvkit/examples/axi4/write_only/traffic.tracker.log                                                     
+Analyze log     pvkit/examples/axi4/write_only/traffic.analyze.log             
+
+HTML report: pvkit/examples/axi4/write_only/traffic.pv.html
+html_report: pvkit/examples/axi4/write_only/traffic.pv.html
+tracker_log: pvkit/examples/axi4/write_only/traffic.tracker.log
+analyze_log: pvkit/examples/axi4/write_only/traffic.analyze.log

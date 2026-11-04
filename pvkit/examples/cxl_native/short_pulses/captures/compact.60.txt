@@ -1,0 +1,46 @@
+XPVKIT  ·  PV SUMMARY
+traffic
+CXL Native / CSV cxl-native-1.0
+──────────────────────────────────────────────────────────
+200.00 µs  ·  4,254 rows  ·  integrity OK
+
+ACTIVITY      10.12%             idle 179.75 µs            
+BANDWIDTH     total 5.69 GB/s                              
+              read 3.10 GB/s                               
+              write 2.59 GB/s                              
+              peak 0.64 GB/s                               
+OUTSTANDING   avg 0.36           peak 4                    
+CREDIT EMPTY  worst 0.24%        M2S_RWD[0] · 160          
+                                 interval(s)               
+Partial write: 0.00% (0 / 820 known messages; 0 unknown) 
+[partial-write opcode]
+
+ PV TREND
+ ─────────────────────────────────────────────────────────
+Read BW   ████████████████████████████  avg 3.10 GB/s
+                                                     
+Write BW  ▇▇▇▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇  avg 2.59 GB/s
+                                                     
+Read OS   ▁▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁  avg 0.20     
+                                                     
+Write OS  ▁▁▁▁▁▁▁▁▁█▅▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁  avg 0.16     
+
+ CREDIT EMPTY
+ ─────────────────────────────────────────────────────────
+M2S_RWD[0]     ░░░░░░░░░░░░░░░░░░░░░░░░░░░·    0.24%
+S2M_DRC[1]     ░░░░░░░░░░░░░░░░░░░░░░░░░░░·    0.24%
+density        low ░▒▓█ high                        
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching 
+issues detected
+
+──────────────────────────────────────────────────────────
+Active window  20.00 ns → 195.66 µs  ·  auto-active  ·  490
+regions
+Bandwidth: accepted-data; transactions / latency / 
+outstanding / backpressure: capture
+HTML … pvkit/examples/cxl_native/short_pulses/traffic.pv.h…
+Track… pvkit/examples/cxl_native/short_pulses/traffic.trac…
+Analy… pvkit/examples/cxl_native/short_pulses/traffic.anal…

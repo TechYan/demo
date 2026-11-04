@@ -1,0 +1,120 @@
+[1mXPVKIT[0m[2m  ·  [0m[1;92mPV SUMMARY[0m
+traffic                     [2m                                      AXI / CSV 2.0[0m
+[2m──────────────────────────────────────────────────────────────────────────────[0m
+24.00 µs[2m  ·  [0m1,698 rows[2m  ·  [0m[32mintegrity OK[0m
+
+[1mACTIVITY                [0m[1m [0m[1;92m89.76%                           [0m [2midle 2.46 µs        [0m
+[1mBANDWIDTH               [0m[1m [0m[1;92mtotal 0.92 GB/s                  [0m                     
+[1m                        [0m[1m [0m[1;92mread 0.51 GB/s                   [0m                     
+[1m                        [0m[1m [0m[1;95mwrite 0.42 GB/s                  [0m                     
+[1m                        [0m[1m [0m[2mpeak 2.35 GB/s                   [0m                     
+[1mOUTSTANDING             [0m[1m [0m[1;92mavg 4.51                         [0m [2mpeak 6              [0m
+Partial write: 0.00% (0 / 280 known beats; 0 unknown) [WSTRB]
+
+[1m TRAFFIC[0m
+[2m ─────────────────────────────────────────────────────────────────────────────[0m
+[1;95mWrite[0m
+   [2mtransactions  [0m[2m [0m70              
+   [2mburst size    [0m[2m [0m128 B           
+   [2mbeats / txn   [0m[2m [0m4               
+   [2mWSTRB partial [0m[2m [0m0 / 280  (0.00%)
+
+[1;92mRead[0m
+   [2mtransactions  [0m[2m [0m85   
+   [2mburst size    [0m[2m [0m128 B
+   [2mbeats / txn   [0m[2m [0m4    
+
+[1m LATENCY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────[0m
+[1;95mWrite  [0m[1m  [0mavg 731.29 ns  p50 732.00 ns  p95 782.00 ns  max 782.00 ns
+[1;92mRead   [0m[1m  [0mavg 671.29 ns  p50 652.00 ns  p95 732.00 ns  max 732.00 ns
+
+[1m PV TREND[0m
+[2m ─────────────────────────────────────────────────────────────────────────────[0m
+[37mRead BW  [0m [37m▁▇▄▇▇▇▄█▄▇▇▄▇▇▇▅▇▄▇▇▄▇▇▅▇▇▄█▅▅█▃▇▆▇▇▇▄▇▅▇▇▄▇▇▇▄█[0m[2;37m  avg [0m[37m0.51 GB/s[0m
+                                                                         
+[37mWrite BW [0m [37m▇▄▇▄▇▄▇▃▇▄▇▄▇▄▇▃▇▄▇▄▇▄▇▃▇▄▇▄▇▄▇▃▇▄▇▄▇▄▇▃▇▄▇▄▇▄▄▁[0m[2;37m  avg [0m[37m0.42 GB/s[0m
+                                                                         
+[37mRead OS  [0m [37m███████████████████████████████████████████████▆[0m[2;37m  avg [0m[37m2.38     [0m
+                                                                         
+[37mWrite OS [0m [37m▆██████████████████████████████████████████████▆[0m[2;37m  avg [0m[37m2.13     [0m
+
+[1m BACKPRESSURE[0m
+[2m ─────────────────────────────────────────────────────────────────────────────[0m
+[37mAW       [0m [37m················································[0m[2;37m  [0m[37m  0.00%[0m
+[37mW        [0m [37m······························░·················[0m[2;37m  [0m[37m 24.26%[0m
+[37mB        [0m [37m················································[0m[2;37m  [0m[37m  0.00%[0m
+                                                                   
+[37mAR       [0m [37m························░·······················[0m[2;37m  [0m[37m 58.25%[0m
+[37mR        [0m [37m················································[0m[2;37m  [0m[37m  0.00%[0m
+[2mdensity  [0m [2mlow ░▒▓█ high                                            [0m
+
+[1m DETAILS[0m
+[2m ─────────────────────────────────────────────────────────────────────────────[0m
+[2mmeasurement window  [0m[2m  [0m0.00 ps → 24.00 µs · 24.00 µs                     
+[2mbandwidth window    [0m[2m  [0m1.07 µs → 22.61 µs · 21.54 µs · auto-active       
+[2mtransaction scope   [0m[2m  [0mcapture (latency / outstanding / backpressure)    
+[2mrows                [0m[2m  [0m1,698 total · 1,692 analyzed                      
+[2mbandwidth peak      [0m[2m  [0mtotal 2.35 GB/s · read 1.17 GB/s · write 1.17 GB/s
+[2mfull-window bandwid…[0m[2m  [0m0.83 GB/s                                         
+[2mWSTRB               [0m[2m  [0m280 known · 0 partial · 0 unknown · 32 bits       
+
+[1m REQUEST / RESPONSE[0m
+[2m ─────────────────────────────────────────────────────────────────────────────[0m
+[2mShowing first 6 of 155 transactions with evidence in the window.[0m
+[1mREAD  ID=0x0  address=0x80007d00  beats=4  COMPLETED[0m
+  AR 1.00 µs  CSV line 3, seq 2, cycle 1000 (outside-window context)
+  R first 1.60 µs  CSV line 29, seq 28, cycle 1600
+  R last 1.61 µs  CSV line 35, seq 34, cycle 1612
+  R response 1.61 µs  CSV line 35, seq 34, cycle 1612
+  latency=612.00 ns  response=0
+
+[1mWRITE  ID=0x0  address=0x90008340  beats=4  COMPLETED[0m
+  AW 1.05 µs  CSV line 5, seq 4, cycle 1050 (outside-window context)
+  W first 1.07 µs  CSV line 7, seq 6, cycle 1070
+  W last 1.08 µs  CSV line 13, seq 12, cycle 1082
+  B response 1.73 µs  CSV line 47, seq 46, cycle 1732
+  latency=682.00 ns  response=0
+
+[1mREAD  ID=0x1  address=0x8000ac40  beats=4  COMPLETED[0m
+  AR 1.25 µs  CSV line 15, seq 14, cycle 1250
+  R first 1.89 µs  CSV line 51, seq 50, cycle 1890
+  R last 1.90 µs  CSV line 57, seq 56, cycle 1902
+  R response 1.90 µs  CSV line 57, seq 56, cycle 1902
+  latency=652.00 ns  response=0
+
+[1mWRITE  ID=0x1  address=0x9000b8c0  beats=4  COMPLETED[0m
+  AW 1.35 µs  CSV line 17, seq 16, cycle 1350
+  W first 1.37 µs  CSV line 19, seq 18, cycle 1370
+  W last 1.38 µs  CSV line 25, seq 24, cycle 1382
+  B response 2.08 µs  CSV line 71, seq 70, cycle 2082
+  latency=732.00 ns  response=0
+
+[1mREAD  ID=0x2  address=0x8000db80  beats=4  COMPLETED[0m
+  AR 1.50 µs  CSV line 27, seq 26, cycle 1500
+  R first 2.18 µs  CSV line 73, seq 72, cycle 2180
+  R last 2.19 µs  CSV line 79, seq 78, cycle 2192
+  R response 2.19 µs  CSV line 79, seq 78, cycle 2192
+  latency=692.00 ns  response=0
+
+[1mWRITE  ID=0x2  address=0x9000ee40  beats=4  COMPLETED[0m
+  AW 1.65 µs  CSV line 37, seq 36, cycle 1650
+  W first 1.67 µs  CSV line 39, seq 38, cycle 1670
+  W last 1.68 µs  CSV line 45, seq 44, cycle 1682
+  B response 2.43 µs  CSV line 93, seq 92, cycle 2432
+  latency=782.00 ns  response=0
+
+[2mPairs and fields are existing analyzer evidence. Additional facts and links are[0m
+[2min JSON / HTML.[0m
+
+[1m INTEGRITY[0m
+[2m ─────────────────────────────────────────────────────────────────────────────[0m
+[2mProtocol checks  [0m[2;32mOK[0m[2m  no structural or transaction-matching issues detected[0m
+
+[2m──────────────────────────────────────────────────────────────────────────────[0m
+[2mActive window  1.07 µs → 22.61 µs  ·  auto-active  ·  1 region[0m
+[2mBandwidth: accepted-data; transactions / latency / outstanding / backpressure: [0m
+[2mcapture[0m
+[2mHTML report     [0m[2m [0mpvkit/examples/axi4/concurrent/traffic.pv.html                
+[2mTracker log     [0m[2m [0mpvkit/examples/axi4/concurrent/traffic.tracker.log            
+[2mAnalyze log     [0m[2m [0mpvkit/examples/axi4/concurrent/traffic.analyze.log            

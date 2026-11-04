@@ -1,0 +1,122 @@
+[1mXPVKIT[0m[2m  ·  [0m[1;92mPV SUMMARY[0m
+traffic
+[2mAXI / CSV 2.0[0m
+[2m──────────────────────────────────────────────────────────[0m
+5.00 µs[2m  ·  [0m28 rows[2m  ·  [0m[31mintegrity 2 issues[0m
+
+[1mACTIVITY          [0m[1m [0m[1;92m0.40%                   [0m [2midle 4.98 µs   [0m
+[1mBANDWIDTH         [0m[1m [0m[1;92mtotal 12.80 GB/s        [0m                
+[1m                  [0m[1m [0m[1;92mread 6.40 GB/s          [0m                
+[1m                  [0m[1m [0m[1;95mwrite 6.40 GB/s         [0m                
+[1m                  [0m[1m [0m[2mpeak 0.52 GB/s          [0m                
+[1mOUTSTANDING       [0m[1m [0m[1;92mavg 1.00                [0m [2mpeak 2         [0m
+Partial write: 0.00% (0 / 4 known beats; 0 unknown) [WSTRB]
+
+[1m TRAFFIC[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[1;95mWrite[0m
+   [2mtransactions  [0m[2m [0m1             
+   [2mburst size    [0m[2m [0m64 B          
+   [2mbeats / txn   [0m[2m [0m2             
+   [2mWSTRB partial [0m[2m [0m0 / 4  (0.00%)
+
+[1;92mRead[0m
+   [2mtransactions  [0m[2m [0m1                                      
+   [2mburst size    [0m[2m [0mavg 96.00 B  p95 124.80 B  max 128.00 B
+   [2mbeats / txn   [0m[2m [0mavg 3.00  p95 3.90  max 4.00           
+
+[1m LATENCY[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[1;95mWrite  [0m[1m  [0mavg 104.00 ns  p50 104.00 ns
+[1m       [0m[1m  [0mp95 104.00 ns  max 104.00 ns
+[1;92mRead   [0m[1m  [0m avg 84.00 ns   p50 84.00 ns
+[1m       [0m[1m  [0m p95 84.00 ns   max 84.00 ns
+
+[1m PV TREND[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[37mRead BW  [0m [37m▁▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█[0m[2;37m  avg [0m[37m6.40 GB/s[0m
+                                                     
+[37mWrite BW [0m [37m██▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁▁[0m[2;37m  avg [0m[37m6.40 GB/s[0m
+                                                     
+[37mRead OS  [0m [37m▁▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█[0m[2;37m  avg [0m[37m0.42     [0m
+                                                     
+[37mWrite OS [0m [37m▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██████████[0m[2;37m  avg [0m[37m0.58     [0m
+
+[1m BACKPRESSURE[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[37mAW       [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[37mW        [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[37mB        [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+                                               
+[37mAR       [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[37mR        [0m [37m····························[0m[2;37m  [0m[37m  0.00%[0m
+[2mdensity  [0m [2mlow ░▒▓█ high                        [0m
+
+[1m DETAILS[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[2mmeasurement window  [0m[2m  [0m0.00 ps → 5.00 µs · 5.00 µs          
+[2mbandwidth window    [0m[2m  [0m420.00 ns → 3.08 µs · 20.00 ns ·     
+[2m                      [0mauto-active                          
+[2mtransaction scope   [0m[2m  [0mcapture (latency / outstanding /     
+[2m                      [0mbackpressure)                        
+[2mrows                [0m[2m  [0m28 total · 16 analyzed               
+[2mbandwidth peak      [0m[2m  [0mtotal 0.52 GB/s · read 0.52 GB/s ·   
+[2m                      [0mwrite 0.52 GB/s                      
+[2mfull-window bandwid…[0m[2m  [0m0.05 GB/s                            
+[2mWSTRB               [0m[2m  [0m4 known · 0 partial · 0 unknown · 32 
+[2m                      [0mbits                                 
+
+[1m REQUEST / RESPONSE[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[2mShowing first 4 of 4 transactions with evidence in the [0m
+[2mwindow.[0m
+[1mWRITE  ID=0x10  address=0x90013200  beats=2  COMPLETED[0m
+  AW 400.00 ns  CSV line 3, seq 2, cycle 400 
+(outside-window context)
+  W first 420.00 ns  CSV line 5, seq 4, cycle 420
+  W last 424.00 ns  CSV line 7, seq 6, cycle 424
+  B response 504.00 ns  CSV line 9, seq 8, cycle 504 
+(outside-window context)
+  latency=104.00 ns  response=0
+
+[1mREAD  ID=0x20  address=0x80027d00  beats=2  COMPLETED[0m
+  AR 1.00 µs  CSV line 11, seq 10, cycle 1000 
+(outside-window context)
+  R first 1.08 µs  CSV line 13, seq 12, cycle 1080
+  R last 1.08 µs  CSV line 15, seq 14, cycle 1084
+  R response 1.08 µs  CSV line 15, seq 14, cycle 1084
+  latency=84.00 ns  response=0
+
+[1mWRITE  ID=0x41  address=0x90010000  beats=2  INCOMPLETE[0m
+  AW 2.20 µs  CSV line 17, seq 16, cycle 2200 
+(outside-window context)
+  W first 2.22 µs  CSV line 19, seq 18, cycle 2220
+  W last 2.22 µs  CSV line 21, seq 20, cycle 2224
+[33m  B response: not observed.[0m
+  latency=UNKNOWN  response=UNKNOWN
+
+[1mREAD  ID=0x31  address=0x80020000  beats=4  INCOMPLETE[0m
+  AR 3.00 µs  CSV line 23, seq 22, cycle 3000 
+(outside-window context)
+  R first 3.08 µs  CSV line 25, seq 24, cycle 3080
+  R last 3.08 µs  CSV line 27, seq 26, cycle 3084
+[33m  R response: not observed.[0m
+  latency=UNKNOWN  response=UNKNOWN
+
+[2mPairs and fields are existing analyzer evidence. Additional[0m
+[2mfacts and links are in JSON / HTML.[0m
+
+[1m INTEGRITY[0m
+[2m ─────────────────────────────────────────────────────────[0m
+[31mProtocol checks  2 issues[0m
+[31m  - 1 write transactions remain outstanding at window end[0m
+[31m  - 1 read transactions remain outstanding at window end[0m
+
+[2m──────────────────────────────────────────────────────────[0m
+[2mActive window  420.00 ns → 3.08 µs  ·  auto-active  ·  4 [0m
+[2mregions[0m
+[2mBandwidth: accepted-data; transactions / latency / [0m
+[2moutstanding / backpressure: capture[0m
+[2mHTML …[0m[2m [0mpvkit/examples/axi4/incomplete_response/traffic.pv.…
+[2mTrack…[0m[2m [0mpvkit/examples/axi4/incomplete_response/traffic.tra…
+[2mAnaly…[0m[2m [0mpvkit/examples/axi4/incomplete_response/traffic.ana…

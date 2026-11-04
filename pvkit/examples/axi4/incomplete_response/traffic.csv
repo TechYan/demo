@@ -1,0 +1,29 @@
+timestamp_ps,cycle,seq,event_kind,channel,valid,ready,id,address,length,size,burst,strobe,last,response,summary
+0,0,1,XPV_EVENT_WINDOW_START,CONTROL,,,,,,,,,,,protocol_incomplete_response: capture window opened
+400000,400,2,XPV_EVENT_HANDSHAKE,AW,1,1,0x10,0x90013200,1,5,0x1,,,,write request: 2 x 32 B
+401000,401,3,XPV_EVENT_STATE,AW,0,1,,,,,,,,,AW idle
+420000,420,4,XPV_EVENT_HANDSHAKE,W,1,1,,,,,,0xffffffff,0,,write data beat 1/2
+421000,421,5,XPV_EVENT_STATE,W,0,1,,,,,,,,,W idle
+424000,424,6,XPV_EVENT_HANDSHAKE,W,1,1,,,,,,0xffffffff,1,,write data beat 2/2
+425000,425,7,XPV_EVENT_STATE,W,0,1,,,,,,,,,W idle
+504000,504,8,XPV_EVENT_HANDSHAKE,B,1,1,0x10,,,,,,,0x0,write response
+505000,505,9,XPV_EVENT_STATE,B,0,1,,,,,,,,,B idle
+1000000,1000,10,XPV_EVENT_HANDSHAKE,AR,1,1,0x20,0x80027d00,1,5,0x1,,,,read request: 2 x 32 B
+1001000,1001,11,XPV_EVENT_STATE,AR,0,1,,,,,,,,,AR idle
+1080000,1080,12,XPV_EVENT_HANDSHAKE,R,1,1,0x20,,,,,,0,0x0,read data beat 1/2
+1081000,1081,13,XPV_EVENT_STATE,R,0,1,,,,,,,,,R idle
+1084000,1084,14,XPV_EVENT_HANDSHAKE,R,1,1,0x20,,,,,,1,0x0,read data beat 2/2
+1085000,1085,15,XPV_EVENT_STATE,R,0,1,,,,,,,,,R idle
+2200000,2200,16,XPV_EVENT_HANDSHAKE,AW,1,1,0x41,0x90010000,1,5,0x1,,,,demo error: write request will not receive B
+2201000,2201,17,XPV_EVENT_STATE,AW,0,1,,,,,,,,,AW idle
+2220000,2220,18,XPV_EVENT_HANDSHAKE,W,1,1,,,,,,0xffffffff,0,,incomplete-response write beat 1/2
+2221000,2221,19,XPV_EVENT_STATE,W,0,1,,,,,,,,,W idle
+2224000,2224,20,XPV_EVENT_HANDSHAKE,W,1,1,,,,,,0xffffffff,1,,incomplete-response write beat 2/2
+2225000,2225,21,XPV_EVENT_STATE,W,0,1,,,,,,,,,W idle
+3000000,3000,22,XPV_EVENT_HANDSHAKE,AR,1,1,0x31,0x80020000,3,5,0x1,,,,demo error: read response stops before RLAST
+3001000,3001,23,XPV_EVENT_STATE,AR,0,1,,,,,,,,,AR idle
+3080000,3080,24,XPV_EVENT_HANDSHAKE,R,1,1,0x31,,,,,,0,0x0,truncated read response beat 1/4
+3081000,3081,25,XPV_EVENT_STATE,R,0,1,,,,,,,,,R idle
+3084000,3084,26,XPV_EVENT_HANDSHAKE,R,1,1,0x31,,,,,,0,0x0,truncated read response beat 2/4
+3085000,3085,27,XPV_EVENT_STATE,R,0,1,,,,,,,,,R idle
+5000000,5000,28,XPV_EVENT_WINDOW_END,CONTROL,,,,,,,,,,,protocol_incomplete_response: capture window closed

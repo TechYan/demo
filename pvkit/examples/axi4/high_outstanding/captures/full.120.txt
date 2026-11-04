@@ -1,0 +1,108 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                                                                                   AXI / CSV 2.0
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+5.00 µs  ·  26,977 rows  ·  integrity OK
+
+ACTIVITY                                BANDWIDTH                               OUTSTANDING                            
+─────────                               ─────────                               ───────────                            
+66.24%                                  total 208.70 GB/s                       avg 560.94                             
+idle 1.69 µs                            R 105.12  ·  W 103.57 GB/s              peak 1,024                             
+                                        peak 256.00 GB/s                                                               
+Partial write: 0.00% (0 / 2,680 known beats; 0 unknown) [WSTRB]
+
+ TRAFFIC
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Write
+    transactions           2,680  burst size      128 B             
+    beats / txn                1  WSTRB partial   0 / 2,680  (0.00%)
+
+Read
+    transactions           2,720  burst size      128 B
+    beats / txn                1                       
+
+ LATENCY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Write    avg 526.60 ns  p50 512.00 ns  p95 572.00 ns  max 632.00 ns
+Read     avg 512.28 ns  p50 512.00 ns  p95 512.00 ns  max 576.00 ns
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Read BW   ▁▁▁▁▁▁▁▁▁▁▁▇███████████████████████████████████▇▁▄██████████████████████  avg 105.12 GB/s
+                                                                                                   
+Write BW  ██████████████████████████▂▅██████▅█████████▇▃███████████████▁▁▁▁▁▁▁▁▁▁▁  avg 103.57 GB/s
+                                                                                                   
+Read OS   ▂▂▃▃▄▅▅▆▇▇████████████████████████████▇▇▇▇▇▇▇▇▇▇██████████████▇▇▆▅▅▄▃▃▂▂  avg 278.68     
+                                                                                                   
+Write OS  ▂▂▃▃▄▅▅▆▇▇████████████████████████▇▇▇▇████████████████████████▇▇▆▅▅▄▃▃▂▂  avg 282.26     
+
+ BACKPRESSURE
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+AW        ····································█░··································    2.90%
+W         ·······························░▒·······································    2.19%
+B         ···········································░▒···························    2.19%
+                                                                                           
+AR        ······································░█░·······························    2.86%
+R         ··············································▓░························    2.30%
+density   low ░▒▓█ high                                                                    
+
+ DETAILS
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+measurement window    0.00 ps → 5.00 µs · 5.00 µs                             
+bandwidth window      1.00 µs → 4.31 µs · 3.31 µs · auto-active               
+transaction scope     capture (latency / outstanding / backpressure)          
+rows                  26,977 total · 26,975 analyzed                          
+bandwidth peak        total 256.00 GB/s · read 128.00 GB/s · write 128.00 GB/s
+full-window bandwid…  138.24 GB/s                                             
+WSTRB                 2,680 known · 0 partial · 0 unknown · 128 bits          
+
+ REQUEST / RESPONSE
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Showing first 6 of 5,400 transactions with evidence in the window.
+READ  ID=0x0  address=0xa0000000  beats=1  COMPLETED
+  AR 1.00 µs  CSV line 3, seq 2, cycle 1000
+  R first 1.51 µs  CSV line 3075, seq 3074, cycle 1512
+  R response 1.51 µs  CSV line 3075, seq 3074, cycle 1512
+  latency=512.00 ns  response=0
+
+WRITE  ID=0x0  address=0xb0000000  beats=1  COMPLETED
+  AW 1.00 µs  CSV line 4, seq 3, cycle 1000
+  W first 1.00 µs  CSV line 5, seq 4, cycle 1000
+  B response 1.51 µs  CSV line 3076, seq 3075, cycle 1512
+  latency=512.00 ns  response=0
+
+READ  ID=0x1  address=0xa0000080  beats=1  COMPLETED
+  AR 1.00 µs  CSV line 9, seq 8, cycle 1001
+  R first 1.51 µs  CSV line 3085, seq 3084, cycle 1513
+  R response 1.51 µs  CSV line 3085, seq 3084, cycle 1513
+  latency=512.00 ns  response=0
+
+WRITE  ID=0x1  address=0xb0000080  beats=1  COMPLETED
+  AW 1.00 µs  CSV line 10, seq 9, cycle 1001
+  W first 1.00 µs  CSV line 11, seq 10, cycle 1001
+  B response 1.51 µs  CSV line 3086, seq 3085, cycle 1513
+  latency=512.00 ns  response=0
+
+READ  ID=0x2  address=0xa0000100  beats=1  COMPLETED
+  AR 1.00 µs  CSV line 15, seq 14, cycle 1002
+  R first 1.51 µs  CSV line 3095, seq 3094, cycle 1514
+  R response 1.51 µs  CSV line 3095, seq 3094, cycle 1514
+  latency=512.00 ns  response=0
+
+WRITE  ID=0x2  address=0xb0000100  beats=1  COMPLETED
+  AW 1.00 µs  CSV line 16, seq 15, cycle 1002
+  W first 1.00 µs  CSV line 17, seq 16, cycle 1002
+  B response 1.51 µs  CSV line 3096, seq 3095, cycle 1514
+  latency=512.00 ns  response=0
+
+Pairs and fields are existing analyzer evidence. Additional facts and links are in JSON / HTML.
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Active window  1.00 µs → 4.31 µs  ·  auto-active  ·  1 region
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture
+HTML report            pvkit/examples/axi4/high_outstanding/traffic.pv.html                                            
+Tracker log            pvkit/examples/axi4/high_outstanding/traffic.tracker.log                                        
+Analyze log            pvkit/examples/axi4/high_outstanding/traffic.analyze.log                                        

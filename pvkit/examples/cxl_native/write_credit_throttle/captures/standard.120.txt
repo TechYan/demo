@@ -1,0 +1,64 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                                                                 CXL Native / CSV cxl-native-1.0
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+1.06 µs  ·  3,216 rows  ·  integrity OK
+
+ACTIVITY                      BANDWIDTH                     OUTSTANDING                   CREDIT EMPTY                 
+─────────                     ─────────                     ───────────                   ────────────                 
+86.79%                        total 111.30 GB/s             avg 60.38                     worst 11.32%                 
+idle 140.00 ns                W 111.30 GB/s                 peak 80                       M2S_RWD[0] · 1 interval(s)   
+                              peak 128.00 GB/s                                                                         
+Partial write: 0.00% (0 / 1,600 known messages; 0 unknown) [partial-write opcode]
+
+ TRAFFIC
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Write     transactions    1,600  /  102,400 B useful payload
+          partial BE                      0 / 1,600  (0.00%)
+
+CHANNEL        MESSAGES           RATE  TOP OPCODES
+M2S_RWD           1,600  1509.43 Mmsg…  MemWr 1,600
+S2M_NDR           1,600  1509.43 Mmsg…  Cmp 1,600  
+
+ LATENCY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Write    avg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+
+ INITIALIZATION
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+mem_mst     IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 1.02 µs  ·  DEINIT 1.02 µs → 1.04 µs  ·
+            IDLE 1.04 µs → 1.06 µs                                                                                     
+mem_slv     IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 1.02 µs  ·  DEINIT 1.02 µs → 1.04 µs  ·
+            IDLE 1.04 µs → 1.06 µs                                                                                     
+
+ MESSAGE SLOT USAGE
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+ Channel            Messages             Used / configured                       Peak simultaneous                     
+ M2S_REQ            0                    0 / 4                                   0                                     
+ M2S_RWD            1,600                2 / 2                                   2                                     
+ S2M_NDR            1,522                6 / 6                                   2                                     
+ S2M_DRC            0                    0 / 2                                   0                                     
+Issued messages in the statistics window; peak counts distinct slots at one timestamp. These are message slots, not 
+inferred buffer lifetimes.
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Write BW  ███████████████████████████████▅▁▁▁▁▁▁▁▁▁███████████████████████████████  avg 111.30 GB/s
+                                                                                                   
+Write OS  ▃▅▇█████████████████████████████▅▄▁▁▁▁▁▁▁▄▅█████████████████████████████  avg 60.38      
+
+ CREDIT EMPTY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+M2S_RWD[0]     ····························▒███████▓···································   11.32%
+M2S_RWD[1]     ····························▒███████▓···································   11.32%
+density        low ░▒▓█ high                                                                    
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Protocol checks  OK  no structural or transaction-matching issues detected
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Active window  20.00 ns → 940.00 ns  ·  auto-active  ·  1 region
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture
+HTML report         pvkit/examples/cxl_native/write_credit_throttle/traffic.pv.html                                    
+Tracker log         pvkit/examples/cxl_native/write_credit_throttle/traffic.tracker.log                                
+Analyze log         pvkit/examples/cxl_native/write_credit_throttle/traffic.analyze.log                                

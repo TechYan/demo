@@ -1,0 +1,877 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CXL Native · 独立 channel 反复 EMPTY · TUI</title><link rel="stylesheet" href="../../../../assets/site.css"></head>
+<body data-command="python xpv.pyz analyze pvkit/examples/cxl_native/independent_channels/traffic.csv"><main><nav><a href="../../../index.html">← PVKit 场景目录</a></nav>
+<h1>CXL Native · 独立 channel 反复 EMPTY</h1><div class="eyebrow">ACTUAL TUI CAPTURE · XPVKIT 0.5.5</div>
+<p>检查四条读写 channel 的独立耗尽模式。 以下内容由同一份 CSV 经 release 工具实际打印，网页仅回放终端输出。</p>
+<div class="links"><a href="traffic.pv.html">交互 HTML 报告</a><a href="traffic.analyze.log">分析日志</a><a href="traffic.tracker.log">Tracker 日志</a><a href="traffic.csv" download>原始 CSV</a></div>
+<div class="controls"><label>报告模式 <select id="mode"><option value="standard">standard / 概览</option><option value="full">full / 协议详情</option><option value="compact">compact / 摘要</option></select></label>
+<label>终端列数 <select id="width"><option>120</option><option>80</option><option>60</option></select></label></div>
+<div class="terminal"><div class="panel" data-mode="standard" data-width="120"><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic               <span style="color: #727272; text-decoration-color: #727272">                                                                  CXL Native / CSV cxl-native-1.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+2.40 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>4,162 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY                      BANDWIDTH                     OUTSTANDING                   CREDIT EMPTY                 </span>
+<span style="color: #727272; text-decoration-color: #727272">─────────                     ─────────                     ───────────                   ────────────                 </span>
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">90.42%                      </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 60.46 GB/s            </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 34.42                   </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">worst 10.00%                 </span>
+<span style="color: #727272; text-decoration-color: #727272">idle 230.00 ns              </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">R 30.79</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">W 29.67</span><span style="color: #727272; text-decoration-color: #727272"> GB/s</span>      <span style="color: #727272; text-decoration-color: #727272">peak 46                     </span>  <span style="color: #727272; text-decoration-color: #727272">S2M_DRC[1] · 6 interval(s)   </span>
+                              <span style="color: #727272; text-decoration-color: #727272">peak 78.22 GB/s             </span>                                                             
+Partial write: 0.00% (0 / 1,006 known messages; 0 unknown) [partial-write opcode]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write   </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,006  /  64,384 B useful payload
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read    </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,044  /  66,816 B useful payload
+          <span style="color: #727272; text-decoration-color: #727272">partial BE      </span>               0 / 1,006  (0.00%)
+
+<span style="font-weight: bold">CHANNEL      </span>  MESSAGES  <span style="color: #727272; text-decoration-color: #727272">         RATE  </span>TOP OPCODES  
+<span style="font-weight: bold">M2S_REQ      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemRd 1,044  
+<span style="font-weight: bold">M2S_RWD      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>MemWr 1,006  
+<span style="font-weight: bold">S2M_NDR      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>Cmp 1,006    
+<span style="font-weight: bold">S2M_DRC      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemData 1,044
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 40.58 ns  p50 41.00 ns  p95 41.00 ns  max 43.00 ns
+
+<span style="font-weight: bold"> INITIALIZATION</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold">mem_mst     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 2.36 µs  ·  DEINIT 2.36 µs → 2.38 µs  ·
+<span style="font-weight: bold">            </span>IDLE 2.38 µs → 2.40 µs                                                                                     
+<span style="font-weight: bold">mem_slv     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 2.36 µs  ·  DEINIT 2.36 µs → 2.38 µs  ·
+<span style="font-weight: bold">            </span>IDLE 2.38 µs → 2.40 µs                                                                                     
+
+<span style="font-weight: bold"> MESSAGE SLOT USAGE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold"> Channel            Messages             Used / configured                       Peak simultaneous                     </span>
+ M2S_REQ            1,044                4 / 4                                   4                                     
+ M2S_RWD            1,006                2 / 2                                   2                                     
+ S2M_NDR            1,006                6 / 6                                   2                                     
+ S2M_DRC            1,044                2 / 2                                   2                                     
+<span style="color: #727272; text-decoration-color: #727272">Issued messages in the statistics window; peak counts distinct slots at one timestamp. These are message slots, not </span>
+<span style="color: #727272; text-decoration-color: #727272">inferred buffer lifetimes.</span>
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▃▇▆▅▇▆▇▆▆▇▆█▆▇▆▄▇▆▇▆▆▇▆▇▆▇▅▅▇▆█▆▇▆▆▇▆▇▅▆▇▆█▆▇▆▆▇▆▇▅▇▆▆▇▆▇▆▆▇▆▆▅▇▆▆▇▆▇▆▆</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">30.79 GB/s</span>
+                                                                                                  
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇▆▆▆▆▆▇▄▆▆▆▆▇▆▆▆▆▆▆▄▆▆▆▆▆▇▆▆▆▆▄▆▆▆▆▆▆▇▆▆▆▆▄▇▆▆▆▆▆▆▇▆▆▃▅▆▇▆▆▆▆▆▇▆▅▃▅▆▇▆▄▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">29.67 GB/s</span>
+                                                                                                  
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▅▇█▆█▇▇█▇█▇█▇▇▇▆█▇▇█▇█▇█▇▇▇▇█▇█▇▇█▇█▇▇▇▇█▇█▇▇█▇█▇▆▆▇█▇█▇▇█▇█▇▆▆▇█▇█▇▇█▇▃</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">17.65     </span>
+                                                                                                  
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▄▇▇▇▇▇▇▆▆▇▇▇▇▇▇▇▇▇▆▅▇▇▇▇▇▇▇▇▇▇▆▅▇▇▇▇▇▇▇▇▇▇▅▆▇▇▇▇▇▇▇▇▇▅▆▇▇▇▇▇▇▇▇▇▇▅▆▇▇▇▇▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">16.77     </span>
+
+<span style="font-weight: bold"> CREDIT EMPTY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_REQ[2]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···▓·········▒▒·········█░········▒░·········▓·········▒▒···············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  7.50%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_RWD[0]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">······▒▓·········▓░········▒▓·········▓░········▒▓·········▓░···········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_NDR[4]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·······▓▒········░▓·········▓▒········░▓·········▓▒········░▓···········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  8.75%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_DRC[1]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····░▓·········▓░········░▓·········▓░········░▓·········▓░·············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #727272; text-decoration-color: #727272">density       </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                                                    </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  20.00 ns → 2.19 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report         </span>pvkit/examples/cxl_native/independent_channels/traffic.pv.html                                     
+<span style="color: #727272; text-decoration-color: #727272">Tracker log         </span>pvkit/examples/cxl_native/independent_channels/traffic.tracker.log                                 
+<span style="color: #727272; text-decoration-color: #727272">Analyze log         </span>pvkit/examples/cxl_native/independent_channels/traffic.analyze.log                                 
+</pre></div><div class="panel" data-mode="full" data-width="120" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic               <span style="color: #727272; text-decoration-color: #727272">                                                                  CXL Native / CSV cxl-native-1.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+2.40 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>4,162 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY                      BANDWIDTH                     OUTSTANDING                   CREDIT EMPTY                 </span>
+<span style="color: #727272; text-decoration-color: #727272">─────────                     ─────────                     ───────────                   ────────────                 </span>
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">90.42%                      </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 60.46 GB/s            </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 34.42                   </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">worst 10.00%                 </span>
+<span style="color: #727272; text-decoration-color: #727272">idle 230.00 ns              </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">R 30.79</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">W 29.67</span><span style="color: #727272; text-decoration-color: #727272"> GB/s</span>      <span style="color: #727272; text-decoration-color: #727272">peak 46                     </span>  <span style="color: #727272; text-decoration-color: #727272">S2M_DRC[1] · 6 interval(s)   </span>
+                              <span style="color: #727272; text-decoration-color: #727272">peak 78.22 GB/s             </span>                                                             
+Partial write: 0.00% (0 / 1,006 known messages; 0 unknown) [partial-write opcode]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write   </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,006  /  64,384 B useful payload
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read    </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,044  /  66,816 B useful payload
+          <span style="color: #727272; text-decoration-color: #727272">partial BE      </span>               0 / 1,006  (0.00%)
+
+<span style="font-weight: bold">CHANNEL      </span>  MESSAGES  <span style="color: #727272; text-decoration-color: #727272">         RATE  </span>TOP OPCODES  
+<span style="font-weight: bold">M2S_REQ      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemRd 1,044  
+<span style="font-weight: bold">M2S_RWD      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>MemWr 1,006  
+<span style="font-weight: bold">S2M_NDR      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>Cmp 1,006    
+<span style="font-weight: bold">S2M_DRC      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemData 1,044
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 40.58 ns  p50 41.00 ns  p95 41.00 ns  max 43.00 ns
+
+<span style="font-weight: bold"> INITIALIZATION</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold">mem_mst     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 2.36 µs  ·  DEINIT 2.36 µs → 2.38 µs  ·
+<span style="font-weight: bold">            </span>IDLE 2.38 µs → 2.40 µs                                                                                     
+<span style="font-weight: bold">mem_slv     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns → 2.36 µs  ·  DEINIT 2.36 µs → 2.38 µs  ·
+<span style="font-weight: bold">            </span>IDLE 2.38 µs → 2.40 µs                                                                                     
+
+<span style="font-weight: bold"> MESSAGE SLOT USAGE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold"> Channel            Messages             Used / configured                       Peak simultaneous                     </span>
+ M2S_REQ            1,044                4 / 4                                   4                                     
+ M2S_RWD            1,006                2 / 2                                   2                                     
+ S2M_NDR            1,006                6 / 6                                   2                                     
+ S2M_DRC            1,044                2 / 2                                   2                                     
+M2S_REQ  S0=267  S1=267  S2=243  S3=267
+M2S_RWD  S0=473  S1=533
+S2M_NDR  S0=171  S1=171  S2=171  S3=171  S4=152  S5=170
+S2M_DRC  S0=574  S1=470
+<span style="color: #727272; text-decoration-color: #727272">Issued messages in the statistics window; peak counts distinct slots at one timestamp. These are message slots, not </span>
+<span style="color: #727272; text-decoration-color: #727272">inferred buffer lifetimes.</span>
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▃▇▆▅▇▆▇▆▆▇▆█▆▇▆▄▇▆▇▆▆▇▆▇▆▇▅▅▇▆█▆▇▆▆▇▆▇▅▆▇▆█▆▇▆▆▇▆▇▅▇▆▆▇▆▇▆▆▇▆▆▅▇▆▆▇▆▇▆▆</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">30.79 GB/s</span>
+                                                                                                  
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇▆▆▆▆▆▇▄▆▆▆▆▇▆▆▆▆▆▆▄▆▆▆▆▆▇▆▆▆▆▄▆▆▆▆▆▆▇▆▆▆▆▄▇▆▆▆▆▆▆▇▆▆▃▅▆▇▆▆▆▆▆▇▆▅▃▅▆▇▆▄▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">29.67 GB/s</span>
+                                                                                                  
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▅▇█▆█▇▇█▇█▇█▇▇▇▆█▇▇█▇█▇█▇▇▇▇█▇█▇▇█▇█▇▇▇▇█▇█▇▇█▇█▇▆▆▇█▇█▇▇█▇█▇▆▆▇█▇█▇▇█▇▃</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">17.65     </span>
+                                                                                                  
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▄▇▇▇▇▇▇▆▆▇▇▇▇▇▇▇▇▇▆▅▇▇▇▇▇▇▇▇▇▇▆▅▇▇▇▇▇▇▇▇▇▇▅▆▇▇▇▇▇▇▇▇▇▅▆▇▇▇▇▇▇▇▇▇▇▅▆▇▇▇▇▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">16.77     </span>
+
+<span style="font-weight: bold"> CREDIT EMPTY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_REQ[2]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···▓·········▒▒·········█░········▒░·········▓·········▒▒···············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  7.50%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_RWD[0]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">······▒▓·········▓░········▒▓·········▓░········▒▓·········▓░···········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_NDR[4]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·······▓▒········░▓·········▓▒········░▓·········▓▒········░▓···········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  8.75%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_DRC[1]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····░▓·········▓░········░▓·········▓░········░▓·········▓░·············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #727272; text-decoration-color: #727272">density       </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                                                    </span>
+
+<span style="font-weight: bold"> DETAILS</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">measurement window    </span>0.00 ps → 2.40 µs · 2.40 µs                                              
+<span style="color: #727272; text-decoration-color: #727272">bandwidth window      </span>20.00 ns → 2.19 µs · 2.17 µs · auto-active                               
+<span style="color: #727272; text-decoration-color: #727272">transaction scope     </span>capture (latency / outstanding / backpressure)                           
+<span style="color: #727272; text-decoration-color: #727272">rows                  </span>4,162 total · 4,150 analyzed                                             
+<span style="color: #727272; text-decoration-color: #727272">profile               </span>cxl3_256b_non_pbr_1024                                                   
+<span style="color: #727272; text-decoration-color: #727272">message slots         </span>M2S_REQ 4 · M2S_RWD 2 · S2M_NDR 6 · S2M_DRC 2 · M2S_BIRSP 0 · S2M_BISNP 0
+<span style="color: #727272; text-decoration-color: #727272">bandwidth peak        </span>total 78.22 GB/s · read 42.67 GB/s · write 35.56 GB/s                    
+<span style="color: #727272; text-decoration-color: #727272">full-window bandwid…  </span>54.67 GB/s                                                               
+<span style="color: #727272; text-decoration-color: #727272">byte enable           </span>1,006 known · 0 partial · 0 unknown · 64 bits                            
+
+<span style="font-weight: bold"> REQUEST / RESPONSE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Showing first 6 of 2,050 request groups intersecting the window.</span>
+<span style="font-weight: bold">REQ M2S_REQ[0]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1000  ld_id=0x0  ckid=0x0  tc=0x0  address=0x40000000  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 9, seq 8, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[0]  MemData  60.00 ns</span>
+  opcode_raw=0x0  tag=0x1000  ld_id=0x0  meta_field=0x0  meta_value=0x0  poison=0  trp=0  devload=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 55, seq 54, cycle 60; MemData 64 B</span>
+  relation=drs  latency=40.00 ns
+
+<span style="font-weight: bold">REQ M2S_REQ[1]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1001  ld_id=0x0  ckid=0x1  tc=0x1  address=0x40000040  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 10, seq 9, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[1]  MemData  60.00 ns</span>
+  opcode_raw=0x0  tag=0x1001  ld_id=0x0  meta_field=0x0  meta_value=0x0  poison=0  trp=0  devload=0x1  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 56, seq 55, cycle 60; MemData 64 B</span>
+  relation=drs  latency=40.00 ns
+
+<span style="font-weight: bold">REQ M2S_REQ[2]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1002  ld_id=0x0  ckid=0x2  tc=0x2  address=0x40000080  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 11, seq 10, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[0]  MemData  61.00 ns</span>
+  opcode_raw=0x0  tag=0x1002  ld_id=0x0  meta_field=0x0  meta_value=0x0  poison=0  trp=0  devload=0x2  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 59, seq 58, cycle 61; MemData 64 B</span>
+  relation=drs  latency=41.00 ns
+
+<span style="font-weight: bold">REQ M2S_REQ[3]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1003  ld_id=0x0  ckid=0x3  tc=0x3  address=0x400000c0  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 12, seq 11, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[1]  MemData  61.00 ns</span>
+  opcode_raw=0x0  tag=0x1003  ld_id=0x0  meta_field=0x0  meta_value=0x0  poison=0  trp=0  devload=0x3  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 60, seq 59, cycle 61; MemData 64 B</span>
+  relation=drs  latency=41.00 ns
+
+<span style="font-weight: bold">REQ M2S_RWD[0]  MemWr  20.00 ns</span>
+  opcode_raw=0x1  tag=0x8000  ld_id=0x0  ckid=0x0  tc=0x0  address=0x80000000  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  byte_enable=0xffffffffffffffff  poison=0  trp=0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 13, seq 12, cycle 20; MemWr 64 B</span>
+<span style="font-weight: bold">RSP S2M_NDR[0]  Cmp  60.00 ns</span>
+  opcode_raw=0x0  tag=0x8000  ld_id=0x0  meta_field=0x0  meta_value=0x0  devload=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 57, seq 56, cycle 60; Cmp</span>
+  relation=ndr  latency=40.00 ns
+
+<span style="font-weight: bold">REQ M2S_RWD[1]  MemWr  20.00 ns</span>
+  opcode_raw=0x1  tag=0x8001  ld_id=0x0  ckid=0x1  tc=0x1  address=0x80000040  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  byte_enable=0xffffffffffffffff  poison=0  trp=0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 14, seq 13, cycle 20; MemWr 64 B</span>
+<span style="font-weight: bold">RSP S2M_NDR[1]  Cmp  60.00 ns</span>
+  opcode_raw=0x0  tag=0x8001  ld_id=0x0  meta_field=0x0  meta_value=0x0  devload=0x1  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 58, seq 57, cycle 60; Cmp</span>
+  relation=ndr  latency=40.00 ns
+
+<span style="color: #727272; text-decoration-color: #727272">Pairs and fields are existing analyzer evidence. Additional facts and links are in JSON / HTML.</span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  20.00 ns → 2.19 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report         </span>pvkit/examples/cxl_native/independent_channels/traffic.pv.html                                     
+<span style="color: #727272; text-decoration-color: #727272">Tracker log         </span>pvkit/examples/cxl_native/independent_channels/traffic.tracker.log                                 
+<span style="color: #727272; text-decoration-color: #727272">Analyze log         </span>pvkit/examples/cxl_native/independent_channels/traffic.analyze.log                                 
+</pre></div><div class="panel" data-mode="compact" data-width="120" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic               <span style="color: #727272; text-decoration-color: #727272">                                                                  CXL Native / CSV cxl-native-1.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+2.40 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>4,162 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY                      BANDWIDTH                     OUTSTANDING                   CREDIT EMPTY                 </span>
+<span style="color: #727272; text-decoration-color: #727272">─────────                     ─────────                     ───────────                   ────────────                 </span>
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">90.42%                      </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 60.46 GB/s            </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 34.42                   </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">worst 10.00%                 </span>
+<span style="color: #727272; text-decoration-color: #727272">idle 230.00 ns              </span>  <span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">R 30.79</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">W 29.67</span><span style="color: #727272; text-decoration-color: #727272"> GB/s</span>      <span style="color: #727272; text-decoration-color: #727272">peak 46                     </span>  <span style="color: #727272; text-decoration-color: #727272">S2M_DRC[1] · 6 interval(s)   </span>
+                              <span style="color: #727272; text-decoration-color: #727272">peak 78.22 GB/s             </span>                                                             
+Partial write: 0.00% (0 / 1,006 known messages; 0 unknown) [partial-write opcode]
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁▃▇▆▅▇▆▇▆▆▇▆█▆▇▆▄▇▆▇▆▆▇▆▇▆▇▅▅▇▆█▆▇▆▆▇▆▇▅▆▇▆█▆▇▆▆▇▆▇▅▇▆▆▇▆▇▆▆▇▆▆▅▇▆▆▇▆▇▆▆</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">30.79 GB/s</span>
+                                                                                                  
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇▆▆▆▆▆▇▄▆▆▆▆▇▆▆▆▆▆▆▄▆▆▆▆▆▇▆▆▆▆▄▆▆▆▆▆▆▇▆▆▆▆▄▇▆▆▆▆▆▆▇▆▆▃▅▆▇▆▆▆▆▆▇▆▅▃▅▆▇▆▄▁</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">29.67 GB/s</span>
+                                                                                                  
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▅▇█▆█▇▇█▇█▇█▇▇▇▆█▇▇█▇█▇█▇▇▇▇█▇█▇▇█▇█▇▇▇▇█▇█▇▇█▇█▇▆▆▇█▇█▇▇█▇█▇▆▆▇█▇█▇▇█▇▃</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">17.65     </span>
+                                                                                                  
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▄▇▇▇▇▇▇▆▆▇▇▇▇▇▇▇▇▇▆▅▇▇▇▇▇▇▇▇▇▇▆▅▇▇▇▇▇▇▇▇▇▇▅▆▇▇▇▇▇▇▇▇▇▅▆▇▇▇▇▇▇▇▇▇▇▅▆▇▇▇▇▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">16.77     </span>
+
+<span style="font-weight: bold"> CREDIT EMPTY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_REQ[2]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···▓·········▒▒·········█░········▒░·········▓·········▒▒···············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  7.50%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_RWD[0]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">······▒▓·········▓░········▒▓·········▓░········▒▓·········▓░···········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_NDR[4]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·······▓▒········░▓·········▓▒········░▓·········▓▒········░▓···········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  8.75%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_DRC[1]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····░▓·········▓░········░▓·········▓░········░▓·········▓░·············</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #727272; text-decoration-color: #727272">density       </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                                                    </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  20.00 ns → 2.19 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report         </span>pvkit/examples/cxl_native/independent_channels/traffic.pv.html                                     
+<span style="color: #727272; text-decoration-color: #727272">Tracker log         </span>pvkit/examples/cxl_native/independent_channels/traffic.tracker.log                                 
+<span style="color: #727272; text-decoration-color: #727272">Analyze log         </span>pvkit/examples/cxl_native/independent_channels/traffic.analyze.log                                 
+</pre></div><div class="panel" data-mode="standard" data-width="80" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic        <span style="color: #727272; text-decoration-color: #727272">                                 CXL Native / CSV cxl-native-1.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+2.40 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>4,162 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY           </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">90.42%                   </span> <span style="color: #727272; text-decoration-color: #727272">idle 230.00 ns                    </span>
+<span style="font-weight: bold">BANDWIDTH          </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 60.46 GB/s         </span>                                   
+<span style="font-weight: bold">                   </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 30.79 GB/s          </span>                                   
+<span style="font-weight: bold">                   </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 29.67 GB/s         </span>                                   
+<span style="font-weight: bold">                   </span><span style="color: #727272; text-decoration-color: #727272">peak 78.22 GB/s          </span>                                   
+<span style="font-weight: bold">OUTSTANDING        </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 34.42                </span> <span style="color: #727272; text-decoration-color: #727272">peak 46                           </span>
+<span style="font-weight: bold">CREDIT EMPTY       </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">worst 10.00%             </span> <span style="color: #727272; text-decoration-color: #727272">S2M_DRC[1] · 6 interval(s)        </span>
+Partial write: 0.00% (0 / 1,006 known messages; 0 unknown) [partial-write 
+opcode]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write   </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,006  /  64,384 B useful payload
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read    </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,044  /  66,816 B useful payload
+          <span style="color: #727272; text-decoration-color: #727272">partial BE      </span>               0 / 1,006  (0.00%)
+
+<span style="font-weight: bold">CHANNEL      </span>  MESSAGES  <span style="color: #727272; text-decoration-color: #727272">         RATE  </span>TOP OPCODES  
+<span style="font-weight: bold">M2S_REQ      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemRd 1,044  
+<span style="font-weight: bold">M2S_RWD      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>MemWr 1,006  
+<span style="font-weight: bold">S2M_NDR      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>Cmp 1,006    
+<span style="font-weight: bold">S2M_DRC      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemData 1,044
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 40.58 ns  p50 41.00 ns  p95 41.00 ns  max 43.00 ns
+
+<span style="font-weight: bold"> INITIALIZATION</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold">mem_mst     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+<span style="font-weight: bold">            </span>2.36 µs  ·  DEINIT 2.36 µs → 2.38 µs  ·  IDLE 2.38 µs → 2.40 µs    
+<span style="font-weight: bold">mem_slv     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+<span style="font-weight: bold">            </span>2.36 µs  ·  DEINIT 2.36 µs → 2.38 µs  ·  IDLE 2.38 µs → 2.40 µs    
+
+<span style="font-weight: bold"> MESSAGE SLOT USAGE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold"> Channel      Messages      Used / configured         Peak simultaneous        </span>
+ M2S_REQ      1,044         4 / 4                     4                        
+ M2S_RWD      1,006         2 / 2                     2                        
+ S2M_NDR      1,006         6 / 6                     2                        
+ S2M_DRC      1,044         2 / 2                     2                        
+<span style="color: #727272; text-decoration-color: #727272">Issued messages in the statistics window; peak counts distinct slots at one </span>
+<span style="color: #727272; text-decoration-color: #727272">timestamp. These are message slots, not inferred buffer lifetimes.</span>
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁█▆▇▇██▇██▆▇▇██▇██▆▇▇██▇██▆██▇█▇█▇▆██▇█▇█▇▆██▇█▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">30.79 GB/s</span>
+                                                                          
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇█▇▇▆▆▇▇▇█▇▇▅▇▇▇▇█▇▇▄▇▇▇█▇▇▇▆▇▇▇█▇▇▆▆▇▇▇█▇▇▅▇▇▇▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">29.67 GB/s</span>
+                                                                          
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇█▆██▇██▇▇▆██▇██▇▇▇██▇██▇▇█▇█▇██▇▆█▇█▇██▇▆█▇█▇█▆</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">17.65     </span>
+                                                                          
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇▇▅</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">16.77     </span>
+
+<span style="font-weight: bold"> CREDIT EMPTY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_REQ[2]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··▒······▒······▓······▒······▒······▓··········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  7.50%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_RWD[0]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····▒░·····▒░·····▒░·····▒░·····▒░·····▒░·······</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_NDR[4]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····░▒·····░▒·····░▒·····░▒·····░▒·····░▒·······</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  8.75%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_DRC[1]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···▓······▓······▓······▓······▓······▓·········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #727272; text-decoration-color: #727272">density       </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                            </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  20.00 ns → 2.19 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: </span>
+<span style="color: #727272; text-decoration-color: #727272">capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report  </span>pvkit/examples/cxl_native/independent_channels/traffic.pv.html    
+<span style="color: #727272; text-decoration-color: #727272">Tracker log  </span>pvkit/examples/cxl_native/independent_channels/traffic.tracker.log
+<span style="color: #727272; text-decoration-color: #727272">Analyze log  </span>pvkit/examples/cxl_native/independent_channels/traffic.analyze.log
+</pre></div><div class="panel" data-mode="full" data-width="80" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic        <span style="color: #727272; text-decoration-color: #727272">                                 CXL Native / CSV cxl-native-1.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+2.40 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>4,162 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY           </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">90.42%                   </span> <span style="color: #727272; text-decoration-color: #727272">idle 230.00 ns                    </span>
+<span style="font-weight: bold">BANDWIDTH          </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 60.46 GB/s         </span>                                   
+<span style="font-weight: bold">                   </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 30.79 GB/s          </span>                                   
+<span style="font-weight: bold">                   </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 29.67 GB/s         </span>                                   
+<span style="font-weight: bold">                   </span><span style="color: #727272; text-decoration-color: #727272">peak 78.22 GB/s          </span>                                   
+<span style="font-weight: bold">OUTSTANDING        </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 34.42                </span> <span style="color: #727272; text-decoration-color: #727272">peak 46                           </span>
+<span style="font-weight: bold">CREDIT EMPTY       </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">worst 10.00%             </span> <span style="color: #727272; text-decoration-color: #727272">S2M_DRC[1] · 6 interval(s)        </span>
+Partial write: 0.00% (0 / 1,006 known messages; 0 unknown) [partial-write 
+opcode]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write   </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,006  /  64,384 B useful payload
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read    </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,044  /  66,816 B useful payload
+          <span style="color: #727272; text-decoration-color: #727272">partial BE      </span>               0 / 1,006  (0.00%)
+
+<span style="font-weight: bold">CHANNEL      </span>  MESSAGES  <span style="color: #727272; text-decoration-color: #727272">         RATE  </span>TOP OPCODES  
+<span style="font-weight: bold">M2S_REQ      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemRd 1,044  
+<span style="font-weight: bold">M2S_RWD      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>MemWr 1,006  
+<span style="font-weight: bold">S2M_NDR      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>Cmp 1,006    
+<span style="font-weight: bold">S2M_DRC      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemData 1,044
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 40.00 ns  p50 40.00 ns  p95 40.00 ns  max 40.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 40.58 ns  p50 41.00 ns  p95 41.00 ns  max 43.00 ns
+
+<span style="font-weight: bold"> INITIALIZATION</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold">mem_mst     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+<span style="font-weight: bold">            </span>2.36 µs  ·  DEINIT 2.36 µs → 2.38 µs  ·  IDLE 2.38 µs → 2.40 µs    
+<span style="font-weight: bold">mem_slv     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 ns  ·  RUN 4.00 ns →
+<span style="font-weight: bold">            </span>2.36 µs  ·  DEINIT 2.36 µs → 2.38 µs  ·  IDLE 2.38 µs → 2.40 µs    
+
+<span style="font-weight: bold"> MESSAGE SLOT USAGE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold"> Channel      Messages      Used / configured         Peak simultaneous        </span>
+ M2S_REQ      1,044         4 / 4                     4                        
+ M2S_RWD      1,006         2 / 2                     2                        
+ S2M_NDR      1,006         6 / 6                     2                        
+ S2M_DRC      1,044         2 / 2                     2                        
+M2S_REQ  S0=267  S1=267  S2=243  S3=267
+M2S_RWD  S0=473  S1=533
+S2M_NDR  S0=171  S1=171  S2=171  S3=171  S4=152  S5=170
+S2M_DRC  S0=574  S1=470
+<span style="color: #727272; text-decoration-color: #727272">Issued messages in the statistics window; peak counts distinct slots at one </span>
+<span style="color: #727272; text-decoration-color: #727272">timestamp. These are message slots, not inferred buffer lifetimes.</span>
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁█▆▇▇██▇██▆▇▇██▇██▆▇▇██▇██▆██▇█▇█▇▆██▇█▇█▇▆██▇█▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">30.79 GB/s</span>
+                                                                          
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇█▇▇▆▆▇▇▇█▇▇▅▇▇▇▇█▇▇▄▇▇▇█▇▇▇▆▇▇▇█▇▇▆▆▇▇▇█▇▇▅▇▇▇▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">29.67 GB/s</span>
+                                                                          
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇█▆██▇██▇▇▆██▇██▇▇▇██▇██▇▇█▇█▇██▇▆█▇█▇██▇▆█▇█▇█▆</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">17.65     </span>
+                                                                          
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇▇▅</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">16.77     </span>
+
+<span style="font-weight: bold"> CREDIT EMPTY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_REQ[2]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··▒······▒······▓······▒······▒······▓··········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  7.50%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_RWD[0]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····▒░·····▒░·····▒░·····▒░·····▒░·····▒░·······</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_NDR[4]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····░▒·····░▒·····░▒·····░▒·····░▒·····░▒·······</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  8.75%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_DRC[1]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···▓······▓······▓······▓······▓······▓·········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #727272; text-decoration-color: #727272">density       </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                            </span>
+
+<span style="font-weight: bold"> DETAILS</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">measurement window    </span>0.00 ps → 2.40 µs · 2.40 µs                              
+<span style="color: #727272; text-decoration-color: #727272">bandwidth window      </span>20.00 ns → 2.19 µs · 2.17 µs · auto-active               
+<span style="color: #727272; text-decoration-color: #727272">transaction scope     </span>capture (latency / outstanding / backpressure)           
+<span style="color: #727272; text-decoration-color: #727272">rows                  </span>4,162 total · 4,150 analyzed                             
+<span style="color: #727272; text-decoration-color: #727272">profile               </span>cxl3_256b_non_pbr_1024                                   
+<span style="color: #727272; text-decoration-color: #727272">message slots         </span>M2S_REQ 4 · M2S_RWD 2 · S2M_NDR 6 · S2M_DRC 2 · M2S_BIRSP
+<span style="color: #727272; text-decoration-color: #727272">                      </span>0 · S2M_BISNP 0                                          
+<span style="color: #727272; text-decoration-color: #727272">bandwidth peak        </span>total 78.22 GB/s · read 42.67 GB/s · write 35.56 GB/s    
+<span style="color: #727272; text-decoration-color: #727272">full-window bandwid…  </span>54.67 GB/s                                               
+<span style="color: #727272; text-decoration-color: #727272">byte enable           </span>1,006 known · 0 partial · 0 unknown · 64 bits            
+
+<span style="font-weight: bold"> REQUEST / RESPONSE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Showing first 6 of 2,050 request groups intersecting the window.</span>
+<span style="font-weight: bold">REQ M2S_REQ[0]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1000  ld_id=0x0  ckid=0x0  tc=0x0  address=0x40000000  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 9, seq 8, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[0]  MemData  60.00 ns</span>
+  opcode_raw=0x0  tag=0x1000  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+poison=0  trp=0  devload=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 55, seq 54, cycle 60; MemData 64 B</span>
+  relation=drs  latency=40.00 ns
+
+<span style="font-weight: bold">REQ M2S_REQ[1]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1001  ld_id=0x0  ckid=0x1  tc=0x1  address=0x40000040  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 10, seq 9, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[1]  MemData  60.00 ns</span>
+  opcode_raw=0x0  tag=0x1001  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+poison=0  trp=0  devload=0x1  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 56, seq 55, cycle 60; MemData 64 B</span>
+  relation=drs  latency=40.00 ns
+
+<span style="font-weight: bold">REQ M2S_REQ[2]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1002  ld_id=0x0  ckid=0x2  tc=0x2  address=0x40000080  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 11, seq 10, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[0]  MemData  61.00 ns</span>
+  opcode_raw=0x0  tag=0x1002  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+poison=0  trp=0  devload=0x2  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 59, seq 58, cycle 61; MemData 64 B</span>
+  relation=drs  latency=41.00 ns
+
+<span style="font-weight: bold">REQ M2S_REQ[3]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1003  ld_id=0x0  ckid=0x3  tc=0x3  address=0x400000c0  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 12, seq 11, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[1]  MemData  61.00 ns</span>
+  opcode_raw=0x0  tag=0x1003  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+poison=0  trp=0  devload=0x3  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 60, seq 59, cycle 61; MemData 64 B</span>
+  relation=drs  latency=41.00 ns
+
+<span style="font-weight: bold">REQ M2S_RWD[0]  MemWr  20.00 ns</span>
+  opcode_raw=0x1  tag=0x8000  ld_id=0x0  ckid=0x0  tc=0x0  address=0x80000000  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  byte_enable=0xffffffffffffffff  
+poison=0  trp=0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 13, seq 12, cycle 20; MemWr 64 B</span>
+<span style="font-weight: bold">RSP S2M_NDR[0]  Cmp  60.00 ns</span>
+  opcode_raw=0x0  tag=0x8000  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+devload=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 57, seq 56, cycle 60; Cmp</span>
+  relation=ndr  latency=40.00 ns
+
+<span style="font-weight: bold">REQ M2S_RWD[1]  MemWr  20.00 ns</span>
+  opcode_raw=0x1  tag=0x8001  ld_id=0x0  ckid=0x1  tc=0x1  address=0x80000040  
+snp_type=0x0  meta_field=0x0  meta_value=0x0  byte_enable=0xffffffffffffffff  
+poison=0  trp=0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 14, seq 13, cycle 20; MemWr 64 B</span>
+<span style="font-weight: bold">RSP S2M_NDR[1]  Cmp  60.00 ns</span>
+  opcode_raw=0x0  tag=0x8001  ld_id=0x0  meta_field=0x0  meta_value=0x0  
+devload=0x1  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 58, seq 57, cycle 60; Cmp</span>
+  relation=ndr  latency=40.00 ns
+
+<span style="color: #727272; text-decoration-color: #727272">Pairs and fields are existing analyzer evidence. Additional facts and links are</span>
+<span style="color: #727272; text-decoration-color: #727272">in JSON / HTML.</span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  20.00 ns → 2.19 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: </span>
+<span style="color: #727272; text-decoration-color: #727272">capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report  </span>pvkit/examples/cxl_native/independent_channels/traffic.pv.html    
+<span style="color: #727272; text-decoration-color: #727272">Tracker log  </span>pvkit/examples/cxl_native/independent_channels/traffic.tracker.log
+<span style="color: #727272; text-decoration-color: #727272">Analyze log  </span>pvkit/examples/cxl_native/independent_channels/traffic.analyze.log
+</pre></div><div class="panel" data-mode="compact" data-width="80" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic        <span style="color: #727272; text-decoration-color: #727272">                                 CXL Native / CSV cxl-native-1.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+2.40 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>4,162 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY           </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">90.42%                   </span> <span style="color: #727272; text-decoration-color: #727272">idle 230.00 ns                    </span>
+<span style="font-weight: bold">BANDWIDTH          </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 60.46 GB/s         </span>                                   
+<span style="font-weight: bold">                   </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 30.79 GB/s          </span>                                   
+<span style="font-weight: bold">                   </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 29.67 GB/s         </span>                                   
+<span style="font-weight: bold">                   </span><span style="color: #727272; text-decoration-color: #727272">peak 78.22 GB/s          </span>                                   
+<span style="font-weight: bold">OUTSTANDING        </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 34.42                </span> <span style="color: #727272; text-decoration-color: #727272">peak 46                           </span>
+<span style="font-weight: bold">CREDIT EMPTY       </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">worst 10.00%             </span> <span style="color: #727272; text-decoration-color: #727272">S2M_DRC[1] · 6 interval(s)        </span>
+Partial write: 0.00% (0 / 1,006 known messages; 0 unknown) [partial-write 
+opcode]
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▁█▆▇▇██▇██▆▇▇██▇██▆▇▇██▇██▆██▇█▇█▇▆██▇█▇█▇▆██▇█▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">30.79 GB/s</span>
+                                                                          
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇█▇▇▆▆▇▇▇█▇▇▅▇▇▇▇█▇▇▄▇▇▇█▇▇▇▆▇▇▇█▇▇▆▆▇▇▇█▇▇▅▇▇▇▂</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">29.67 GB/s</span>
+                                                                          
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇█▆██▇██▇▇▆██▇██▇▇▇██▇██▇▇█▇█▇██▇▆█▇█▇██▇▆█▇█▇█▆</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">17.65     </span>
+                                                                          
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇▇▇▇▇▆▇▇▇▇▇▇▆▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▇▇▇▅</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">16.77     </span>
+
+<span style="font-weight: bold"> CREDIT EMPTY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_REQ[2]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··▒······▒······▓······▒······▒······▓··········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  7.50%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_RWD[0]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····▒░·····▒░·····▒░·····▒░·····▒░·····▒░·······</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_NDR[4]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">····░▒·····░▒·····░▒·····░▒·····░▒·····░▒·······</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  8.75%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_DRC[1]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">···▓······▓······▓······▓······▓······▓·········</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #727272; text-decoration-color: #727272">density       </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                                            </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  20.00 ns → 2.19 µs  ·  auto-active  ·  1 region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: </span>
+<span style="color: #727272; text-decoration-color: #727272">capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML report  </span>pvkit/examples/cxl_native/independent_channels/traffic.pv.html    
+<span style="color: #727272; text-decoration-color: #727272">Tracker log  </span>pvkit/examples/cxl_native/independent_channels/traffic.tracker.log
+<span style="color: #727272; text-decoration-color: #727272">Analyze log  </span>pvkit/examples/cxl_native/independent_channels/traffic.analyze.log
+</pre></div><div class="panel" data-mode="standard" data-width="60" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic
+<span style="color: #727272; text-decoration-color: #727272">CXL Native / CSV cxl-native-1.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+2.40 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>4,162 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY      </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">90.42%            </span> <span style="color: #727272; text-decoration-color: #727272">idle 230.00 ns            </span>
+<span style="font-weight: bold">BANDWIDTH     </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 60.46 GB/s  </span>                           
+<span style="font-weight: bold">              </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 30.79 GB/s   </span>                           
+<span style="font-weight: bold">              </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 29.67 GB/s  </span>                           
+<span style="font-weight: bold">              </span><span style="color: #727272; text-decoration-color: #727272">peak 78.22 GB/s   </span>                           
+<span style="font-weight: bold">OUTSTANDING   </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 34.42         </span> <span style="color: #727272; text-decoration-color: #727272">peak 46                   </span>
+<span style="font-weight: bold">CREDIT EMPTY  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">worst 10.00%      </span> <span style="color: #727272; text-decoration-color: #727272">S2M_DRC[1] · 6 interval(s)</span>
+Partial write: 0.00% (0 / 1,006 known messages; 0 unknown) 
+[partial-write opcode]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write   </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,006  /  64,384 B useful payload
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read    </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,044  /  66,816 B useful payload
+          <span style="color: #727272; text-decoration-color: #727272">partial BE      </span>               0 / 1,006  (0.00%)
+
+<span style="font-weight: bold">CHANNEL      </span>  MESSAGES  <span style="color: #727272; text-decoration-color: #727272">         RATE  </span>TOP OPCODES  
+<span style="font-weight: bold">M2S_REQ      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemRd 1,044  
+<span style="font-weight: bold">M2S_RWD      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>MemWr 1,006  
+<span style="font-weight: bold">S2M_NDR      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>Cmp 1,006    
+<span style="font-weight: bold">S2M_DRC      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemData 1,044
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 40.00 ns  p50 40.00 ns
+<span style="font-weight: bold">         </span>p95 40.00 ns  max 40.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 40.58 ns  p50 41.00 ns
+<span style="font-weight: bold">         </span>p95 41.00 ns  max 43.00 ns
+
+<span style="font-weight: bold"> INITIALIZATION</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold">mem_mst     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 
+<span style="font-weight: bold">            </span>ns  ·  RUN 4.00 ns → 2.36 µs  ·  DEINIT 2.36 µs
+<span style="font-weight: bold">            </span>→ 2.38 µs  ·  IDLE 2.38 µs → 2.40 µs           
+<span style="font-weight: bold">mem_slv     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 
+<span style="font-weight: bold">            </span>ns  ·  RUN 4.00 ns → 2.36 µs  ·  DEINIT 2.36 µs
+<span style="font-weight: bold">            </span>→ 2.38 µs  ·  IDLE 2.38 µs → 2.40 µs           
+
+<span style="font-weight: bold"> MESSAGE SLOT USAGE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold"> Channel   Messages   Used / configured  Peak simultaneous </span>
+ M2S_REQ   1,044      4 / 4              4                 
+ M2S_RWD   1,006      2 / 2              2                 
+ S2M_NDR   1,006      6 / 6              2                 
+ S2M_DRC   1,044      2 / 2              2                 
+<span style="color: #727272; text-decoration-color: #727272">Issued messages in the statistics window; peak counts </span>
+<span style="color: #727272; text-decoration-color: #727272">distinct slots at one timestamp. These are message slots, </span>
+<span style="color: #727272; text-decoration-color: #727272">not inferred buffer lifetimes.</span>
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▄▇▇███▇██▇▇▇▇█████▇▇█▇██▇██▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">30.79 GB/s</span>
+                                                      
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">██▇▇██▇▆███▇▇███▆█▇█▇▇██▇▆█▄</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">29.67 GB/s</span>
+                                                      
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">█████▇████▇███▇████▇███████▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">17.65     </span>
+                                                      
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▆▇▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">16.77     </span>
+
+<span style="font-weight: bold"> CREDIT EMPTY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_REQ[2]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·░···░···▒···░···░···▒······</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  7.50%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_RWD[0]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··▒░··░░··░░··░░··░▒··░▒····</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_NDR[4]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··░░··░░···▒···▒···▒···▒····</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  8.75%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_DRC[1]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·░░··░▒··░▒···▒···▒···▒·····</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #727272; text-decoration-color: #727272">density       </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                        </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching </span>
+<span style="color: #727272; text-decoration-color: #727272">issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  20.00 ns → 2.19 µs  ·  auto-active  ·  1 </span>
+<span style="color: #727272; text-decoration-color: #727272">region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / </span>
+<span style="color: #727272; text-decoration-color: #727272">outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML … </span>pvkit/examples/cxl_native/independent_channels/traf…
+<span style="color: #727272; text-decoration-color: #727272">Track… </span>pvkit/examples/cxl_native/independent_channels/traf…
+<span style="color: #727272; text-decoration-color: #727272">Analy… </span>pvkit/examples/cxl_native/independent_channels/traf…
+</pre></div><div class="panel" data-mode="full" data-width="60" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic
+<span style="color: #727272; text-decoration-color: #727272">CXL Native / CSV cxl-native-1.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+2.40 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>4,162 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY      </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">90.42%            </span> <span style="color: #727272; text-decoration-color: #727272">idle 230.00 ns            </span>
+<span style="font-weight: bold">BANDWIDTH     </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 60.46 GB/s  </span>                           
+<span style="font-weight: bold">              </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 30.79 GB/s   </span>                           
+<span style="font-weight: bold">              </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 29.67 GB/s  </span>                           
+<span style="font-weight: bold">              </span><span style="color: #727272; text-decoration-color: #727272">peak 78.22 GB/s   </span>                           
+<span style="font-weight: bold">OUTSTANDING   </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 34.42         </span> <span style="color: #727272; text-decoration-color: #727272">peak 46                   </span>
+<span style="font-weight: bold">CREDIT EMPTY  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">worst 10.00%      </span> <span style="color: #727272; text-decoration-color: #727272">S2M_DRC[1] · 6 interval(s)</span>
+Partial write: 0.00% (0 / 1,006 known messages; 0 unknown) 
+[partial-write opcode]
+
+<span style="font-weight: bold"> TRAFFIC</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write   </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,006  /  64,384 B useful payload
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read    </span>  <span style="color: #727272; text-decoration-color: #727272">transactions    </span>1,044  /  66,816 B useful payload
+          <span style="color: #727272; text-decoration-color: #727272">partial BE      </span>               0 / 1,006  (0.00%)
+
+<span style="font-weight: bold">CHANNEL      </span>  MESSAGES  <span style="color: #727272; text-decoration-color: #727272">         RATE  </span>TOP OPCODES  
+<span style="font-weight: bold">M2S_REQ      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemRd 1,044  
+<span style="font-weight: bold">M2S_RWD      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>MemWr 1,006  
+<span style="font-weight: bold">S2M_NDR      </span>     1,006  <span style="color: #727272; text-decoration-color: #727272">419.17 Mmsg/s  </span>Cmp 1,006    
+<span style="font-weight: bold">S2M_DRC      </span>     1,044  <span style="color: #727272; text-decoration-color: #727272">435.00 Mmsg/s  </span>MemData 1,044
+
+<span style="font-weight: bold"> LATENCY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">Write  </span><span style="font-weight: bold">  </span>avg 40.00 ns  p50 40.00 ns
+<span style="font-weight: bold">         </span>p95 40.00 ns  max 40.00 ns
+<span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">Read   </span><span style="font-weight: bold">  </span>avg 40.58 ns  p50 41.00 ns
+<span style="font-weight: bold">         </span>p95 41.00 ns  max 43.00 ns
+
+<span style="font-weight: bold"> INITIALIZATION</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold">mem_mst     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 
+<span style="font-weight: bold">            </span>ns  ·  RUN 4.00 ns → 2.36 µs  ·  DEINIT 2.36 µs
+<span style="font-weight: bold">            </span>→ 2.38 µs  ·  IDLE 2.38 µs → 2.40 µs           
+<span style="font-weight: bold">mem_slv     </span>IDLE 0.00 ps → 2.00 ns  ·  INIT 2.00 ns → 4.00 
+<span style="font-weight: bold">            </span>ns  ·  RUN 4.00 ns → 2.36 µs  ·  DEINIT 2.36 µs
+<span style="font-weight: bold">            </span>→ 2.38 µs  ·  IDLE 2.38 µs → 2.40 µs           
+
+<span style="font-weight: bold"> MESSAGE SLOT USAGE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="font-weight: bold"> Channel   Messages   Used / configured  Peak simultaneous </span>
+ M2S_REQ   1,044      4 / 4              4                 
+ M2S_RWD   1,006      2 / 2              2                 
+ S2M_NDR   1,006      6 / 6              2                 
+ S2M_DRC   1,044      2 / 2              2                 
+M2S_REQ  S0=267  S1=267  S2=243  S3=267
+M2S_RWD  S0=473  S1=533
+S2M_NDR  S0=171  S1=171  S2=171  S3=171  S4=152  S5=170
+S2M_DRC  S0=574  S1=470
+<span style="color: #727272; text-decoration-color: #727272">Issued messages in the statistics window; peak counts </span>
+<span style="color: #727272; text-decoration-color: #727272">distinct slots at one timestamp. These are message slots, </span>
+<span style="color: #727272; text-decoration-color: #727272">not inferred buffer lifetimes.</span>
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▄▇▇███▇██▇▇▇▇█████▇▇█▇██▇██▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">30.79 GB/s</span>
+                                                      
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">██▇▇██▇▆███▇▇███▆█▇█▇▇██▇▆█▄</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">29.67 GB/s</span>
+                                                      
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">█████▇████▇███▇████▇███████▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">17.65     </span>
+                                                      
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▆▇▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">16.77     </span>
+
+<span style="font-weight: bold"> CREDIT EMPTY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_REQ[2]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·░···░···▒···░···░···▒······</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  7.50%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_RWD[0]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··▒░··░░··░░··░░··░▒··░▒····</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_NDR[4]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··░░··░░···▒···▒···▒···▒····</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  8.75%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_DRC[1]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·░░··░▒··░▒···▒···▒···▒·····</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #727272; text-decoration-color: #727272">density       </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                        </span>
+
+<span style="font-weight: bold"> DETAILS</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">measurement window    </span>0.00 ps → 2.40 µs · 2.40 µs          
+<span style="color: #727272; text-decoration-color: #727272">bandwidth window      </span>20.00 ns → 2.19 µs · 2.17 µs ·       
+<span style="color: #727272; text-decoration-color: #727272">                      </span>auto-active                          
+<span style="color: #727272; text-decoration-color: #727272">transaction scope     </span>capture (latency / outstanding /     
+<span style="color: #727272; text-decoration-color: #727272">                      </span>backpressure)                        
+<span style="color: #727272; text-decoration-color: #727272">rows                  </span>4,162 total · 4,150 analyzed         
+<span style="color: #727272; text-decoration-color: #727272">profile               </span>cxl3_256b_non_pbr_1024               
+<span style="color: #727272; text-decoration-color: #727272">message slots         </span>M2S_REQ 4 · M2S_RWD 2 · S2M_NDR 6 ·  
+<span style="color: #727272; text-decoration-color: #727272">                      </span>S2M_DRC 2 · M2S_BIRSP 0 · S2M_BISNP 0
+<span style="color: #727272; text-decoration-color: #727272">bandwidth peak        </span>total 78.22 GB/s · read 42.67 GB/s · 
+<span style="color: #727272; text-decoration-color: #727272">                      </span>write 35.56 GB/s                     
+<span style="color: #727272; text-decoration-color: #727272">full-window bandwid…  </span>54.67 GB/s                           
+<span style="color: #727272; text-decoration-color: #727272">byte enable           </span>1,006 known · 0 partial · 0 unknown ·
+<span style="color: #727272; text-decoration-color: #727272">                      </span>64 bits                              
+
+<span style="font-weight: bold"> REQUEST / RESPONSE</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Showing first 6 of 2,050 request groups intersecting the </span>
+<span style="color: #727272; text-decoration-color: #727272">window.</span>
+<span style="font-weight: bold">REQ M2S_REQ[0]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1000  ld_id=0x0  ckid=0x0  tc=0x0  
+address=0x40000000  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 9, seq 8, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[0]  MemData  60.00 ns</span>
+  opcode_raw=0x0  tag=0x1000  ld_id=0x0  meta_field=0x0  
+meta_value=0x0  poison=0  trp=0  devload=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 55, seq 54, cycle 60; MemData 64 B</span>
+  relation=drs  latency=40.00 ns
+
+<span style="font-weight: bold">REQ M2S_REQ[1]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1001  ld_id=0x0  ckid=0x1  tc=0x1  
+address=0x40000040  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 10, seq 9, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[1]  MemData  60.00 ns</span>
+  opcode_raw=0x0  tag=0x1001  ld_id=0x0  meta_field=0x0  
+meta_value=0x0  poison=0  trp=0  devload=0x1  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 56, seq 55, cycle 60; MemData 64 B</span>
+  relation=drs  latency=40.00 ns
+
+<span style="font-weight: bold">REQ M2S_REQ[2]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1002  ld_id=0x0  ckid=0x2  tc=0x2  
+address=0x40000080  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 11, seq 10, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[0]  MemData  61.00 ns</span>
+  opcode_raw=0x0  tag=0x1002  ld_id=0x0  meta_field=0x0  
+meta_value=0x0  poison=0  trp=0  devload=0x2  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 59, seq 58, cycle 61; MemData 64 B</span>
+  relation=drs  latency=41.00 ns
+
+<span style="font-weight: bold">REQ M2S_REQ[3]  MemRd  20.00 ns</span>
+  opcode_raw=0x1  tag=0x1003  ld_id=0x0  ckid=0x3  tc=0x3  
+address=0x400000c0  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 12, seq 11, cycle 20; MemRd 64 B</span>
+<span style="font-weight: bold">RSP S2M_DRC[1]  MemData  61.00 ns</span>
+  opcode_raw=0x0  tag=0x1003  ld_id=0x0  meta_field=0x0  
+meta_value=0x0  poison=0  trp=0  devload=0x3  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 60, seq 59, cycle 61; MemData 64 B</span>
+  relation=drs  latency=41.00 ns
+
+<span style="font-weight: bold">REQ M2S_RWD[0]  MemWr  20.00 ns</span>
+  opcode_raw=0x1  tag=0x8000  ld_id=0x0  ckid=0x0  tc=0x0  
+address=0x80000000  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  byte_enable=0xffffffffffffffff  poison=0  
+trp=0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 13, seq 12, cycle 20; MemWr 64 B</span>
+<span style="font-weight: bold">RSP S2M_NDR[0]  Cmp  60.00 ns</span>
+  opcode_raw=0x0  tag=0x8000  ld_id=0x0  meta_field=0x0  
+meta_value=0x0  devload=0x0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 57, seq 56, cycle 60; Cmp</span>
+  relation=ndr  latency=40.00 ns
+
+<span style="font-weight: bold">REQ M2S_RWD[1]  MemWr  20.00 ns</span>
+  opcode_raw=0x1  tag=0x8001  ld_id=0x0  ckid=0x1  tc=0x1  
+address=0x80000040  snp_type=0x0  meta_field=0x0  
+meta_value=0x0  byte_enable=0xffffffffffffffff  poison=0  
+trp=0  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 14, seq 13, cycle 20; MemWr 64 B</span>
+<span style="font-weight: bold">RSP S2M_NDR[1]  Cmp  60.00 ns</span>
+  opcode_raw=0x0  tag=0x8001  ld_id=0x0  meta_field=0x0  
+meta_value=0x0  devload=0x1  data_xz=0
+<span style="color: #727272; text-decoration-color: #727272">  CSV line 58, seq 57, cycle 60; Cmp</span>
+  relation=ndr  latency=40.00 ns
+
+<span style="color: #727272; text-decoration-color: #727272">Pairs and fields are existing analyzer evidence. Additional</span>
+<span style="color: #727272; text-decoration-color: #727272">facts and links are in JSON / HTML.</span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching </span>
+<span style="color: #727272; text-decoration-color: #727272">issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  20.00 ns → 2.19 µs  ·  auto-active  ·  1 </span>
+<span style="color: #727272; text-decoration-color: #727272">region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / </span>
+<span style="color: #727272; text-decoration-color: #727272">outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML … </span>pvkit/examples/cxl_native/independent_channels/traf…
+<span style="color: #727272; text-decoration-color: #727272">Track… </span>pvkit/examples/cxl_native/independent_channels/traf…
+<span style="color: #727272; text-decoration-color: #727272">Analy… </span>pvkit/examples/cxl_native/independent_channels/traf…
+</pre></div><div class="panel" data-mode="compact" data-width="60" hidden><pre><span style="font-weight: bold">XPVKIT</span><span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">PV SUMMARY</span>
+traffic
+<span style="color: #727272; text-decoration-color: #727272">CXL Native / CSV cxl-native-1.0</span>
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+2.40 µs<span style="color: #727272; text-decoration-color: #727272">  ·  </span>4,162 rows<span style="color: #727272; text-decoration-color: #727272">  ·  </span><span style="color: #98e024; text-decoration-color: #98e024">integrity OK</span>
+
+<span style="font-weight: bold">ACTIVITY      </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">90.42%            </span> <span style="color: #727272; text-decoration-color: #727272">idle 230.00 ns            </span>
+<span style="font-weight: bold">BANDWIDTH     </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">total 60.46 GB/s  </span>                           
+<span style="font-weight: bold">              </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">read 30.79 GB/s   </span>                           
+<span style="font-weight: bold">              </span><span style="color: #f4005f; text-decoration-color: #f4005f; font-weight: bold">write 29.67 GB/s  </span>                           
+<span style="font-weight: bold">              </span><span style="color: #727272; text-decoration-color: #727272">peak 78.22 GB/s   </span>                           
+<span style="font-weight: bold">OUTSTANDING   </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">avg 34.42         </span> <span style="color: #727272; text-decoration-color: #727272">peak 46                   </span>
+<span style="font-weight: bold">CREDIT EMPTY  </span><span style="color: #98e024; text-decoration-color: #98e024; font-weight: bold">worst 10.00%      </span> <span style="color: #727272; text-decoration-color: #727272">S2M_DRC[1] · 6 interval(s)</span>
+Partial write: 0.00% (0 / 1,006 known messages; 0 unknown) 
+[partial-write opcode]
+
+<span style="font-weight: bold"> PV TREND</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read BW  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▄▇▇███▇██▇▇▇▇█████▇▇█▇██▇██▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">30.79 GB/s</span>
+                                                      
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write BW </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">██▇▇██▇▆███▇▇███▆█▇█▇▇██▇▆█▄</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">29.67 GB/s</span>
+                                                      
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Read OS  </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">█████▇████▇███▇████▇███████▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">17.65     </span>
+                                                      
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">Write OS </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▆▇▇▇▇▇▇▇▇▆▇▇</span><span style="color: #686860; text-decoration-color: #686860">  avg </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">16.77     </span>
+
+<span style="font-weight: bold"> CREDIT EMPTY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_REQ[2]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·░···░···▒···░···░···▒······</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  7.50%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">M2S_RWD[0]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··▒░··░░··░░··░░··░▒··░▒····</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_NDR[4]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">··░░··░░···▒···▒···▒···▒····</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5">  8.75%</span>
+<span style="color: #c4c5b5; text-decoration-color: #c4c5b5">S2M_DRC[1]    </span> <span style="color: #c4c5b5; text-decoration-color: #c4c5b5">·░░··░▒··░▒···▒···▒···▒·····</span><span style="color: #686860; text-decoration-color: #686860">  </span><span style="color: #c4c5b5; text-decoration-color: #c4c5b5"> 10.00%</span>
+<span style="color: #727272; text-decoration-color: #727272">density       </span> <span style="color: #727272; text-decoration-color: #727272">low ░▒▓█ high                        </span>
+
+<span style="font-weight: bold"> INTEGRITY</span>
+<span style="color: #727272; text-decoration-color: #727272"> ─────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Protocol checks  </span><span style="color: #527618; text-decoration-color: #527618">OK</span><span style="color: #727272; text-decoration-color: #727272">  no structural or transaction-matching </span>
+<span style="color: #727272; text-decoration-color: #727272">issues detected</span>
+
+<span style="color: #727272; text-decoration-color: #727272">──────────────────────────────────────────────────────────</span>
+<span style="color: #727272; text-decoration-color: #727272">Active window  20.00 ns → 2.19 µs  ·  auto-active  ·  1 </span>
+<span style="color: #727272; text-decoration-color: #727272">region</span>
+<span style="color: #727272; text-decoration-color: #727272">Bandwidth: accepted-data; transactions / latency / </span>
+<span style="color: #727272; text-decoration-color: #727272">outstanding / backpressure: capture</span>
+<span style="color: #727272; text-decoration-color: #727272">HTML … </span>pvkit/examples/cxl_native/independent_channels/traf…
+<span style="color: #727272; text-decoration-color: #727272">Track… </span>pvkit/examples/cxl_native/independent_channels/traf…
+<span style="color: #727272; text-decoration-color: #727272">Analy… </span>pvkit/examples/cxl_native/independent_channels/traf…
+</pre></div></div>
+<div class="links"><a id="txt" href="captures/standard.120.txt">当前输出纯文本</a><a id="ansi" href="captures/standard.120.ansi" download>下载 ANSI</a></div>
+<p>使用已有的 xpvkit 0.5.5 工具，从仓库根目录复现（Rich 为彩色 TUI 的可选依赖）：</p>
+<pre class="command" id="command">python xpv.pyz analyze pvkit/examples/cxl_native/independent_channels/traffic.csv --report-mode standard --trend all</pre>
+<p>默认带宽按实际数据活动窗口计算；事务、延迟与诊断保留完整 capture 范围。TUI 是输出式报告，鼠标选窗与事务查询请打开交互 HTML。</p><footer>PVKit demo · xpvkit 0.5.5 · 合成示例数据</footer></main><script src="../../../../assets/tui.js"></script></body></html>

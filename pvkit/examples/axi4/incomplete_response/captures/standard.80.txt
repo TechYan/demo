@@ -1,0 +1,64 @@
+XPVKIT  ·  PV SUMMARY
+traffic                                                           AXI / CSV 2.0
+──────────────────────────────────────────────────────────────────────────────
+5.00 µs  ·  28 rows  ·  integrity 2 issues
+
+ACTIVITY                 0.40%                             idle 4.98 µs        
+BANDWIDTH                total 12.80 GB/s                                      
+                         read 6.40 GB/s                                        
+                         write 6.40 GB/s                                       
+                         peak 0.52 GB/s                                        
+OUTSTANDING              avg 1.00                          peak 2              
+Partial write: 0.00% (0 / 4 known beats; 0 unknown) [WSTRB]
+
+ TRAFFIC
+ ─────────────────────────────────────────────────────────────────────────────
+Write
+   transactions   1             
+   burst size     64 B          
+   beats / txn    2             
+   WSTRB partial  0 / 4  (0.00%)
+
+Read
+   transactions   1                                      
+   burst size     avg 96.00 B  p95 124.80 B  max 128.00 B
+   beats / txn    avg 3.00  p95 3.90  max 4.00           
+
+ LATENCY
+ ─────────────────────────────────────────────────────────────────────────────
+Write    avg 104.00 ns  p50 104.00 ns  p95 104.00 ns  max 104.00 ns
+Read      avg 84.00 ns   p50 84.00 ns   p95 84.00 ns   max 84.00 ns
+
+ PV TREND
+ ─────────────────────────────────────────────────────────────────────────────
+Read BW   ▁▁▁▁▁▁▁▁▁▁▁███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██  avg 6.40 GB/s
+                                                                         
+Write BW  ███▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁  avg 6.40 GB/s
+                                                                         
+Read OS   ▁▁▁▁▁▁▁▁▁██▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁██  avg 0.42     
+                                                                         
+Write OS  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁█████████████████  avg 0.58     
+
+ BACKPRESSURE
+ ─────────────────────────────────────────────────────────────────────────────
+AW        ················································    0.00%
+W         ················································    0.00%
+B         ················································    0.00%
+                                                                   
+AR        ················································    0.00%
+R         ················································    0.00%
+density   low ░▒▓█ high                                            
+
+ INTEGRITY
+ ─────────────────────────────────────────────────────────────────────────────
+Protocol checks  2 issues
+  - 1 write transactions remain outstanding at window end
+  - 1 read transactions remain outstanding at window end
+
+──────────────────────────────────────────────────────────────────────────────
+Active window  420.00 ns → 3.08 µs  ·  auto-active  ·  4 regions
+Bandwidth: accepted-data; transactions / latency / outstanding / backpressure: 
+capture
+HTML report    pvkit/examples/axi4/incomplete_response/traffic.pv.html         
+Tracker log    pvkit/examples/axi4/incomplete_response/traffic.tracker.log     
+Analyze log    pvkit/examples/axi4/incomplete_response/traffic.analyze.log     
