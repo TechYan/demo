@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="syan"><title>SPI 使用指导</title><style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--fg:#182739;--muted:#536579;--line:#dce4ed;--accent:#1459ad;--code:#f0f4f8}
+@media(prefers-color-scheme:dark){:root{--bg:#111a25;--panel:#172332;--fg:#e6edf5;--muted:#adbdce;--line:#35485b;--accent:#89baff;--code:#0f1b29}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+header{padding:22px max(24px,calc((100vw - 1440px)/2));background:var(--panel);border-bottom:1px solid var(--line)}
+header strong{font-size:20px}header p{margin:5px 0;color:var(--muted)}nav{display:flex;gap:22px;margin-top:12px}
+.layout{max-width:1488px;margin:28px auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;padding:0 24px}
+aside{align-self:start;position:sticky;top:20px;max-height:92vh;overflow:auto;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;line-height:1.6}
+aside ul{padding-left:20px}aside>div>ul{padding-left:14px}aside li{margin:8px 0}
+main{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:28px 34px}
+h1{font-size:29px;line-height:1.45;margin-top:0}h2{font-size:23px;margin-top:2.5em;border-bottom:1px solid var(--line);padding-bottom:8px}h3{font-size:19px;margin-top:2em}h1,h2,h3{scroll-margin-top:20px}
+a{color:var(--accent);text-underline-offset:3px}p{margin:1em 0}li{margin:.5em 0}
+table{display:block;overflow-x:auto;border-collapse:collapse;width:100%;font-size:14px;margin:20px 0}th,td{border:1px solid var(--line);padding:12px 14px;min-width:130px;vertical-align:top}th{background:var(--code);font-weight:600;text-align:left}
+code{font:0.9em/1.6 Consolas,'Cascadia Mono',monospace;background:var(--code);border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{padding:18px;overflow-x:auto;background:var(--code);border:1px solid var(--line);border-radius:8px;line-height:1.55}pre code{padding:0;white-space:pre;overflow-wrap:normal}
+footer{padding:20px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--line);margin-top:32px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;padding:0 12px}aside{position:static;max-height:none}main{padding:22px 18px}h1{font-size:25px}}
+@media print{aside,nav{display:none}.layout{display:block;padding:0;margin:0}main{border:0;padding:0}body{background:white;color:black}table{display:table;font-size:10px}pre{white-space:pre-wrap}a{color:inherit}}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}aside a{overflow-wrap:anywhere}
+</style></head>
+<body><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><strong>SVIP · SPI</strong><p>syan · four-wire · Mode 0–3 · master / slave / passive · VCS / UVM1.2</p><nav><a href="user-guide.html">使用指导</a><a href="architecture.html">架构</a><a href="../../scope.html#verification">验收记录</a><a href="user-guide.html">文档页</a></nav></header>
+<div class="layout"><aside aria-label="目录"><div class="toc">
+<ul>
+<li><a href="#spi">SPI 使用指导</a><ul>
+<li><a href="#1">1. 编译和连接</a></li>
+<li><a href="#2-pattern">2. 发送确定 pattern</a></li>
+<li><a href="#3">3. 约束随机</a></li>
+<li><a href="#4">4. 从端响应</a></li>
+<li><a href="#5-command">5. 根据 command 生成后续数据</a></li>
+<li><a href="#6">6. 时序、停钟和模式切换</a></li>
+<li><a href="#7-mask">7. 期望比较与有效性 mask</a></li>
+<li><a href="#8-trackercoverage">8. 检查、tracker、coverage 和波形</a></li>
+<li><a href="#9-examples">9. Examples 与实际边界</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside><main><h1 id="spi">SPI 使用指导</h1>
+<p>Author: syan</p>
+<p>本指导面向 VCS/UVM1.2 的 IP/SoC 验证接入。支持范围和实际验收配置见 <a href="architecture.html">架构</a> 与 <a href="../../scope.html#verification">验收记录</a>。所有源码在 spi/，公共 coverage 在 common/；商业 VIP 和 cocotb 均不是运行依赖。</p>
+<h2 id="1">1. 编译和连接</h2>
+<p>从 <code>spi/</code> 目录执行 filelist；先编译 UVM1.2，再按以下顺序分析独立单元：</p>
+<pre><code class="language-bash">vlogan -full64 -sverilog -ntb_opts uvm-1.2
+vlogan -full64 -sverilog -ntb_opts uvm-1.2 -f files.f
+vlogan -full64 -sverilog -ntb_opts uvm-1.2 -f sequence_lib/files.f
+vlogan -full64 -sverilog -ntb_opts uvm-1.2 -f checker/files.f
+</code></pre>
+<p>顶层导入并配置 virtual interface：</p>
+<pre><code class="language-systemverilog">`include &quot;svip_spi_defs.svh&quot;
+import uvm_pkg::*;
+import svip_spi_pkg::*;
+tri sclk, mosi, miso;
+tri [`SVIP_SPI_MAX_CS-1:0] cs_n;
+svip_spi_if spi_pins(reset_n, sclk, cs_n, mosi, miso);
+svip_spi_sva protocol_checker(spi_pins); // 每条总线一个
+initial begin
+  uvm_config_db#(virtual svip_spi_if)::set(
+    null, &quot;uvm_test_top.env.spi&quot;, &quot;vif&quot;, spi_pins);
+  run_test();
+end
+</code></pre>
+<p>把同名 tri 接 DUT 引脚；实际只有一个 CS 时接 cs_n[0]、cfg.num_cs=1，其他容器位无需用作业务线。多个 active agent 各有自己的 spi_if endpoint，连接相同物理 wires；config_db 按各 agent 路径分别设置，避免 wildcard 把所有 driver 指向同一个 endpoint。</p>
+<p>环境 build_phase 中创建配置与 agent：</p>
+<pre><code class="language-systemverilog">cfg = svip_spi_cfg::type_id::create(&quot;cfg&quot;);
+cfg.role = SVIP_SPI_MASTER;
+cfg.mode = 0;
+cfg.word_bits = 8;
+cfg.num_cs = 1;
+uvm_config_db#(svip_spi_cfg)::set(this, &quot;spi&quot;, &quot;cfg&quot;, cfg);
+spi = svip_spi_agent::type_id::create(&quot;spi&quot;, this);
+</code></pre>
+<p>active slave 设置 role=SVIP_SPI_SLAVE 和 cs_index；passive 设置 is_active=UVM_PASSIVE。cfg.vif 可由上面的 config_db 自动填充。被动监视需要显式正确的模式/字长，不自动猜测 CPHA。</p>
+<h2 id="2-pattern">2. 发送确定 pattern</h2>
+<p>导入 <code>svip_spi_seq_pkg::*</code>，在 test 或 virtual sequence 中执行：</p>
+<pre><code class="language-systemverilog">svip_spi_transfer_seq seq;
+seq = svip_spi_transfer_seq::type_id::create(&quot;seq&quot;);
+seq.cs = 0;
+seq.tx_words = '{'h96, 'h23, 'h00};
+seq.start(env.spi.sequencer);
+if (seq.result.status != SVIP_SPI_OK)
+  `uvm_error(&quot;MY_SPI&quot;, seq.result.convert2string())
+// result.rx_words 为四态数据，n_sampled / n_received 表示实际接收量。
+</code></pre>
+<p>整个数组在同一个 CS 窗口内发送。读操作同样需要发送填充 word 来产生 SCLK；指令、地址、dummy 是业务约定，可直接组合为数组。没有总线级 read/write opcode。非字节 word 使用低 word_bits 位；MSB 从有效最高位开始。</p>
+<p><code>tx_words</code> 用二态数据表达合法激励。测试 X/Z 或毛刺时由外部 fixture/引脚故障源注入，接收始终保留四态；不要把 tx_words 中赋 X 当作可靠故障注入方法。</p>
+<h2 id="3">3. 约束随机</h2>
+<p>transaction 可直接 randomize；软默认长度1..16，随机化以 transaction.word_bits 限制有效数据位，真实传输 profile 由 cfg 决定：</p>
+<pre><code class="language-systemverilog">svip_spi_txn t;
+t = svip_spi_txn::type_id::create(&quot;random_request&quot;);
+t.word_bits = cfg.word_bits;
+if (!t.randomize() with { cs == 0; tx_words.size() == 12; })
+  `uvm_fatal(&quot;MY_SPI&quot;, &quot;randomization failed&quot;)
+seq.tx_words = t.tx_words;
+seq.cs = t.cs;
+seq.start(env.spi.sequencer);
+</code></pre>
+<p>自定义 sequence 可直接 start_item(t)/finish_item(t)，无需 helper。driver 对手工赋值同样检查 CS、payload 范围、资源上限和比较数组形状。pattern 用数组生成零、一、walking-one、交替、指定 header/payload 即可。</p>
+<h2 id="4">4. 从端响应</h2>
+<p>在 build 配置 response_mode：</p>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>行为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SVIP_SPI_FIXED（默认）</td>
+<td>发送 fill_word 的有效位，默认0</td>
+</tr>
+<tr>
+<td>SVIP_SPI_RANDOM</td>
+<td>每个未来 word 产生随机有效位；CPHA0 可提前准备未使用字</td>
+</tr>
+<tr>
+<td>SVIP_SPI_QUEUED</td>
+<td>从有界队列取一份 response，对应一次选中</td>
+</tr>
+</tbody>
+</table>
+<p>预装使用公开入口：</p>
+<pre><code class="language-systemverilog">svip_spi_txn response;
+response = svip_spi_txn::type_id::create(&quot;response&quot;);
+response.tx_words = '{'h3d, 'ha7, 'h51};
+if (!env.spi_slave.enqueue_response(response))
+  `uvm_fatal(&quot;MY_SPI&quot;, &quot;response not accepted&quot;)
+// enqueue 返回后再启动 DUT/master。修改 response 不影响队列。
+</code></pre>
+<p>响应的目标由 slave agent 的 cs_index 决定，response.cs 不构成第二套路由。队列满/非 QUEUED/非法 payload 会拒绝并报告；不足时填充并报告 UNDERRUN。短帧剩余数据丢弃；中途入队只用于下一帧。通过 completion_ap 观察已接纳响应的完成、取消与未使用量，pending_responses() 查询排队数量。</p>
+<h2 id="5-command">5. 根据 command 生成后续数据</h2>
+<pre><code class="language-systemverilog">class my_spi_response extends svip_spi_callback;
+  virtual function void prepare_word(input svip_spi_frame prefix,
+                                    input int unsigned index,
+                                    inout svip_spi_word_t value);
+    if (index == 0) value = 'h00;
+    else if (prefix.mosi_words.size() &gt;= 1)
+      value = prefix.mosi_words[0] == 'h96 ? 'ha7 : 'h51;
+  endfunction
+endclass
+// slave 使用 FIXED 作为基值，再由回调选择未来 word。
+// test/virtual sequence 中，在活动帧之前注册：
+my_spi_response model = new();
+env.spi_slave.add_callback(model);
+</code></pre>
+<p>回调不等待时间，只读取已完成 MOSI prefix，且只影响未呈现的下一 word。CPHA0 可能多准备一个未被采样的 word；存储写入等副作用应通过实际 word_ap/frame_ap 提交。Flash、传感器寄存器或外部 memory model 的地址解析放在这里或用户 subscriber 中。</p>
+<p>master 另有 pre_transfer/post_transfer hook。pre 修改待发 payload/CS，post 观察已终结快照；派生实现不需要调用空的 super 方法。</p>
+<p>业务 tag 等元数据可通过派生 svip_spi_txn 扩展，使用 UVM factory 注册，并在 do_copy 中先调用 super.do_copy(rhs)，再复制自定义字段；driver 的 clone/copy 会保留派生类型。可运行 master_extension 查看完整路径。callback 的空默认 hook 可直接重载，与 transaction 复制规则分别使用。</p>
+<h2 id="6">6. 时序、停钟和模式切换</h2>
+<p>所有公开 <code>time</code> 字段及结果时间戳都保存 <strong>ps 数值</strong>。用户赋值的 package/module 若采用1ps timeunit，可使用5ns等时间字面量；跨不同timeunit时直接使用ps整数，避免字面量先在调用作用域缩放。例如在1ns timeunit的test package中，<code>cfg.t_low=5ns</code>实际存入5，会被driver解释为5ps。以下写法与调用作用域无关：</p>
+<pre><code class="language-systemverilog">cfg.t_low  = 5_000;  // 5000ps = 5ns
+cfg.t_high = 8_000;  // 8000ps = 8ns
+cfg.min_setup = 50;  // 50ps
+cfg.min_hold  = 50;
+</code></pre>
+<p>建议项目的SPI sequence/test package声明 <code>timeunit 1ps; timeprecision 1ps;</code>。打印结果时间使用<code>%0d</code>并标记ps；<code>%t</code>还受全局<code>$timeformat</code>影响。此跨作用域规则已用目标VCS窄探针确认。</p>
+<table>
+<thead>
+<tr>
+<th>配置/控制</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>t_low / t_high</td>
+<td>固定 SCLK 低/高时间，默认各50ns</td>
+</tr>
+<tr>
+<td>t_low_max / t_high_max</td>
+<td>非0且大于最小值时在范围内随机采样；0不消耗额外 RNG</td>
+</tr>
+<tr>
+<td>t_cs_setup / t_cs_hold / t_cs_idle</td>
+<td>CS 建立、最终时钟后的保持、不同 CS 窗口间隔</td>
+</tr>
+<tr>
+<td>frame_delay / frame_delay_max</td>
+<td>本地事务启动前的额外固定/随机 latency</td>
+</tr>
+<tr>
+<td>word_gap / word_gap_max</td>
+<td>CS 保持选中时，完整 word 之间的额外固定/随机 gap</td>
+</tr>
+<tr>
+<td>drive_delay</td>
+<td>slave 首位预装/launch 到 MISO 的传播延迟；必须小于最短半周期</td>
+</tr>
+<tr>
+<td>frame_timeout</td>
+<td>默认0关闭；非0时给出明确 TIMEOUT 终态</td>
+</tr>
+<tr>
+<td>set_clock_hold(bit)</td>
+<td>master 完成当前 bit，停在 CPOL；CS 继续选中，释放后续传</td>
+</tr>
+<tr>
+<td>abort_current()</td>
+<td>终结当前 master 工作并收尾，返回 ABORTED，保留 partial 诊断</td>
+</tr>
+</tbody>
+</table>
+<p>时序在每个活动工作开始时快照；直接更改 cfg 用于后续工作。hold 是明确的运行期控制，SPI 没有 slave READY 反压。</p>
+<p>profile 在总线 idle 时原子更新：</p>
+<pre><code class="language-systemverilog">if (!env.spi.set_profile(3, 9, 1))
+  `uvm_fatal(&quot;MY_SPI&quot;, &quot;mode switch rejected&quot;)
+</code></pre>
+<p>slave 还要求响应队列为空；DUT 与其他观察 agent 也必须使用对应 profile。在 selected 帧中直接逐字段改变 mode/字长不是支持的用法。</p>
+<h2 id="7-mask">7. 期望比较与有效性 mask</h2>
+<p><code>seq.check_rx=1</code> 打开预期比较，expected_words 与 payload 等长；compare_mask 为空表示全部有效位参与，非空时与 payload 等长。mismatch 返回 COMPARE_ERROR 和 n_mismatches。</p>
+<p><code>cfg.miso_check_mask[]</code> 是按 packed word 位编号的 required-data 策略：1要求该位已知并检查其 MISO 时序；0允许 command/dummy 阶段无有效返回。空数组以及超出数组的后续 word 默认全部检查。它与 compare_mask 分别配置，SCLK/CS/MOSI 规则持续有效，raw rx_words 仍保留 X/Z。</p>
+<pre><code class="language-systemverilog">cfg.miso_check_mask = '{'0, '1}; // 第一word不要求MISO，第二word全检查
+// 在idle配置并调用cfg.publish_profile()，使独立checker同步该策略。
+seq.check_rx = 1;
+seq.expected_words = '{'0, 'ha7};
+seq.compare_mask = '{'0, '1};
+</code></pre>
+<h2 id="8-trackercoverage">8. 检查、tracker、coverage 和波形</h2>
+<p>数据结构检查与帧重建在 core；数值时序和控制线规则由 checker 文件负责。规则、默认窗口和负例预算见 <a href="../../scope.html#checkers">checker说明</a>。接入后用一个合法场景及故意非法场景确认实际绑定，不以编译成功代替启用证明。</p>
+<p>tracker 默认开启；tracker_filename 为空时按实例命名。FRAME 行后跟 MOSI/MISO 行，明确 ps 时间、实例、CS/profile、实际采样数、partial 与状态；默认只预览前16word，tracker.preview_words=0 可输出全部。每实例独立文件，多run目录隔离。</p>
+<p>设置 cfg.coverage_en=1，仿真命令传 <code>+svip_fc_json=/path/fc.json</code>；final hook 导出服务统计，脚本使用 common/tools/fc_report.py 合并。native covergroup 按实例，service 的 spi.frame/spi.timing/spi.completion 按实际样本聚合。不要将未发出的请求计为成功覆盖。</p>
+<p><code>frame_ap</code> 提供完整物理帧；<code>word_ap</code> 提供逐 word 累计前缀；<code>completion_ap</code> 提供局部工作终态。订阅者复制后再修改。特别长的帧优先 frame_ap，避免逐 word 复制长前缀。</p>
+<p>runner <code>--waves</code> 默认 FSDB、<code>--waves vcd</code> 回退。完整接口/类内部调试优先FSDB；VCD回退已验证物理引脚数据，任意层次选择性dump仍受VCS限制。波形审计应核对 timebase、初值、完整性、采样沿前值和首末位；同 tick/NBA 顺序还需原生断言和时点检查，settled 波形无法单独证明。</p>
+<h2 id="9-examples">9. Examples 与实际边界</h2>
+<p>从 <a href="../../examples.html#spi">testsuite 入口</a> 选择案例。客户示例展示公开 API，配套 testbench 的 fixture/manual 仅负责模拟对端与独立期望；实际项目用 DUT/业务模型替换对端。compliance 承担非法输入、边界、检查预算和恢复验证。</p>
+<p>仿真器、容器、矩阵、覆盖、波形和变异结果以 <a href="../../scope.html#verification">verification.md</a> 的实际证据为准。局部 reset 不要求外部 master 同时复位：当前响应取消，monitor 忽略未重新选中的帧尾，等 CS idle 后恢复。reset取消已接纳的活动item，尚未接纳的sequence item沿标准UVM路径在恢复后继续。调用 reset 时让 driver 返回 RESET_ABORTED 后再管理 sequence 生命周期；不要在 driver 仍持有 item 时强行清空 sequencer 的内部队列。</p><footer>标准四线SPI profile；实际支持和实测范围见验收记录。</footer></main></div></body></html>

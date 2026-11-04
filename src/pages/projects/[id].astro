@@ -1,0 +1,22 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import ProjectVisual from '../../components/ProjectVisual.astro';
+import projects from '../../data/projects.json';
+import { sitePath } from '../../lib/catalog.mjs';
+export function getStaticPaths() { return projects.map(project => ({ params: { id: project.id }, props: { project } })); }
+const { project } = Astro.props;
+const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
+const next = projects[(projects.findIndex(p => p.id === project.id) + 1) % projects.length];
+const categoryLabels: Record<string, string> = { analysis: '分析与诊断', protocol: '协议可视化', verification: '验证与架构', registers: '寄存器与配置' };
+---
+<Base title={`${project.name} — TechYan Demo`} description={project.lead} projectName={project.name}>
+  <div class:list={['project-detail', `accent-${project.color}`]}><div class="detail-back"><a href={href('') + '#projects'} class="text-link"><Icon name="back" size={15}/>返回项目索引</a></div>
+    <section class="detail-hero"><div><div class="eyebrow">{project.label}</div><h1>{project.name}</h1><p class="lead">{project.lead}</p><div class="detail-actions"><a href={href(project.primary)} class="primary-button">进入演示<Icon name="arrow" size={17}/></a><a href={`https://github.com/TechYan/demo/tree/main/${project.id}`} class="secondary-button" target="_blank" rel="noopener noreferrer"><Icon name="github" size={15}/>示例文件</a></div></div><div class="detail-art"><ProjectVisual id={project.id}/></div></section>
+    <div class="detail-meta"><div><span>FIELD</span><b>{categoryLabels[project.category]}</b></div><div><span>FORMAT</span><b>{project.format}</b></div><ul class="tags" aria-label="技术标签">{project.tags.map((tag: string) => <li>{tag}</li>)}</ul></div>
+    <section class="detail-section"><div class="section-kicker"><span>01</span> OPEN & EXPLORE</div><h2>从这里开始</h2><div class="artifact-grid">{project.actions.map((action: { title: string; description: string; path: string; type: string }) => <a class="artifact-link" href={href(action.path)}><span class="artifact-icon"><Icon name={action.type === 'TERMINAL' ? 'terminal' : action.type === 'LOG' ? 'file' : action.type.includes('GUIDE') ? 'book' : 'code'} size={18}/></span><div class="artifact-copy"><small>{action.type}</small><strong>{action.title}</strong><p>{action.description}</p></div><Icon name="diagonal" size={16}/></a>)}</div></section>
+    <section class="detail-section"><div class="section-kicker"><span>02</span> WHAT TO LOOK FOR</div><h2>值得探索的细节</h2><div class="highlight-list">{project.highlights.map((highlight: { title: string; detail: string }, index: number) => <article class="highlight-item"><span>{String(index + 1).padStart(2, '0')}</span><h3>{highlight.title}</h3><p>{highlight.detail}</p></article>)}</div></section>
+    <aside class="scope-note"><Icon name="file" size={17}/><div><b>关于这份演示</b><p>{project.scope}</p></div></aside>
+    <nav class="related-projects" aria-label="继续探索"><span>KEEP EXPLORING</span><a href={href(`projects/${next.id}/`)}>下一个项目 / {next.name}<Icon name="arrow" size={17}/></a></nav>
+  </div>
+</Base>

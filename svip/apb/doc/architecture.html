@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="syan"><title>SVIP APB 架构与使用契约</title><style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--fg:#182739;--muted:#536579;--line:#dce4ed;--accent:#1459ad;--code:#f0f4f8}
+@media(prefers-color-scheme:dark){:root{--bg:#111a25;--panel:#172332;--fg:#e6edf5;--muted:#adbdce;--line:#35485b;--accent:#89baff;--code:#0f1b29}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+header{padding:22px max(24px,calc((100vw - 1440px)/2));background:var(--panel);border-bottom:1px solid var(--line)}
+header strong{font-size:20px}header p{margin:5px 0;color:var(--muted)}nav{display:flex;gap:22px;margin-top:12px}
+.layout{max-width:1488px;margin:28px auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;padding:0 24px}
+aside{align-self:start;position:sticky;top:20px;max-height:92vh;overflow:auto;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;line-height:1.6}
+aside ul{padding-left:20px}aside>div>ul{padding-left:14px}aside li{margin:8px 0}
+main{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:28px 34px}
+h1{font-size:29px;line-height:1.45;margin-top:0}h2{font-size:23px;margin-top:2.5em;border-bottom:1px solid var(--line);padding-bottom:8px}h3{font-size:19px;margin-top:2em}h1,h2,h3{scroll-margin-top:20px}
+a{color:var(--accent);text-underline-offset:3px}p{margin:1em 0}li{margin:.5em 0}
+table{display:block;overflow-x:auto;border-collapse:collapse;width:100%;font-size:14px;margin:20px 0}th,td{border:1px solid var(--line);padding:12px 14px;min-width:130px;vertical-align:top}th{background:var(--code);font-weight:600;text-align:left}
+code{font:0.9em/1.6 Consolas,'Cascadia Mono',monospace;background:var(--code);border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{padding:18px;overflow-x:auto;background:var(--code);border:1px solid var(--line);border-radius:8px;line-height:1.55}pre code{padding:0;white-space:pre;overflow-wrap:normal}
+footer{padding:20px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--line);margin-top:32px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;padding:0 12px}aside{position:static;max-height:none}main{padding:22px 18px}h1{font-size:25px}}
+@media print{aside,nav{display:none}.layout{display:block;padding:0;margin:0}main{border:0;padding:0}body{background:white;color:black}table{display:table;font-size:10px}pre{white-space:pre-wrap}a{color:inherit}}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}
+</style></head><body><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><strong>SVIP · APB 客户用法与验证</strong><p>syan · 2026-11-01 · requester / passive</p><nav><a href="architecture.html">本页文档</a><a href="architecture.html">架构</a><a href="usage-cookbook.html">客户用法</a><a href="../../scope.html#verification">第二轮验收</a><a href="../../examples.html#apb">Testsuite</a></nav></header><div class="layout"><aside aria-label="目录"><div class="toc">
+<ul>
+<li><a href="#svip-apb">SVIP APB 架构与使用契约</a><ul>
+<li><a href="#_1">目标与范围</a></li>
+<li><a href="#_2">数据路径与对象所有权</a></li>
+<li><a href="#reset">时序与 reset</a></li>
+<li><a href="#checker-monitor">Checker 与 monitor 的职责</a></li>
+<li><a href="#ral">RAL</a></li>
+<li><a href="#_3">配置与扩展边界</a></li>
+<li><a href="#trackercoverage">Tracker、coverage 与证据</a></li>
+<li><a href="#_4">自测试与维护</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside><main><h1 id="svip-apb">SVIP APB 架构与使用契约</h1>
+<p>Author: syan</p>
+<h2 id="_1">目标与范围</h2>
+<p>首期是 APB3/APB4 requester 与 passive VIP，面向 VCS/UVM1.2 工程。保留串行驱动，用明确终结、四态检查和可观察结果补齐工程边界。无 wire ID/burst/outstanding，也不增加软件 batch 或 interface controller。产品 subordinate/memory/USER/APB5 属于后续范围。</p>
+<p>统一最大32-bit容器，cfg 定义有效地址1..32、DATA8/16/32，实际 DUT 按低有效位连接。端口读写数据同宽；cfg.create_txn 为正常随机设置对齐/有效位约束，driver 仍独立校验呈现前请求。Address 高位越界与未对齐请求拒绝；write data 的容器高位无效，按有效宽度截取。</p>
+<h2 id="_2">数据路径与对象所有权</h2>
+<pre><code class="language-text">用户 sequence / RAL
+          |
+     UVM sequencer
+          |
+    driver pull + private clone
+          |
+          +-&gt; SETUP -&gt; ACCESS -&gt; PREADY wait -&gt; candidate result
+          |                                     |
+          +-&gt; raw reset + epoch guard ---------+
+                                                |
+                     parent reset arbitration / terminal
+                                                |
+                      caller.copy + terminal snapshot + item_done
+
+APB raw pins -&gt; independent monitor -&gt; ap (all completions)
+                         |             reg_ap (OK only) -&gt; RAL predictor
+                         +------------ abort_ap
+
+active terminal / passive monitor -&gt; tracker + optional native coverage
+raw pins -&gt; SVA, independent of driver/coverage/tracker
+</code></pre>
+<p>请求进入 driver 后冻结为私有 clone；上层持有的对象在完成时同步回写。父流程是唯一 item_done owner，reset 只取消 transfer child，不取消 UVM pull loop。每个已接纳请求产生恰好一个终结结果；普通同步 sequence/RAL 无需额外 response queue。</p>
+<p>analysis 对象为只读快照。Driver 发布私有 clone，monitor 为每次观察分配对象且发布后不再修改。用户 subscriber 若要改写，应自行 clone，不能污染其他 subscriber 的观察。</p>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>语义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PENDING</td>
+<td>尚未终结，不应出现在终结 tracker/coverage</td>
+</tr>
+<tr>
+<td>OK</td>
+<td>已观察到完成，响应及有效读数据已知</td>
+</tr>
+<tr>
+<td>SLVERR</td>
+<td>完成周期实际 PSLVERR=1；允许 error read 数据无效</td>
+</tr>
+<tr>
+<td>RESET_ABORTED</td>
+<td>共同 bus reset 打断，不代表收到 PSLVERR</td>
+</tr>
+<tr>
+<td>BAD_REQUEST</td>
+<td>呈现前的未知有效字段、地址越界或未对齐等本地错误</td>
+</tr>
+<tr>
+<td>X_RESPONSE</td>
+<td>完成响应或成功读有效数据含 X/Z；保留四态值并报告</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reset">时序与 reset</h2>
+<pre><code class="language-text">cycle         n            n+1              n+2 ... finish
+phase       SETUP         ACCESS          ACCESS / next SETUP
+PSEL          1             1                   1
+PENABLE       0             1              wait=1 / finish后0
+payload     present -------- held stable --------+
+</code></pre>
+<p>clocking input #1step、output #0，timeunit1ns/precision1ps。正常驱动仅由串行 transfer child 写入。零等待表示 ACCESS 的第一个采样周期即可完成，不省略 SETUP。</p>
+<p>Raw PRESETn 非1触发 reset epoch，guard 不依赖 sampled reset，因此短 pulse 不会被下一次时钟采样掩盖。停止旧 transfer 后，父流程压低控制、等待 NBA、再压一次，消除已排队的 clocking #0 输出残留。同时间步 NBA reset 优先于 candidate completion。控制在该时间步 NBA settling 后空闲；不承诺异步转换的所有 delta 都无变化。</p>
+<p>共同 bus reset 后从 SETUP 重新开始。普通完成填采样时刻，abort 填实际 reset 时刻；不复用未初始化 time，也不将 reset 编码成一个 PSLVERR。Reset 不承诺取消已发生的外设写副作用。</p>
+<p><code>hold</code> 只阻止新请求，已呈现请求继续完成。Idle latency 可固定、范围随机或 back-to-back；固定范围不额外消耗 RNG。<code>max_wait_cycles</code> 是本地 watchdog，0表示关闭；超限报告一次后继续等 PREADY，不能为了超时擅自撤 ACCESS。</p>
+<p>Passive <code>t_start</code> 是首次 SETUP 采样，active 正常传输是 requester 呈现 SETUP 时刻；已接纳但尚未呈现就被reset中止的请求保留接纳时刻。两种角色不是同一时间锚点。wait_cycles 统计选中 ACCESS 内尚未完成的采样周期；含 X PREADY 的违规周期会被 checker 报告，仍属于尚未完成的等待。</p>
+<h2 id="checker-monitor">Checker 与 monitor 的职责</h2>
+<p>依据 <a href="https://documentation-service.arm.com/static/63fe2c1356ea36189d4e79f3">Arm IHI0024E</a> 的 transfer/state/validity 条款和上游 APB SVA，规则说明见 <a href="../../scope.html#checkers">checker</a>。</p>
+<ul>
+<li>PSEL 保持已知；PENABLE 的 known 要求由本地 PSEL 限定。</li>
+<li>PREADY 在选中 ACCESS 检查，PSLVERR 在完成窗口检查；error read 不要求 PRDATA 已知。</li>
+<li>PSTRB 控制 APB4 哪些写 lane 必须 known；PWDATA 的有效总线稳定性按 §4.1 单独检查，允许保持稳定的 inactive-X，容器高位忽略。</li>
+<li>SVA 检阶段、稳定性和四态；monitor 独立重建完成/abort 与 wait watchdog。没有靠 coverage 充当 checker。</li>
+</ul>
+<p><code>cfg.checks_en</code> 用于 build 初始值；运行期用 <code>agent.set_checks()</code> 同步到 IF 和 watchdog。Driver 的非法请求/未知完成响应报告属于 API 安全边界，不由这个 protocol-check 开关关闭。</p>
+<h2 id="ral">RAL</h2>
+<pre><code class="language-text">map frontdoor -&gt; adapter -&gt; synchronous requester -&gt; request result
+                                    |
+pins -&gt; monitor.reg_ap (only OK) -&gt; uvm_reg_predictor -&gt; mirror
+         monitor.ap still retains SLVERR/X completions for observation
+</code></pre>
+<p>使用 <code>agent.connect_reg_map(map)</code> 和 <code>connect_predictor(predictor,map)</code>。Adapter 按有效 DATA 填 n_bits、byte_en 和 status；APB4 宣称 byte enable，APB3 不宣称。Map 关闭 auto_predict，避免与独立 monitor 重复更新。</p>
+<p>实测发现 UVM1.2 predictor 不将 adapter 的 rw.status 传给预测对象；仅设置 UVM_NOT_OK 不能阻止 error read X 污染 mirror。因此成功事务端口与完整观察端口分开。Error/abort 不更新 mirror；错误写后旧 mirror 不是 DUT 无副作用的证明。</p>
+<p>本轮 register 不大于一个 APB data word，helper 会早拒绝更宽 register，避免标准 predictor 内部 partial collection 遇 error/reset 后留下欠账。本轮没有重写 UVM predictor 来扩张范围。</p>
+<h2 id="_3">配置与扩展边界</h2>
+<table>
+<thead>
+<tr>
+<th>Build 前确定</th>
+<th>可运行期控制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vif、is_active、addr_width、data_width、apb4</td>
+<td>hold、min/max_idle_cycles、back_to_back</td>
+</tr>
+<tr>
+<td>tracker_en/filename、coverage_en</td>
+<td>agent.set_checks()、max_wait_cycles</td>
+</tr>
+</tbody>
+</table>
+<p>公共模型是 cfg + transaction + UVM sequence + analysis port。用户可用标准 UVM 派生与 sequence 组织业务，不需要先理解内部 queue 或多个完成事件。协议 USER pins、通用响应接管、外部 memory callback 等需求在对应角色实现时再设计，避免第一版引入不可用开关。</p>
+<h2 id="trackercoverage">Tracker、coverage 与证据</h2>
+<p>Tracker 是可选 subscriber：active 观察所有 driver terminal（含 SETUP 尚未被 monitor 采到的 abort），passive 观察 monitor 完成/abort，避免双写同一事务。日志含时间、TXN/ABORT/REJECT、方向、地址、数据、prot/strb、status/slverr、wait、start/end。</p>
+<p>Native covergroup 在实际终结点采样，方向、结果、wait、宽度、prot/strobe 与 cross 独立于检查开关。统计的是声明的 terminal stream，包括明确区分的 abort/reject；不把初始化/预分配内容算成完成。首期没有 FC JSON 或跨 run 合并 API。</p>
+<p>运行器对每场保留独立 UUID 目录、精确 case/class/profile marker、源/工具/fixture/catalog/binary 身份、日志和所需产物。源码变化拒绝沿用旧 build；布尔与整数元数据不混同。Tracker 行数/内容、native coverage sample count/VDB 和请求的 VCD/FSDB 均有真实消费者。裸 <code>--waves</code> 为VCD，<code>--waves fsdb</code> 启用VCS/Verdi原生dump，格式参与编译身份与运行产物检查。</p>
+<h2 id="_4">自测试与维护</h2>
+<p>Independent narrow-port responder 使用自己的 byte memory，test 用另一份 byte oracle；不调用产品 mask/地址/内存语义算法生成期望。Checker faults 使用独立 pin fixture，按 rule/scope/count 预算，未预算错误仍失败。Fixture 在 sample+1ps 后用 raw NBA 模拟 clk-to-output；不在旧 clocking event 之外误用 output #0。</p>
+<p>Examples 展示接入、sequence、随机、timing/back-to-back/hold、error、RAL、passive，并检查结果。Compliance 检每项规则、合法邻居、参数边界、reset 组合、ownership 和 RAL 错误路径。清单唯一来源是 <a href="../../examples.html#apb">catalog.json</a>，入口见 <a href="../../examples.html#apb">testsuite README</a>。</p>
+<p>第二轮补充literal/约束随机/byte-lane与反压示例。反压来自fixture的响应mux；memory仅按实际bus READY/ERROR提交，不能在被覆盖的内部READY上提前提交。详情及配置消费点见 <a href="usage-cookbook.html">使用指南</a>。产品仍为requester/passive。</p>
+<p>验证按 basic → directed/RED-GREEN → review → freeze → regression → raw audit。具体执行范围与未测项见 <a href="../../scope.html#verification">round1-verification.md</a>、<a href="../../scope.html#verification">round2-verification.md</a>，不能把结构索引、编译或单个 smoke 当作完整协议认证。</p><footer>能力与已测范围见对应验收记录。</footer></main></div></body></html>

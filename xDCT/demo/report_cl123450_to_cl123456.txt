@@ -1,0 +1,72 @@
+========================================================================
+TOP INTERFACE CHANGE REPORT
+========================================================================
+Top module       : chip_top
+Previous P4 CL   : 123450
+Current P4 CL    : 123456
+Result           : BREAKING_CHANGE
+
+SUMMARY
+------------------------------------------------------------------------
+Ports            : 9 -> 9
+Added            : 1
+Removed          : 1
+Modified         : 5
+Order only       : 3
+Breaking changes : 6
+
+Category counts  : ADDED=1, DIRECTION_CHANGED=1, MODPORT_CHANGED=1, ORDER_CHANGED=1, ORDER_ONLY=3, REMOVED=1, TYPE_CHANGED=3, WIDTH_CHANGED=3
+
+DETAILS
+------------------------------------------------------------------------
+[REMOVED][BREAKING] legacy_mode
+  old: input logic legacy_mode
+  new: <absent>
+
+[ADDED][INFO] link_up
+  old: <absent>
+  new: output logic link_up
+
+[ORDER_ONLY][INFO] clk
+  old: input logic clk
+  new: input logic clk
+  declaration_order: 0 -> 1
+
+[MODPORT_CHANGED][ORDER_CHANGED][BREAKING] ctrl
+  old: ctrl_if.master ctrl
+  new: ctrl_if.slave ctrl
+  modport: 'master' -> 'slave'
+  declaration_order: 6 -> 5
+
+[WIDTH_CHANGED][TYPE_CHANGED][BREAKING] lanes
+  old: input logic[7:0]$[0:1] lanes
+  new: input logic[7:0]$[0:3] lanes
+  resolved_type: 'logic[7:0]$[0:1]' -> 'logic[7:0]$[0:3]'
+  bitstream_width: 16 -> 32
+
+[ORDER_ONLY][INFO] pad
+  old: inout logic pad
+  new: inout logic pad
+  declaration_order: 5 -> 6
+
+[ORDER_ONLY][INFO] rst_n
+  old: input logic rst_n
+  new: input logic rst_n
+  declaration_order: 1 -> 0
+
+[WIDTH_CHANGED][TYPE_CHANGED][BREAKING] rx_data
+  old: input logic[15:0] rx_data
+  new: input logic[31:0] rx_data
+  resolved_type: 'logic[15:0]' -> 'logic[31:0]'
+  bitstream_width: 16 -> 32
+
+[DIRECTION_CHANGED][BREAKING] status
+  old: output logic[3:0] status
+  new: input logic[3:0] status
+  direction: 'output' -> 'input'
+
+[WIDTH_CHANGED][TYPE_CHANGED][BREAKING] tx_data
+  old: output logic[15:0] tx_data
+  new: output logic[31:0] tx_data
+  resolved_type: 'logic[15:0]' -> 'logic[31:0]'
+  bitstream_width: 16 -> 32

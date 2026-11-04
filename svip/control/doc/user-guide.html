@@ -1,0 +1,189 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SVIP Control · 使用指导</title><style>
+:root{color-scheme:light;--ink:#17283c;--muted:#51657a;--line:#dce4eb;--brand:#116c71}
+*{box-sizing:border-box}body{margin:0;font:16px/1.75 system-ui,"Microsoft YaHei",sans-serif;color:var(--ink);background:#f5f7fa}
+header{padding:26px max(24px,calc((100vw - 1280px)/2));background:#122d3f;color:white}
+header small{letter-spacing:.16em;color:#a6dbd5}header strong{display:block;font-size:25px}
+.layout{display:grid;grid-template-columns:240px minmax(0,960px);gap:32px;max-width:1280px;padding:32px 24px;margin:auto}
+nav{position:sticky;top:20px;align-self:start;max-height:92vh;overflow:auto;font-size:14px}nav ul{padding-left:18px}nav a{color:var(--muted);text-decoration:none}
+main{background:white;padding:28px 42px;border:1px solid var(--line);border-radius:12px;min-width:0}h1{font-size:30px;line-height:1.3}h2{font-size:23px;padding-top:22px;border-top:1px solid var(--line);margin-top:34px}h3{font-size:19px}a{color:var(--brand)}
+pre{overflow:auto;padding:20px;background:#122638;color:#e1eef5;border-radius:8px;font:13px/1.6 Consolas,monospace}code{font-family:Consolas,monospace;overflow-wrap:anywhere}p code,li code{background:#eef3f6;padding:2px 5px;border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow:auto}th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}th{background:#edf5f4}tr:nth-child(even){background:#fafcfd}
+footer{color:var(--muted);margin:32px 0;font-size:13px}blockquote{border-left:4px solid var(--brand);padding-left:16px;color:var(--muted)}
+@media(max-width:850px){.layout{grid-template-columns:1fr}nav{position:static;max-height:none}main{padding:22px}header{padding:20px}}
+</style><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><small>SVIP / CONTROL</small><strong>Clock · Reset · Signal</strong></header><div class="layout"><nav><p><a href="recipes.html">场景指南</a> · <a href="user-guide.html">使用指导</a> · <a href="architecture.html">架构</a> · <a href="../../scope.html#verification">验收</a></p><div class="toc">
+<ul>
+<li><a href="#clock-reset-signal">Clock / Reset / Signal 使用指导</a><ul>
+<li><a href="#1">1. 接入前先决定三件事</a></li>
+<li><a href="#2">2. 编译和最小接入</a></li>
+<li><a href="#3-clock">3. Clock：启动、停低、变周期</a></li>
+<li><a href="#4-resetsourceepoch-gap">4. Reset：source、epoch 和 gap</a></li>
+<li><a href="#5-signalvaluemask-phase">5. Signal：value、mask 和 phase</a></li>
+<li><a href="#6">6. 观察和判错</a></li>
+<li><a href="#7-profile-transitionplan">7. Profile 和 TransitionPlan</a></li>
+<li><a href="#8-tieofffusestrap-irq">8. Tieoff、Fuse/Strap 和 IRQ</a></li>
+<li><a href="#9-csr">9. 真实 CSR 接入</a></li>
+<li><a href="#10-tracker">10. 结果、tracker 和回归</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><main><h1 id="clock-reset-signal">Clock / Reset / Signal 使用指导</h1>
+<p>Author: syan · P0a / P0b</p>
+<p>首次接入可先看 <a href="recipes.html">场景指南</a>：按功能选择独立组件、phase、example 和测试入口，再按本文查具体 API。</p>
+<h2 id="1">1. 接入前先决定三件事</h2>
+<ol>
+<li>谁驱动真实 pin：TB source 或 DUT source。后者只观察。</li>
+<li>同一物理 pin/vector 的 canonical root 是什么；alias/slice 必须归一，不能用不同逻辑名规避 ownership。</li>
+<li>对哪个 clock 的 rising edge、哪个 phase 驱动/观察。时间统一为整数 <strong>1ps ticks</strong>。</li>
+</ol>
+<p>绑定在 env 初始化时做一次，testcase 只使用 controller。没有每根 pin 的 agent/sequencer，也不需要新的 Python 运行时。</p>
+<p>调用方的 timeunit 可能是 1ns；请用 <code>svip_control_now()</code> 取得当前 tick，用 <code>23ns/1ps</code> 表达 23ns 对应的整数 ticks。直接把调用方的 <code>$time</code> 或 <code>23ns</code> 传给整数 tick 参数会使用调用方的单位，不能这样换算。real 单位输入先经 <code>svip_control_ticks(picoseconds, ticks)</code> 检查精度，再提交。</p>
+<h2 id="2">2. 编译和最小接入</h2>
+<p>Clock、Reset、Signal 可以只编译需要的组件。以下命令从产品仓库根执行：</p>
+<pre><code class="language-bash">vcs -full64 -sverilog -ntb_opts uvm-1.2 -timescale=1ps/1ps \
+  -debug_access+all -f control/clock/files.f \
+  control/clock/examples/svip_clock_example.sv \
+  -top svip_clock_example -o simv
+./simv
+</code></pre>
+<p>Reset 和 Signal 的独立 filelist 分别为 <code>control/reset/files.f</code>、<code>control/signal/files.f</code>。可复制的完整示例在 <a href="../../sources.html#control-clock-examples-svip-clock-example-sv">Clock</a>、<a href="../../sources.html#control-reset-examples-svip-reset-example-sv">Reset</a>、<a href="../../sources.html#control-signal-examples-svip-signal-example-sv">Signal</a> 下；后两个使用外部 HDL clock，不需要 Clock UVC。</p>
+<p>单组件直接导入公共层与自身 package：</p>
+<pre><code class="language-systemverilog">import svip_control_common_pkg::*;
+import svip_signal_pkg::*; // 或 svip_clock_pkg / svip_reset_pkg
+</code></pre>
+<p>按需组合使用一次 <code>common/files.f</code> 加所选组件的 <code>sources.f</code>，例如 <a href="../../scope.html#runtime">Clock + Signal</a>：</p>
+<pre><code class="language-text">-f control/common/files.f
+-f control/clock/sources.f
+-f control/signal/sources.f
+</code></pre>
+<p>不要叠加多个自包含的组件 <code>files.f</code>，否则会重复编译公共 package 和 DPI。完整 Control 用根 <code>control/files.f</code>；包含全部 controller、coordinator 和原有 <code>svip_control_pkg</code> 重导出入口。原来的 <code>import svip_control_pkg::*</code> 以及 qualified 类型名仍有效，类型和静态计数器只有一份。</p>
+<p>完整接入可运行的 <a href="../../sources.html#control-testbench-svip-control-quickstart-sv">quickstart</a>：</p>
+<pre><code class="language-bash">vcs -full64 -sverilog -ntb_opts uvm-1.2 -timescale=1ps/1ps \
+  -debug_access+all -f control/files.f \
+  control/testbench/svip_control_quickstart.sv \
+  -top svip_control_quickstart -o simv
+./simv
+</code></pre>
+<p>公共 filelist 已包含 <code>control/common/backend/svip_control_read_only.cpp</code>，不再单独追加。核心和单组件均不依赖 APB。需要 CSR adapter 时，在 Signal 或完整 Control 之后添加 <code>-f control/signal/adapters/files_apb.f</code>，并导入 <code>svip_control_apb_pkg::*</code>；真实项目仍使用自己的 APB agent 和 DUT。若项目已编译 APB，直接追加 adapter 的 <code>.sv</code>，避免再次编译 APB。</p>
+<p>正常 TB 输入这样接：</p>
+<pre><code class="language-systemverilog">wire [64:0] cfg;
+svip_control_pin_if#(65) cfg_pin(cfg, core_clk);
+assign cfg = cfg_pin.drive_value;
+// 初始化阶段：实际 pin 已知后创建 binding。
+svip_control_sv_binding#(65) binding = new(cfg_pin);
+</code></pre>
+<p>interface 的 <code>observed</code> 必须接真实 pin；capture clock 接真实接收域的 clock。binding 自动取得该 observed 路径，不能把 driver shadow 的路径当成观测路径。active-low 初始无效 reset 使用 <code>svip_control_pin_if#(1,1'b1)</code>，其 binding 也使用相同参数。</p>
+<p>显式注册物理身份：</p>
+<pre><code class="language-systemverilog">if (!resources.register_pin(&quot;cfg&quot;, binding, &quot;dut.cfg&quot;, 0, &quot;tb&quot;, 0,
+    SVIP_CONTROL_SIGNAL, SVIP_CONTROL_DIRECT_PIN, cfg_ep, reason))
+  `uvm_fatal(&quot;CFG&quot;, reason)
+signal_bank = new(cfg_ep, core_clock);
+reset.attach(cfg_ep, '0);
+</code></pre>
+<p><code>0</code> offset 表示当前 interface 对应 canonical root 的最低物理 bit。另一 slice 应给出同 root 和正确 offset；相同 interface handle 也会自动识别。P0 的 recipe 对整个 canonical bank 独占。</p>
+<p>观察 DUT 输出：不连接 <code>drive_value</code> 到 DUT，binding 创建时第三个参数 <code>drive_allowed=0</code>，注册 <code>observe_only=1</code>。reg-control 的 CSR 输出另指定 <code>SVIP_CONTROL_CSR</code>。对这种 endpoint 的普通 <code>set()</code> 会被拒绝。</p>
+<h2 id="3-clock">3. Clock：启动、停低、变周期</h2>
+<pre><code class="language-systemverilog">core_clock = new(core_ep, 2000, 3000); // high=2ns, low=3ns
+fork core_clock.run(); core_clock.monitor(); join_none
+core_clock.start(svip_control_now()+20000, result);
+core_clock.wait_edges(4, svip_control_now()+50000, result);
+core_clock.stop_low(svip_control_now()+20000, result);
+core_clock.start(svip_control_now()+20000, result); // resume，完整等 low
+core_clock.set_period_at_boundary(1300, 2700,
+    svip_control_now()+20000, result);
+</code></pre>
+<p><code>start</code> 成功表示接受启动；首个实际 edge 可用 <code>wait_edges()</code> 或 monitor 确认。<code>wait_edges(N)</code> 等 N 个未来 rising edges，不是任意时刻起 N 个完整周期。<code>stop_low</code> 成功则已经确认真实 pin 为 0。重复 start 不重新定相，重复 stop 稳定幂等。</p>
+<p>周期切换不截断 high/low，在下一完整周期边界生效，<code>boundary_edge()</code> 给出实际接受 timing 的 tick。<code>loss_timeout</code> 可配置独立 clock loss 门限，intentional stop 不报 loss。创建 reference 时最后一个参数设为 <code>1</code>；普通 stop 被拒绝。</p>
+<p><code>is_running()</code> 是 engine 已接受运行状态，<code>has_observed_edge()</code> 还要求本次 start/resume 后已经出现真实 edge。domain registry 的 <code>wait_ready()</code> 使用后者和实际 reset 状态；它只证明外部 clock/reset 可用，DUT 内部 local-reset、配置 ack 和业务 ready 需要项目自己的观察条件。</p>
+<p>P0 生成固定初值 0 的 TB clock。DUT generated clock 只观察，改变它应通过 DUT 的输入或 CSR。P1 才扩展派生关系。</p>
+<h2 id="4-resetsourceepoch-gap">4. Reset：source、epoch 和 gap</h2>
+<pre><code class="language-systemverilog">reset = new(reset_ep, 1); // active-low
+reset.attach(cfg_ep, '0);
+reset.attach(irq_ep, '0);
+fork reset.monitor(); join_none
+reset.set_source(&quot;software&quot;, 1, deadline, result);
+reset.set_source(&quot;watchdog&quot;, 1, deadline, result);
+reset.set_source(&quot;software&quot;, 0, deadline, result); // watchdog 仍保持 reset
+reset.set_source(&quot;watchdog&quot;, 0, deadline, result);
+</code></pre>
+<p><code>asserted</code> 是逻辑是否有效，controller 处理极性。X/Z 请求会拒绝。<code>source_at()</code> 指定绝对 tick，<code>source_after_edge()</code> 指定运行中 clock 的未来 rising edge ID。每个动作都有独立 deadline。</p>
+<p>独立 Reset 只需公共层，<code>attach()</code> 接收公共 endpoint，不导入 Signal 组件。<code>source_after_edge()</code> 接受公共 <code>svip_control_clock_ref</code>；项目可提供外部 clock 的 reference，或直接传入 Clock 组件的 controller。</p>
+<p>实际 epoch 从真实 pin 的 inactive→active 变化产生。重复 assert 同值不会虚增；初始就有效的 reset 使用 <code>INITIAL_ASSERTED</code> source，明确 release 该 token。source command 完成只表示外部 reset pin 行为，不能代替 DUT 的同步 reset 接收证明。</p>
+<p>reset-clock gap：</p>
+<pre><code class="language-systemverilog">coordinator = new(resources);
+map = new(&quot;por_gap&quot;, reset, reference_clock);
+map.add_clock(core_clock);
+map.add_clock(aux_clock); // 异频也允许，重复添加会去重
+map.pre_cycles = 3;
+map.post_cycles = 2;
+map.offset_ticks = 1;
+map.release_guard_ticks = 1;
+coordinator.gap(map, svip_control_now()+200000, result);
+</code></pre>
+<p>reference 为 100MHz 时，assert→resume 接受恰好 50ns；请求停钟到 R0 的等待另计，首个 functional edge 还要完整等 low_ticks。<code>last_gap</code> 包含实际 stop ack、R0、assert/release/resume 和首 edge 时间。</p>
+<p>gap 中别的 source 阻止物理释放时返回 partial，功能 clock 保持停低；由 testcase 明确清除原因后恢复。reference loss 由独立 timer 结束。<code>synchronous_assert=1</code> 的整段停钟 plan 会被拒绝。这是停钟窗口释放外部 reset，不能称为停止 clock 上的同步释放。</p>
+<h2 id="5-signalvaluemask-phase">5. Signal：value、mask 和 phase</h2>
+<pre><code class="language-systemverilog">when_at = new(SVIP_CONTROL_ASYNC_AT, svip_control_now()+17);
+signal_bank.set(65'h10000000000000001, svip_control_mask(65),
+    when_at, deadline, result);
+
+when_at = new(SVIP_CONTROL_BEFORE_CAPTURE, core_clock.next_rise_tick());
+when_at.setup_ticks = 100;
+signal_bank.set(value, write_mask, when_at, deadline, result);
+
+when_at = new(SVIP_CONTROL_AFTER_SOURCE_EDGE, 0,
+    core_clock.endpoint.monitor().rises()+1);
+signal_bank.set(value, write_mask, when_at, deadline, result);
+</code></pre>
+<p>BEFORE_CAPTURE 的 <code>at_tick</code> 是 capture 时刻，实际写入在正 setup 之前。AFTER_SOURCE_EDGE 在指定实际 edge 的 NBA 之后、同 timestamp 写入，让该 edge 采到旧值。ASYNC_AT 不悄悄对齐 clock。对未建立时序关系的外部 clock，不承诺 coincident Active 驱动的物理采样结果。</p>
+<p>纯异步 Signal 用 <code>signal_bank = new(cfg_ep)</code>，无需 Clock 组件。按边沿使用时，构造参数接受 <code>svip_control_clock_ref</code>。它只包含实际 clock endpoint、<code>is_running()</code>、<code>predicts_rise(tick)</code>；外部时钟实现必须如实描述运行状态和可预测边界，不能预测的 BEFORE_CAPTURE 请求应被拒绝。完整外部时钟接法见 <a href="../../sources.html#control-signal-examples-svip-signal-example-sv">Signal 独立示例</a>。</p>
+<p><code>write_mask</code> 只决定更新哪些 bit；checker 的 <code>compare_mask</code> 独立。value/mask 超宽、X/Z 和非法 phase 在写入前拒绝。默认 container 为 1024，可用编译宏 <code>SVIP_CONTROL_MAX_W</code> 调整；逻辑实际宽度仍由 interface 参数声明。整数负数不能默默截断到小 pin，请显式编码为所需宽度的 packed bits。</p>
+<h2 id="6">6. 观察和判错</h2>
+<pre><code class="language-systemverilog">signal_bank.expect_value(expected, compare_mask, deadline, result);
+signal_bank.expect_value(expected, compare_mask, deadline, result, 1,
+    SVIP_CONTROL_CAPTURE_VALUE, last_seen_capture_id);
+signal_bank.expect_stable(expected, until_tick, deadline, result);
+</code></pre>
+<p>默认 expect 使用最终 ReadOnly pin 值；capture expect 使用独立 HDL sampler 和明确 edge ID。未给 capture anchor 时，从调用时当前 ID 后的下一次采样开始。底层 <code>monitor().sample()</code> 可以取得最新的带时间历史 capture，不把它当作当前连续值。</p>
+<p><code>known</code> mask 保存真实 X/Z 信息，未知 bit 不能满足已知预期。<code>expect_stable</code> 使用真实变化计数和最终采样，连同 timestamp 内返回原值的变化也能发现。预期不满足会返回 timeout/partial 并报告 <code>SVIP_CONTROL_EXPECT</code> / <code>SVIP_CONTROL_STABLE</code>。专用负测可关闭普通报告再自己检查结果，正常使用保留默认报告。</p>
+<h2 id="7-profile-transitionplan">7. Profile 和 TransitionPlan</h2>
+<pre><code class="language-systemverilog">profile = new(&quot;normal&quot;);
+profile.add(mode_bank, mode_value, mode_mask);
+profile.add(limit_bank, limit_value, limit_mask);
+coordinator.capture_coherent(profile, core_clock,
+    core_clock.next_rise_tick(), 100, deadline, result);
+</code></pre>
+<p>适用成员必须同 source clock、owner、kind 和 reset dependencies；快照在指定 capture 前写完并稳定。非法字段 preflight 失败，不部分写。不同 delta 的异步观察者不在原子保证内。</p>
+<p>跨域时用 <code>svip_control_transition_plan</code> 为 target 的每组目标提供一个 <code>svip_control_when</code>，再调用 <code>coordinator.transition()</code>。<code>progress</code> 保留逐步骤结果。<code>request_global_atomic=1</code> 被拒绝；barrier 只说明这些步骤均已完成。</p>
+<h2 id="8-tieofffusestrap-irq">8. Tieoff、Fuse/Strap 和 IRQ</h2>
+<p>tieoff 的 signal endpoint 使用 <code>SVIP_CONTROL_TIEOFF</code>：</p>
+<pre><code class="language-systemverilog">tieoff_control = new(tieoff_signal);
+tieoff_control.configure(1, deadline, result);
+if (!tieoff_control.lock()) `uvm_fatal(&quot;TIEOFF&quot;, &quot;busy&quot;)
+</code></pre>
+<p>lock 后普通 set/pulse 也不能改值。用 <code>expect_stable</code> 配合窗口检查实际连线。</p>
+<p>fuse/strap 消费端镜像使用 <code>SVIP_CONTROL_FUSE</code>。<code>svip_fuse_mirror</code> 绑定指定 POR/load reset watch；该 reset 真实 active 且是新 epoch 时 <code>load_image()</code> 才打开窗口，完成后 lock。普通 functional reset 不给它添加清零依赖；它会保留 image。这里模拟消费端镜像，不实现 OTP 烧写协议。</p>
+<p>IRQ source 用 <code>svip_irq_source</code>，提供 <code>level()</code>、继承的 <code>pulse_time()</code> 和 <code>pulse_cycles()</code>。时间 pulse 精确按整数 tick，不因窄于目标 clock 而拉长。cycle pulse 的含义是 N 次未来采样；停钟到 deadline 后清到 idle 并返回 timeout，reset/cancel 后旧 cleanup 被禁止。</p>
+<p>DUT IRQ 输出用 <code>svip_irq_observer</code>：<code>expect_level()</code>、<code>measure_pulse()</code>。测量完整 pulse 需从真实 inactive 开始观察。输出清除走源条件或真实 CSR，observer 不提供反向 drive 接口。</p>
+<h2 id="9-csr">9. 真实 CSR 接入</h2>
+<p>连接完成后创建 <code>svip_control_apb_adapter</code>，传入现有 active APB4 agent：</p>
+<pre><code class="language-systemverilog">csr = new(apb_agent);
+if (!csr.add_field(&quot;control&quot;, csr_output_ep, 'h0, 0, 32,
+    SVIP_CONTROL_CSR_WORD, reason)) `uvm_fatal(&quot;CSR&quot;, reason)
+csr.write(&quot;control&quot;, 32'h80402001, deadline, bus_result);
+csr_output_observer.expect_value(32'h80402001, svip_control_mask(32),
+    effect_deadline, effect_result);
+</code></pre>
+<p><code>csr_output_ep</code> 必须为 CSR/passive。word 模式要求完整 register image；bytes 模式只允许完整 byte，使用 APB PSTRB；W1C 只向目标 bit 写 1，其他 bit 写 0；read-clear 只能显式 read。不提供盲目 RMW。</p>
+<p>bus_result 的 applied_kind 为 <code>CSR_TRANSACTION_COMPLETED</code>，observed/effective 仍未知。checker 通过实际目标输出确认后，effect_result 才带独立证据。多 CSR 用 <code>write_profile()</code> 得到逐项 progress，失败返回 partial；无硬件 commit 时拒绝 atomic。</p>
+<p><strong>APB timeout 不等于事务取消。</strong> adapter 不杀死现有 driver 的 sequence；transport 进入隔离，后续请求拒绝，直到 <code>drain()</code> 看到原事务真实完成或 reset-aborted。若不希望原写入随后发生，由项目显式 reset/恢复，再 drain，不能假装 rollback。详见 <code>example_csr</code> 和 <code>csr_failures</code>。</p>
+<h2 id="10-tracker">10. 结果、tracker 和回归</h2>
+<p>检查 <code>result.status</code>，保留 requested/scheduled/applied/observed/effective 时间与 reason。applied_kind 区分 pin 写入和 CSR 完成。普通 set 的 observed 是真实 pin；它不自动证明内部业务已消费。effective 只由明确的实际观测条件设置。</p>
+<p>tracker 包含命令 ID、owner、generation、实际 epoch、phase、clock/edge、deadline、value/known mask。sequence 是本地日志序号，不能用来声称 simulator delta 编号。开启/关闭：</p>
+<pre><code class="language-systemverilog">svip_control_result::open_tracker(&quot;control.log&quot;);
+// execute commands
+svip_control_result::close_tracker();
+svip_control_result::write_coverage(&quot;control-coverage.json&quot;);
+</code></pre>
+<p>runner 会完成上述调用并校验 tracker terminal 与 coverage 一一对应。coverage 区分 command status/phase 计数和真实观测宽度/view/known、stop/reset/gap counters；验收完备性由完整测试矩阵判断。</p>
+<p>examples 是能复制的使用方式，compliance 负责非法控制、冲突、deadline、reset 和故障判错。实际命令、配置、结果和产物哈希保存在 build 下。能力范围及本版实测记录见 <a href="../../scope.html#verification">verification</a>。</p><footer>Author: syan · 本地离线文档 · P0a/P0b</footer></main></div></html>

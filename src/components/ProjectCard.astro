@@ -1,0 +1,17 @@
+---
+import Icon from './Icon.astro';
+import ProjectVisual from './ProjectVisual.astro';
+import { sitePath } from '../lib/catalog.mjs';
+const { project, index } = Astro.props;
+const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
+---
+<article class:list={['project-card', `accent-${project.color}`]} data-project={project.id}>
+  <a href={href(`projects/${project.id}/`)} class="project-art-link" aria-label={`了解 ${project.name}`} tabindex="-1"><ProjectVisual id={project.id}/></a>
+  <div class="project-card-body">
+    <div class="project-card-meta"><span class="mono">{String(index + 1).padStart(2, '0')} / {project.label}</span><span class="project-live" title="静态演示可访问"></span></div>
+    <h3><a href={href(`projects/${project.id}/`)}>{project.name}<Icon name="diagonal" size={19}/></a></h3>
+    <p>{project.description}</p>
+    <ul class="tags" aria-label="技术标签">{project.tags.map((tag: string) => <li>{tag}</li>)}</ul>
+  </div>
+  <div class="project-card-footer"><span>{project.format}</span><a href={href(project.primary)}>进入演示<Icon name="arrow" size={16}/></a></div>
+</article>

@@ -1,0 +1,347 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The complete UVM fixture</title><style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f4f6fa;color:#172033;font:16px/1.7 system-ui,-apple-system,'Segoe UI',sans-serif}main{max-width:1120px;margin:auto;padding:45px 28px 80px}a{color:#3159cc;text-underline-offset:4px}nav{display:flex;gap:20px;flex-wrap:wrap;font-size:14px}h1{font-size:clamp(36px,5vw,62px);letter-spacing:-2px;line-height:1.1;margin:34px 0 22px}h2{font-size:26px;letter-spacing:-.5px;margin:44px 0 18px}h3{margin:0 0 8px;font-size:20px}.eyebrow{color:#607089;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-top:40px}.lead{max-width:800px;font-size:20px;color:#536078}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:18px;margin:28px 0}.card{padding:24px;background:#fff;border:1px solid #dce2ec;border-radius:12px}.card p{color:#536078;margin-bottom:0}.card .number{font-size:34px;font-weight:700;color:#172033}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0}.button{display:inline-block;padding:12px 20px;background:#3159cc;color:#fff;border-radius:7px;text-decoration:none;font-weight:600}.button.secondary{background:#fff;color:#3159cc;border:1px solid #dce2ec}.note{padding:18px 22px;background:#eaf0ff;border-left:3px solid #5279e1;border-radius:0 8px 8px 0;color:#394c76}.muted{color:#607089;font-size:14px}code,pre{font-family:Consolas,'Courier New',monospace}code{font-size:.9em;overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#101b30;color:#dce8fc;padding:22px;border-radius:8px;font-size:13px;line-height:1.65}.source-section{scroll-margin-top:24px;border-top:1px solid #dce2ec;margin-top:32px;padding-top:20px}.source-section h2{font-size:20px;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}td,th{text-align:left;border:1px solid #dce2ec;padding:12px}ul{padding-left:22px}li{margin:6px 0}.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;padding:4px 8px;border-radius:4px;background:#e9efff;color:#3159cc}footer{margin-top:50px;padding-top:22px;border-top:1px solid #dce2ec;color:#607089;font-size:13px}@media(max-width:600px){main{padding:24px 18px 55px}h1{letter-spacing:-1px}table{font-size:12px}td,th{padding:8px}.card{padding:19px}}
+</style></head><body><main><nav><a href="index.html">← Package index</a></nav><p class="eyebrow">Source browser</p><h1>The complete UVM fixture</h1><p class="lead">A sanitized ready/valid environment: test, environment, agent, sequence, scoreboard, coverage, interface, and a small DUT. These are the exact source files used to generate the interactive wiki.</p><ul><li><a href="#examples-demo-uvm-filelist-f">examples/demo_uvm/filelist.f</a></li><li><a href="#examples-demo-uvm-filelists-rtl-f">examples/demo_uvm/filelists/rtl.f</a></li><li><a href="#examples-demo-uvm-rtl-demo-dut-sv">examples/demo_uvm/rtl/demo_dut.sv</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-agent-svh">examples/demo_uvm/tb/classes/demo_agent.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-coverage-svh">examples/demo_uvm/tb/classes/demo_coverage.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-driver-svh">examples/demo_uvm/tb/classes/demo_driver.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-env-svh">examples/demo_uvm/tb/classes/demo_env.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-env-config-svh">examples/demo_uvm/tb/classes/demo_env_config.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-item-svh">examples/demo_uvm/tb/classes/demo_item.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-monitor-svh">examples/demo_uvm/tb/classes/demo_monitor.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-scoreboard-svh">examples/demo_uvm/tb/classes/demo_scoreboard.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-sequence-svh">examples/demo_uvm/tb/classes/demo_sequence.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-sequencer-svh">examples/demo_uvm/tb/classes/demo_sequencer.svh</a></li><li><a href="#examples-demo-uvm-tb-classes-demo-smoke-test-svh">examples/demo_uvm/tb/classes/demo_smoke_test.svh</a></li><li><a href="#examples-demo-uvm-tb-demo-if-sv">examples/demo_uvm/tb/demo_if.sv</a></li><li><a href="#examples-demo-uvm-tb-demo-pkg-sv">examples/demo_uvm/tb/demo_pkg.sv</a></li><li><a href="#examples-demo-uvm-tb-demo-top-sv">examples/demo_uvm/tb/demo_top.sv</a></li></ul><section class="source-section" id="examples-demo-uvm-filelist-f"><h2>examples/demo_uvm/filelist.f</h2><p><a href="examples/demo_uvm/filelist.f" download>Download original source</a> · 6 lines</p><pre><code>+incdir+./tb/classes
++define+DEMO_DATA_WIDTH=16
+-f ./filelists/rtl.f
+./tb/demo_if.sv
+./tb/demo_pkg.sv
+./tb/demo_top.sv
+</code></pre></section><section class="source-section" id="examples-demo-uvm-filelists-rtl-f"><h2>examples/demo_uvm/filelists/rtl.f</h2><p><a href="examples/demo_uvm/filelists/rtl.f" download>Download original source</a> · 1 lines</p><pre><code>../rtl/demo_dut.sv
+</code></pre></section><section class="source-section" id="examples-demo-uvm-rtl-demo-dut-sv"><h2>examples/demo_uvm/rtl/demo_dut.sv</h2><p><a href="examples/demo_uvm/rtl/demo_dut.sv" download>Download original source</a> · 20 lines</p><pre><code>module demo_dut (
+  input  logic                         clk,
+  input  logic                         reset_n,
+  input  logic                         valid,
+  output logic                         ready,
+  input  logic [`DEMO_DATA_WIDTH-1:0] data
+);
+
+  logic [31:0] accepted_count;
+
+  assign ready = reset_n;
+
+  always_ff @(posedge clk or negedge reset_n) begin
+    if (!reset_n)
+      accepted_count &lt;= &#x27;0;
+    else if (valid &amp;&amp; ready)
+      accepted_count &lt;= accepted_count + 1&#x27;b1;
+  end
+
+endmodule
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-agent-svh"><h2>examples/demo_uvm/tb/classes/demo_agent.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_agent.svh" download>Download original source</a> · 26 lines</p><pre><code>class demo_agent extends uvm_agent;
+  `uvm_component_utils(demo_agent)
+
+  demo_sequencer sequencer;
+  demo_driver    driver;
+  demo_monitor   monitor;
+
+  function new(string name = &quot;demo_agent&quot;, uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    monitor = demo_monitor::type_id::create(&quot;monitor&quot;, this);
+    if (is_active == UVM_ACTIVE) begin
+      sequencer = demo_sequencer::type_id::create(&quot;sequencer&quot;, this);
+      driver    = demo_driver::type_id::create(&quot;driver&quot;, this);
+    end
+  endfunction
+
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    if (is_active == UVM_ACTIVE)
+      driver.seq_item_port.connect(sequencer.seq_item_export);
+  endfunction
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-coverage-svh"><h2>examples/demo_uvm/tb/classes/demo_coverage.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_coverage.svh" download>Download original source</a> · 23 lines</p><pre><code>class demo_coverage extends uvm_subscriber #(demo_item);
+  `uvm_component_utils(demo_coverage)
+
+  bit [`DEMO_DATA_WIDTH-1:0] sampled_data;
+
+  covergroup data_cg;
+    option.per_instance = 1;
+    data_cp: coverpoint sampled_data {
+      bins low  = {[0:63]};
+      bins high = {[64:255]};
+    }
+  endgroup
+
+  function new(string name = &quot;demo_coverage&quot;, uvm_component parent = null);
+    super.new(name, parent);
+    data_cg = new();
+  endfunction
+
+  function void write(demo_item item);
+    sampled_data = item.data;
+    data_cg.sample();
+  endfunction
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-driver-svh"><h2>examples/demo_uvm/tb/classes/demo_driver.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_driver.svh" download>Download original source</a> · 29 lines</p><pre><code>class demo_driver extends uvm_driver #(demo_item);
+  `uvm_component_utils(demo_driver)
+
+  virtual demo_if vif;
+
+  function new(string name = &quot;demo_driver&quot;, uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    if (!uvm_config_db #(virtual demo_if)::get(this, &quot;&quot;, &quot;vif&quot;, vif))
+      `uvm_fatal(get_type_name(), &quot;virtual interface was not configured&quot;)
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    vif.valid &lt;= 1&#x27;b0;
+    vif.data  &lt;= &#x27;0;
+    forever begin
+      seq_item_port.get_next_item(req);
+      @(posedge vif.clk);
+      vif.valid &lt;= 1&#x27;b1;
+      vif.data  &lt;= req.data;
+      do @(posedge vif.clk); while (!vif.ready);
+      vif.valid &lt;= 1&#x27;b0;
+      seq_item_port.item_done();
+    end
+  endtask
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-env-svh"><h2>examples/demo_uvm/tb/classes/demo_env.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_env.svh" download>Download original source</a> · 28 lines</p><pre><code>class demo_env extends uvm_env;
+  `uvm_component_utils(demo_env)
+
+  demo_env_config cfg;
+  demo_agent       agent;
+  demo_scoreboard  scoreboard;
+  demo_coverage    coverage;
+
+  function new(string name = &quot;demo_env&quot;, uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    if (!uvm_config_db #(demo_env_config)::get(this, &quot;&quot;, &quot;cfg&quot;, cfg))
+      cfg = demo_env_config::type_id::create(&quot;cfg&quot;);
+    agent = demo_agent::type_id::create(&quot;agent&quot;, this);
+    agent.is_active = cfg.is_active;
+    scoreboard = demo_scoreboard::type_id::create(&quot;scoreboard&quot;, this);
+    coverage = demo_coverage::type_id::create(&quot;coverage&quot;, this);
+  endfunction
+
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    agent.monitor.item_ap.connect(scoreboard.item_imp);
+    agent.monitor.item_ap.connect(coverage.analysis_export);
+  endfunction
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-env-config-svh"><h2>examples/demo_uvm/tb/classes/demo_env_config.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_env_config.svh" download>Download original source</a> · 13 lines</p><pre><code>class demo_env_config extends uvm_object;
+  uvm_active_passive_enum is_active = UVM_ACTIVE;
+  int unsigned item_count = 8;
+
+  `uvm_object_utils_begin(demo_env_config)
+    `uvm_field_enum(uvm_active_passive_enum, is_active, UVM_DEFAULT)
+    `uvm_field_int(item_count, UVM_DEFAULT)
+  `uvm_object_utils_end
+
+  function new(string name = &quot;demo_env_config&quot;);
+    super.new(name);
+  endfunction
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-item-svh"><h2>examples/demo_uvm/tb/classes/demo_item.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_item.svh" download>Download original source</a> · 15 lines</p><pre><code>class demo_item extends uvm_sequence_item;
+  rand bit [`DEMO_DATA_WIDTH-1:0] data;
+
+  `uvm_object_utils_begin(demo_item)
+    `uvm_field_int(data, UVM_DEFAULT)
+  `uvm_object_utils_end
+
+  function new(string name = &quot;demo_item&quot;);
+    super.new(name);
+  endfunction
+
+  constraint data_c {
+    data inside {[0:255]};
+  }
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-monitor-svh"><h2>examples/demo_uvm/tb/classes/demo_monitor.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_monitor.svh" download>Download original source</a> · 29 lines</p><pre><code>class demo_monitor extends uvm_monitor;
+  `uvm_component_utils(demo_monitor)
+
+  virtual demo_if vif;
+  uvm_analysis_port #(demo_item) item_ap;
+
+  function new(string name = &quot;demo_monitor&quot;, uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    item_ap = new(&quot;item_ap&quot;, this);
+    if (!uvm_config_db #(virtual demo_if)::get(this, &quot;&quot;, &quot;vif&quot;, vif))
+      `uvm_fatal(get_type_name(), &quot;virtual interface was not configured&quot;)
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    demo_item observed;
+    forever begin
+      @(posedge vif.clk);
+      if (vif.reset_n &amp;&amp; vif.valid &amp;&amp; vif.ready) begin
+        observed = demo_item::type_id::create(&quot;observed&quot;);
+        observed.data = vif.data;
+        item_ap.write(observed);
+      end
+    end
+  endtask
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-scoreboard-svh"><h2>examples/demo_uvm/tb/classes/demo_scoreboard.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_scoreboard.svh" download>Download original source</a> · 24 lines</p><pre><code>class demo_scoreboard extends uvm_scoreboard;
+  `uvm_component_utils(demo_scoreboard)
+
+  uvm_analysis_imp #(demo_item, demo_scoreboard) item_imp;
+  int unsigned observed_count;
+
+  function new(string name = &quot;demo_scoreboard&quot;, uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    item_imp = new(&quot;item_imp&quot;, this);
+  endfunction
+
+  function void write(demo_item item);
+    observed_count++;
+    `uvm_info(get_type_name(), $sformatf(&quot;observed data 0x%0h&quot;, item.data), UVM_MEDIUM)
+  endfunction
+
+  function void report_phase(uvm_phase phase);
+    `uvm_info(get_type_name(), $sformatf(&quot;observed %0d items&quot;, observed_count), UVM_LOW)
+  endfunction
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-sequence-svh"><h2>examples/demo_uvm/tb/classes/demo_sequence.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_sequence.svh" download>Download original source</a> · 19 lines</p><pre><code>class demo_sequence extends uvm_sequence #(demo_item);
+  int unsigned item_count = 8;
+
+  `uvm_object_utils(demo_sequence)
+
+  function new(string name = &quot;demo_sequence&quot;);
+    super.new(name);
+  endfunction
+
+  task body();
+    repeat (item_count) begin
+      req = demo_item::type_id::create(&quot;req&quot;);
+      start_item(req);
+      if (!req.randomize())
+        `uvm_fatal(get_type_name(), &quot;demo_item randomization failed&quot;)
+      finish_item(req);
+    end
+  endtask
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-sequencer-svh"><h2>examples/demo_uvm/tb/classes/demo_sequencer.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_sequencer.svh" download>Download original source</a> · 7 lines</p><pre><code>class demo_sequencer extends uvm_sequencer #(demo_item);
+  `uvm_component_utils(demo_sequencer)
+
+  function new(string name = &quot;demo_sequencer&quot;, uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-classes-demo-smoke-test-svh"><h2>examples/demo_uvm/tb/classes/demo_smoke_test.svh</h2><p><a href="examples/demo_uvm/tb/classes/demo_smoke_test.svh" download>Download original source</a> · 28 lines</p><pre><code>class demo_smoke_test extends uvm_test;
+  `uvm_component_utils(demo_smoke_test)
+
+  demo_env        env;
+  demo_env_config cfg;
+
+  function new(string name = &quot;demo_smoke_test&quot;, uvm_component parent = null);
+    super.new(name, parent);
+  endfunction
+
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    cfg = demo_env_config::type_id::create(&quot;cfg&quot;);
+    cfg.item_count = 8;
+    uvm_config_db #(demo_env_config)::set(this, &quot;env&quot;, &quot;cfg&quot;, cfg);
+    env = demo_env::type_id::create(&quot;env&quot;, this);
+  endfunction
+
+  task run_phase(uvm_phase phase);
+    demo_sequence sequence;
+    phase.raise_objection(this);
+    sequence = demo_sequence::type_id::create(&quot;sequence&quot;);
+    sequence.item_count = cfg.item_count;
+    sequence.start(env.agent.sequencer);
+    #20ns;
+    phase.drop_objection(this);
+  endtask
+endclass
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-demo-if-sv"><h2>examples/demo_uvm/tb/demo_if.sv</h2><p><a href="examples/demo_uvm/tb/demo_if.sv" download>Download original source</a> · 28 lines</p><pre><code>`ifndef DEMO_DATA_WIDTH
+`define DEMO_DATA_WIDTH 16
+`endif
+
+interface demo_if (
+  input logic clk,
+  input logic reset_n
+);
+  logic                        valid;
+  logic                        ready;
+  logic [`DEMO_DATA_WIDTH-1:0] data;
+
+  modport driver_mp (
+    input  clk,
+    input  reset_n,
+    input  ready,
+    output valid,
+    output data
+  );
+
+  modport monitor_mp (
+    input clk,
+    input reset_n,
+    input valid,
+    input ready,
+    input data
+  );
+endinterface
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-demo-pkg-sv"><h2>examples/demo_uvm/tb/demo_pkg.sv</h2><p><a href="examples/demo_uvm/tb/demo_pkg.sv" download>Download original source</a> · 16 lines</p><pre><code>package demo_pkg;
+  import uvm_pkg::*;
+  `include &quot;uvm_macros.svh&quot;
+
+  `include &quot;demo_item.svh&quot;
+  `include &quot;demo_env_config.svh&quot;
+  `include &quot;demo_sequence.svh&quot;
+  `include &quot;demo_sequencer.svh&quot;
+  `include &quot;demo_driver.svh&quot;
+  `include &quot;demo_monitor.svh&quot;
+  `include &quot;demo_agent.svh&quot;
+  `include &quot;demo_scoreboard.svh&quot;
+  `include &quot;demo_coverage.svh&quot;
+  `include &quot;demo_env.svh&quot;
+  `include &quot;demo_smoke_test.svh&quot;
+endpackage
+</code></pre></section><section class="source-section" id="examples-demo-uvm-tb-demo-top-sv"><h2>examples/demo_uvm/tb/demo_top.sv</h2><p><a href="examples/demo_uvm/tb/demo_top.sv" download>Download original source</a> · 32 lines</p><pre><code>module demo_top;
+  import uvm_pkg::*;
+  import demo_pkg::*;
+
+  logic clk = 1&#x27;b0;
+  logic reset_n = 1&#x27;b0;
+
+  always #5ns clk = ~clk;
+
+  demo_if demo_vif (
+    .clk     (clk),
+    .reset_n (reset_n)
+  );
+
+  demo_dut dut (
+    .clk     (clk),
+    .reset_n (reset_n),
+    .valid   (demo_vif.valid),
+    .ready   (demo_vif.ready),
+    .data    (demo_vif.data)
+  );
+
+  initial begin
+    repeat (4) @(posedge clk);
+    reset_n = 1&#x27;b1;
+  end
+
+  initial begin
+    uvm_config_db #(virtual demo_if)::set(null, &quot;*&quot;, &quot;vif&quot;, demo_vif);
+    run_test(&quot;demo_smoke_test&quot;);
+  end
+endmodule
+</code></pre></section><footer>TechYan / Demo · Portable documentation and source examples · <a href="provenance.json">Source provenance</a></footer></main></body></html>

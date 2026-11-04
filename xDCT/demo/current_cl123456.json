@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "p4_cl": "123456",
+  "top_module": "chip_top",
+  "ports": [
+    {
+      "name": "rst_n",
+      "kind": "port",
+      "direction": "input",
+      "storage": "variable",
+      "resolved_type": "logic",
+      "bitstream_width": 1,
+      "signed": false,
+      "interface_type": null,
+      "modport": null,
+      "declaration_order": 0
+    },
+    {
+      "name": "clk",
+      "kind": "port",
+      "direction": "input",
+      "storage": "variable",
+      "resolved_type": "logic",
+      "bitstream_width": 1,
+      "signed": false,
+      "interface_type": null,
+      "modport": null,
+      "declaration_order": 1
+    },
+    {
+      "name": "rx_data",
+      "kind": "port",
+      "direction": "input",
+      "storage": "variable",
+      "resolved_type": "logic[31:0]",
+      "bitstream_width": 32,
+      "signed": false,
+      "interface_type": null,
+      "modport": null,
+      "declaration_order": 2
+    },
+    {
+      "name": "tx_data",
+      "kind": "port",
+      "direction": "output",
+      "storage": "variable",
+      "resolved_type": "logic[31:0]",
+      "bitstream_width": 32,
+      "signed": false,
+      "interface_type": null,
+      "modport": null,
+      "declaration_order": 3
+    },
+    {
+      "name": "status",
+      "kind": "port",
+      "direction": "input",
+      "storage": "variable",
+      "resolved_type": "logic[3:0]",
+      "bitstream_width": 4,
+      "signed": false,
+      "interface_type": null,
+      "modport": null,
+      "declaration_order": 4
+    },
+    {
+      "name": "ctrl",
+      "kind": "interface",
+      "direction": "interface",
+      "storage": null,
+      "resolved_type": null,
+      "bitstream_width": null,
+      "signed": null,
+      "interface_type": "ctrl_if",
+      "modport": "slave",
+      "declaration_order": 5
+    },
+    {
+      "name": "pad",
+      "kind": "port",
+      "direction": "inout",
+      "storage": "net",
+      "resolved_type": "logic",
+      "bitstream_width": 1,
+      "signed": false,
+      "interface_type": null,
+      "modport": null,
+      "declaration_order": 6
+    },
+    {
+      "name": "lanes",
+      "kind": "port",
+      "direction": "input",
+      "storage": "variable",
+      "resolved_type": "logic[7:0]$[0:3]",
+      "bitstream_width": 32,
+      "signed": false,
+      "interface_type": null,
+      "modport": null,
+      "declaration_order": 7
+    },
+    {
+      "name": "link_up",
+      "kind": "port",
+      "direction": "output",
+      "storage": "variable",
+      "resolved_type": "logic",
+      "bitstream_width": 1,
+      "signed": false,
+      "interface_type": null,
+      "modport": null,
+      "declaration_order": 8
+    }
+  ]
+}

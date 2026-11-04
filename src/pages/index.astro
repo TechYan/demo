@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ProjectVisual from '../components/ProjectVisual.astro';
+import projects from '../data/projects.json';
+import { sitePath } from '../lib/catalog.mjs';
+const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
+const categories = [{ id: 'all', label: '全部项目' }, { id: 'protocol', label: '协议可视化' }, { id: 'verification', label: '验证与架构' }, { id: 'analysis', label: '分析与诊断' }, { id: 'registers', label: '寄存器与配置' }];
+const projectCount = String(projects.length).padStart(2, '0');
+---
+<Base>
+  <section class="hero">
+    <div class="eyebrow">ENGINEERING / OPEN PLAYGROUND</div>
+    <h1>Engineering,<br/><span>made explorable.</span></h1>
+    <p class="hero-copy">从协议里的每一个字节，到工程里的每一条连接。<br/>这里收集可以直接体验的工具、可以追溯的结果，以及构建它们的思路。</p>
+    <div class="hero-bottom"><div class="hero-actions"><a class="primary-button" href="#projects">探索全部项目<Icon name="arrow" size={17}/></a><a class="text-link" href="https://github.com/TechYan/demo" target="_blank" rel="noopener noreferrer"><Icon name="github" size={16}/>查看源码</a></div><div class="hero-stats"><div class="hero-stat"><strong>{projectCount}</strong><span>工程项目</span></div><div class="hero-stat"><strong>15</strong><span>PVKit 场景</span></div><div class="hero-stat"><strong>04</strong><span>探索方向</span></div></div></div>
+  </section>
+  <section aria-label="精选项目"><div class="section-kicker"><span>01</span> FEATURED PROJECT</div><article class="featured accent-lime"><div class="featured-info"><div class="featured-label"><Icon name="pulse" size={15}/>PERFORMANCE. WITH EVIDENCE.</div><h2>PVKit</h2><p>让总线流量变得可读。把性能指标、协议事务与原始采样，放回同一条时间线上。</p><div class="featured-tags">AXI4 / CXL NATIVE / HTML / TUI</div><a class="featured-link" href={href('projects/pvkit/')}>浏览 15 个分析场景<Icon name="arrow" size={17}/></a></div><div class="featured-preview"><ProjectVisual id="pvkit" featured/><div class="preview-caption"><span>报告视图示意 / PERFORMANCE VIEW</span><b>READ + WRITE</b></div></div></article></section>
+  <section class="projects-section" id="projects" aria-labelledby="projects-heading"><div class="section-heading"><div><h2 id="projects-heading">Project index<span>/ {projectCount}</span></h2><p>选择一个方向，打开一个具体的工程问题。</p></div><label class="search-box"><Icon name="search" size={16}/><input id="project-search" type="search" placeholder="搜索项目、协议或技术…" aria-label="搜索项目、协议或技术" autocomplete="off"/><kbd aria-hidden="true">/</kbd></label></div>
+    <div class="category-filters" role="group" aria-label="按方向筛选项目">{categories.map(category => <button class="filter-button" data-category={category.id} aria-pressed={category.id === 'all' ? 'true' : 'false'}>{category.label}<span>{String(category.id === 'all' ? projects.length : projects.filter(p => p.category === category.id).length).padStart(2, '0')}</span></button>)}<span id="result-count" class="result-count" role="status" aria-live="polite">SHOWING {projectCount} PROJECTS</span></div>
+    <div class="project-grid">{projects.map((project, index) => <ProjectCard project={project} index={index}/>)}</div>
+    <div class="empty-state" id="empty-state" hidden><h3>没有找到匹配的项目</h3><p>试试 AXI、UVM、寄存器，或切换探索方向。</p><button id="clear-search">清除搜索与筛选 →</button></div>
+  </section>
+  <section class="workflow-section" id="workflow"><div class="section-kicker"><span>02</span> CONNECT THE DOTS</div><h2>独立的工具，连贯的工程实践。</h2><p>从理解协议到构建验证环境，再到分析流量与组织寄存器配置，沿着问题探索下一步。</p><div class="workflow-steps"><a class="workflow-step" href={href('projects/bus-protocol-lab/')}><span class="mono">01 / UNDERSTAND</span><strong>理解协议<Icon name="arrow" size={15}/></strong><p>Bytes → AXI → PCIe</p></a><a class="workflow-step" href={href('projects/uvm_wiki/')}><span class="mono">02 / BUILD</span><strong>看清验证结构<Icon name="arrow" size={15}/></strong><p>UVM Wiki / SVIP</p></a><a class="workflow-step" href={href('projects/pvkit/')}><span class="mono">03 / INSPECT</span><strong>沿证据分析<Icon name="arrow" size={15}/></strong><p>PVKit / xDCT</p></a><a class="workflow-step" href={href('projects/pg_gen/')}><span class="mono">04 / CONFIGURE</span><strong>组织配置步骤<Icon name="arrow" size={15}/></strong><p>PG Builder / xpggen</p></a></div></section>
+</Base>
+<script>
+  import projects from '../data/projects.json';
+  import { filterProjects } from '../lib/catalog.mjs';
+  const search = document.querySelector<HTMLInputElement>('#project-search')!;
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>('[data-category]')];
+  const query = new URLSearchParams(location.search);
+  let category = buttons.some(b => b.dataset.category === query.get('category')) ? query.get('category')! : 'all';
+  search.value = query.get('q') || '';
+  function update() {
+    const visible = new Set(filterProjects(projects, search.value, category).map(p => p.id));
+    document.querySelectorAll<HTMLElement>('[data-project]').forEach(card => card.hidden = !visible.has(card.dataset.project!));
+    buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.category === category)));
+    document.querySelector('#result-count')!.textContent = `SHOWING ${String(visible.size).padStart(2, '0')} PROJECT${visible.size === 1 ? '' : 'S'}`;
+    (document.querySelector('#empty-state') as HTMLElement).hidden = visible.size !== 0;
+    const params = new URLSearchParams();
+    if (category !== 'all') params.set('category', category);
+    if (search.value.trim()) params.set('q', search.value.trim());
+    history.replaceState(null, '', location.pathname + (params.size ? '?' + params.toString() : '') + location.hash);
+  }
+  buttons.forEach(button => button.addEventListener('click', () => { category = button.dataset.category!; update(); }));
+  search.addEventListener('input', update);
+  document.querySelector('#clear-search')?.addEventListener('click', () => { category = 'all'; search.value = ''; update(); search.focus(); });
+  document.addEventListener('keydown', event => {
+    if (event.key === '/' && !(event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) && !(event.target as HTMLElement)?.isContentEditable) { event.preventDefault(); search.focus(); }
+  });
+  update();
+</script>

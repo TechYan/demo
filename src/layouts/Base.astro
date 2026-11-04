@@ -1,0 +1,57 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import projects from '../data/projects.json';
+import { sitePath } from '../lib/catalog.mjs';
+const { title = 'TechYan — Engineering Playground', description = '探索协议、验证、性能分析与寄存器工具的交互演示。', projectName = '' } = Astro.props;
+const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+  <head>
+    <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content={description}/><meta name="theme-color" content="#101211"/>
+    <title>{title}</title><link rel="icon" href={href('favicon.svg')} type="image/svg+xml"/>
+    <link rel="canonical" href={canonical}/><meta property="og:title" content={title}/><meta property="og:description" content={description}/><meta property="og:type" content="website"/>
+    <script is:inline>try{const t=localStorage.getItem('techyan-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch{}</script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <aside class="sidebar">
+      <a class="brand" href={href('')} aria-label="TechYan Demo 首页"><span class="brand-symbol">ty<span>.</span></span><span class="brand-word">TechYan<span>engineering playground</span></span></a>
+      <div class="sidebar-body">
+        <div class="sidebar-intro"><span class="status-dot"></span> A COLLECTION OF WORK</div>
+        <p class="sidebar-copy">把工程里的想法，<br/>变成可以探索的作品。</p>
+        <nav aria-label="主导航" class="main-nav">
+          <a href={href('')} class:list={['nav-link', { active: !projectName }]} aria-current={!projectName ? 'page' : undefined}><Icon name="grid" size={18}/><span>项目索引</span><span class="nav-count">{String(projects.length).padStart(2, '0')}</span></a>
+          <a href={href('') + '#workflow'} class="nav-link"><Icon name="code" size={18}/><span>工程工具链</span></a>
+          <a href="https://github.com/TechYan/demo" class="nav-link" target="_blank" rel="noopener noreferrer"><Icon name="github" size={18}/><span>GitHub 仓库</span><Icon name="diagonal" size={14}/></a>
+        </nav>
+        <div class="sidebar-categories"><div class="small-heading">EXPLORE BY FIELD</div>
+          <a href={href('') + '?category=protocol#projects'}><span class="category-dot blue"></span>协议可视化</a>
+          <a href={href('') + '?category=verification#projects'}><span class="category-dot violet"></span>验证与架构</a>
+          <a href={href('') + '?category=analysis#projects'}><span class="category-dot lime"></span>分析与诊断</a>
+          <a href={href('') + '?category=registers#projects'}><span class="category-dot amber"></span>寄存器与配置</a>
+        </div>
+      </div>
+      <div class="sidebar-bottom"><div class="local-first"><Icon name="terminal" size={16}/><span>Open. Inspect. Explore.</span></div><div class="sidebar-bottom-row"><span class="mono">© 2026 TechYan</span><button id="theme-toggle" class="icon-button" aria-label="切换浅色主题" title="切换主题"><Icon name="sun" size={17}/></button></div></div>
+    </aside>
+    <div class="site-content">
+      <header class="topbar"><div class="breadcrumb"><a href={href('')}>TechYan</a><span>/</span><span>{projectName || 'demo'}</span></div><a href="https://github.com/TechYan/demo" target="_blank" rel="noopener noreferrer" class="topbar-source"><span class="status-dot"></span>PUBLIC DEMOS<Icon name="github" size={17}/></a></header>
+      <main id="main-content"><slot/></main>
+      <footer class="site-footer"><a href={href('')}>TechYan <span>/</span> Demo</a><p>源码、示例与结果，让工程细节可以被看见。</p><a href="https://github.com/TechYan/demo/blob/main/THIRD_PARTY_NOTICES.md" target="_blank" rel="noopener noreferrer">Credits<Icon name="diagonal" size={13}/></a></footer>
+    </div>
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
+      function updateThemeLabel() { toggle?.setAttribute('aria-label', document.documentElement.dataset.theme === 'light' ? '切换深色主题' : '切换浅色主题'); }
+      updateThemeLabel();
+      toggle?.addEventListener('click', () => {
+        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        try { localStorage.setItem('techyan-theme', next); } catch {}
+        updateThemeLabel();
+      });
+    </script>
+  </body>
+</html>

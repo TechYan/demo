@@ -1,0 +1,144 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="syan"><title>SVIP AXI4 · architecture</title><style>*{box-sizing:border-box}body{margin:0;background:#f4f6f8;color:#192332;font:16px/1.75 system-ui,"Microsoft YaHei",sans-serif}header{padding:24px 5%;background:#17293d;color:white}header p{margin:0;color:#c9d7e5}.layout{display:grid;grid-template-columns:235px minmax(0,960px);gap:30px;max-width:1320px;margin:28px auto;padding:0 24px}nav{position:sticky;top:24px;align-self:start;font-size:14px;max-height:90vh;overflow:auto}nav ul{padding-left:18px}nav a{color:#245b87;text-decoration:none}main{background:white;padding:30px 40px;border:1px solid #dce3ea;border-radius:10px;min-width:0}h1,h2{line-height:1.4}h2{margin-top:2.1em;padding-bottom:8px;border-bottom:1px solid #dce3ea}pre{padding:18px;background:#eef3f7;overflow:auto;line-height:1.55;font-size:13px}code{font-family:Consolas,monospace}p code,li code,td code{background:#eef3f7;padding:1px 4px}table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid #dce3ea;padding:9px;text-align:left;vertical-align:top}th{background:#eef3f7}a{color:#176199}footer{font-size:12px;color:#657487;margin-top:30px}@media(max-width:850px){.layout{display:block}nav{position:static;max-height:none}main{padding:20px}}@media print{nav,header{display:none}.layout{display:block;margin:0;padding:0}main{border:0;padding:0}pre{white-space:pre-wrap}}</style></head><body><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><strong>SVIP AXI4 v0.4</strong><p>VCS / UVM 1.2 · Author: syan</p></header><div class="layout"><nav aria-label="目录"><div class="toc">
+<ul>
+<li><a href="#svip-axi4">SVIP AXI4 架构与使用契约</a><ul>
+<li><a href="#_1">架构</a></li>
+<li><a href="#_2">目录和编译</a></li>
+<li><a href="#_3">位宽与容量</a></li>
+<li><a href="#transaction-pattern">Transaction、随机化与 pattern</a></li>
+<li><a href="#memory">三种 memory 用法</a></li>
+<li><a href="#sequence-slave">Sequence 接管 slave 回复</a></li>
+<li><a href="#reset-callback">Reset、时序、控制和 callback</a></li>
+<li><a href="#coverage-tracker">检查、coverage 和 tracker</a></li>
+<li><a href="#_4">验证边界</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><main><h1 id="svip-axi4">SVIP AXI4 架构与使用契约</h1>
+<p>Author: syan</p>
+<p>SVIP 面向 VCS / UVM 1.2 的 AXI4 memory-mapped 验证。采用独立通道驱动和 subordinate 周期引擎，按真实验证工程的需求提供配置、reset、检查、观察和响应所有权。普通工程使用 transaction、cfg、agent 三层入口。</p>
+<h2 id="_1">架构</h2>
+<pre><code class="language-text">manager sequence (optional svip_axi_seq_pkg)
+             |
+         sequencer
+             |
+     clone + callback + bounded pending
+             |
+     independent WR / RD admission credits
+          /      |       \
+       AW loop  W loop   AR loop
+          \      |       /
+         clocking outputs (#0)
+                 |
+               AXI pins &lt;-------- subordinate cycle engine
+                 |                sample -&gt; AW/W FIFO pairing
+            #1step sample                     |
+                 |                     AUTO or USER ownership
+              monitor                  /              \
+          /      |       \       SV memory/RANDOM     get_request
+     protocol  assembler coverage                       |
+     checks      |                                upper sequence
+             ap / channel_ap                     send_response
+                 |                                      |
+        tracker / user subscribers          next clock + ID-order + latency
+</code></pre>
+<p>Manager 的 AW/W/AR 独立推进，W burst 按接纳顺序完成。AW 和 W 可以任意先到。Subordinate 用原有 B/R 队列按 due cycle 选取响应；同 ID 保序，不同 ID 可重排，R 可按不同 RID 逐拍交织。USER 模式在这些队列保留尚未提交响应的占位项，后续同 ID 响应无法越过它。<code>reorder_en=0</code> 会保持更严格的全局队头顺序。</p>
+<h2 id="_2">目录和编译</h2>
+<p>产品由 <code>common/</code> 与 <code>axi/</code> 组成，本文路径以 <code>axi/</code> 为基准。AXI 专用符号统一 <code>svip_axi_</code> / <code>SVIP_AXI_</code>；已有通用 coverage service 与随机化宏保留 <code>svip_</code> / <code>SVIP_</code>。详见 <a href="../../scope.html#runtime">目录与命名迁移</a>。</p>
+<p>Core 编译顺序为 <code>src/svip_axi_bus_if.sv</code>、<code>../common/cov/svip_fc_pkg.sv</code>、<code>src/svip_axi_pkg.sv</code>。VCS/vlogan 使用 <code>-sverilog -timescale=1ns/1ps</code>，并先编译 UVM1.2 package。Include 路径加入 <code>src</code>、<code>../common</code>、<code>../common/cov</code>、<code>src/coverage</code>。使用随附 sequence 时，再编译 <code>sequence_lib/svip_axi_seq_pkg.sv</code>，增加该目录的 include 路径并 import <code>svip_axi_seq_pkg::*</code>。Core 不依赖这个包。可选工程 scoreboard 在 <code>src/scoreboard</code>。</p>
+<p><code>src/coverage/svip_axi_coverage.svh</code> 承载被动功能覆盖率。<code>testsuite/examples</code> 展示可复制的公开接口用法，<code>testsuite/compliance</code> 检查功能契约。<code>testbench</code> 是独立自测 fixture，不属于接入 DUT 必须使用的接口。</p>
+<h2 id="_3">位宽与容量</h2>
+<p><code>src/svip_axi_defs.svh</code> 是编译容器的唯一配置入口；同一次构建的 interface/package 必须使用同一组定义。</p>
+<table>
+<thead>
+<tr>
+<th>编译定义</th>
+<th style="text-align: right;">默认</th>
+<th>支持范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SVIP_AXI_MAX_DATA_W</code></td>
+<td style="text-align: right;">1024</td>
+<td>32..1024，2 的幂</td>
+</tr>
+<tr>
+<td><code>SVIP_AXI_MAX_ADDR_W</code></td>
+<td style="text-align: right;">64</td>
+<td>32..64</td>
+</tr>
+<tr>
+<td><code>SVIP_AXI_MAX_WR_ID_W</code></td>
+<td style="text-align: right;">12</td>
+<td>1..64</td>
+</tr>
+<tr>
+<td><code>SVIP_AXI_MAX_RD_ID_W</code></td>
+<td style="text-align: right;">12</td>
+<td>1..64</td>
+</tr>
+<tr>
+<td><code>SVIP_AXI_MAX_USER_W</code></td>
+<td style="text-align: right;">68</td>
+<td>正数；runner 接受 1..4096</td>
+</tr>
+</tbody>
+</table>
+<p>事务使用公共 <code>svip_axi_addr_t/id_t/data_t/strb_t/user_t</code>。ID 容器取 WR/RD 最大值，实际 AW/B 与 AR/R 引脚分别使用 WR/RD 容器。Monitor 的稳定性快照宽度从字段宽度计算，不使用固定总位数。内存的 seed/hash 故意保留 64 位，与地址容器无关。</p>
+<pre><code class="language-systemverilog">cfg.data_bytes = 64;       // DATA512；DATA1024 使用128
+cfg.wr_id_width = 8;
+cfg.rd_id_width = 6;
+cfg.wr_addr_width = 48;
+cfg.rd_addr_width = 40;
+cfg.max_wr_outstanding = 32;
+cfg.max_rd_outstanding = 64;
+cfg.max_pending = 256;
+</code></pre>
+<p>位宽、容量、memory_mode 与 sub_response_mode 在agent build前配置，运行中保持固定；timing和公开控制API可在运行中使用。WR/RD 的有效 ID/地址宽度独立。ID 有效宽度允许0，代表该方向 ID 必须为0；地址有效宽度为1..编译容器。W/R 共用 DATA 宽度，<code>data_bytes</code> 必须是4..最大容器字节数内的2次幂。较窄 DUT 引脚应在 top 中明确切片/零扩展，cfg 取实际宽度；手工构造的越界请求也会在 manager 接纳处被拒绝。没有静默截断有效字段的模式。</p>
+<p>Outstanding 总量按读写独立；<code>max_per_id_outstanding=0</code> 表示只受方向总量限制，非零表示每个 ID 的可选共同策略。<code>max_pending</code> 限制已由 UVM 接纳、尚未获得通道额度的队列。Subordinate 也有独立读写资源上限，force READY 不能越过真实存储容量。</p>
+<h2 id="transaction-pattern">Transaction、随机化与 pattern</h2>
+<p><code>svip_axi_base_seq::new_txn()</code> 自动复制 cfg 元数据。手工创建时，先调用 <code>cfg.configure_txn(t)</code>，再 <code>t.randomize() with {...}</code>。约束涵盖方向有效位宽、合法 burst/size/cache、4KB 边界、FIXED/WRAP 长度以及 exclusive 对齐和大小。WRAP 顶端地址用相对偏移计算，避免地址上界加法溢出。</p>
+<p><code>post_randomize()</code> 为写请求产生随机 DATA 和全有效 lane WSTRB；<code>fill_wdata(SVIP_AXI_STRB_FULL/RANDOM/MIXED)</code> 切换 strobe pattern。USER、REGION/LOOP 默认0，由用户按业务填写；保留默认零侧带有助于普通接入。USER 可以在 sequence 中自行随机，无需新接口。<code>svip_axi_rand_seq</code> 提供随机流量和独占4KB页槽，检查页槽容量并受两个方向有效地址宽度共同约束；小于一页的地址空间应直接使用 transaction sequence。</p>
+<p><code>send(t)</code> 在 UVM 接纳时返回，driver 保存私有 clone 和 UVM response 路由。<code>wait_all()</code> 等待真实完成；在 <code>on_done(response)</code> 获取结果，不要把原请求对象当 response。Reset 中止的 manager completion 带 <code>aborted=1</code>。完整随机 pattern 的验收同时观察实际 AW/AR/W 引脚并做独立字节读回，不能仅统计随机对象。</p>
+<h2 id="memory">三种 memory 用法</h2>
+<p>默认 <code>cfg.memory_mode=SVIP_AXI_MEMORY</code>、<code>cfg.sub_response_mode=SVIP_AXI_SUB_AUTO</code>。未指定 <code>cfg.mem</code> 时 agent 创建稀疏 SV byte memory。未写字节取 seed/address 的确定性 hash，同地址重复读一致；写尊重 WSTRB/active lanes，错误区域可返回 SLVERR/DECERR，reset 保留字节并清除 exclusive reservation。</p>
+<p>外挂 memory 通过派生 <code>svip_axi_mem</code>，覆盖虚方法 <code>read_byte</code>、<code>write_byte</code>、按需 <code>byte_resp</code>，然后在 build 前赋给 <code>cfg.mem</code>。<code>write_txn</code> 经虚 byte 方法写入，beat status 始终咨询虚 byte status。若需要枚举/copy 外部内容，也覆盖 <code>is_written/get_written</code>；若目标也是外部模型，需要实现相应 <code>copy_from</code> 行为。外部系统直接修改 backing store 时调用 <code>invalidate_range(addr,nbytes)</code>，使该端口的 exclusive reservation 失效。多个 port 共享同一外部存储时，应分别保留各端口 exclusive 元数据，并广播外部写入失效；不要把不同端口相同数值的 ID 当全局唯一 ID。</p>
+<pre><code class="language-systemverilog">class my_mem extends svip_axi_mem;
+  byte unsigned backing[svip_axi_addr_t];
+  function new(string name=&quot;my_mem&quot;); super.new(name); endfunction
+  virtual function bit [7:0] read_byte(svip_axi_addr_t a);
+    return backing.exists(a) ? backing[a] : 0;
+  endfunction
+  virtual function void write_byte(svip_axi_addr_t a,bit [7:0] v);
+    backing[a]=v;
+    invalidate_range(a,1); // 也覆盖直接调用 adapter.write_byte 的情况
+  endfunction
+endclass
+</code></pre>
+<p>设置 <code>cfg.memory_mode=SVIP_AXI_RANDOM</code> 后不创建或访问 memory，<code>cfg.mem</code> 可以为 null。写请求不会保存，读请求每次呈现新 beat 时产生随机 active-lane 数据，并在停等期间保持；默认响应为 OKAY，exclusive 视为不支持。与默认 hash memory 的可重复读数据不同，RANDOM 用于不关心数据关联的响应场景。</p>
+<h2 id="sequence-slave">Sequence 接管 slave 回复</h2>
+<pre><code class="language-systemverilog">sc.sub_response_mode = SVIP_AXI_SUB_USER;  // build 前配置
+// 上层 sequence/task 中：
+sub.get_request(req);
+rsp = sub.default_response(req);          // 显式执行默认 memory/RANDOM 和 hooks
+rsp.buser = svip_axi_user_t'('h25);
+if (!sub.send_response(req,rsp))
+  `uvm_error(&quot;RESP&quot;, &quot;request was already submitted or invalidated by reset&quot;)
+</code></pre>
+<p><code>get_request</code> 对写在 AW+完整W 收齐后交付，对读在 AR 接受后交付。它阻塞等待下一笔请求；只 retain 这次交付的确切 req handle 作为关联凭据。响应用 clone 构造，或使用 <code>default_response</code>。使用 ID 关联会混淆同 ID outstanding，因此 API 不接受替代 req clone 作为凭据。</p>
+<p><code>default_response</code> 只有显式调用时才执行 memory/random、shape hook 和 callback；同请求仅执行一次，后续返回独立缓存副本。USER 模式中，默认 memory helper 的调用先后顺序由 sequence 负责，尤其是重叠地址的同 ID 请求。完全自定义响应时不调用 helper，用户自行决定 data/status 和外部存储副作用。</p>
+<p><code>send_response</code> 立即验证并保存响应快照，成功返回1，重复或 reset 后旧句柄返回0。当前有效请求的元数据修改、空 rsp、错误数组长度会报告精确错误且允许修正后重提。Read 必须有完整 <code>data[]</code> 和 <code>rresp[]</code>；<code>ruser[]/rloop[]</code> 允许全空并补零，非空必须完整。可逐拍设置混合 RRESP。API 不从调用者保留可变数组引用。</p>
+<p>提交只会在 <code>$realtime</code> 严格晚于提交时刻的 driver 时钟被消费，然后应用原有 latency。这个规则固定同一 timestamp 的 active/NBA 提交行为。用户可延后响应、让其他 ID 前进；同 ID 在总线最终回复仍保序。<code>example_slave_model</code> 展示最小用法，<code>reactive_*</code> 用例验证复杂边界。</p>
+<h2 id="reset-callback">Reset、时序、控制和 callback</h2>
+<p>接口使用 clocking block：输入 <code>#1step</code>、输出 <code>#0</code>。Driver 的 reset supervisor 结束旧 epoch，清队列/credits/USER context，在 raw assertion 和 NBA 活动后恢复空闲 VALID；monitor 同时监听 reset 边沿与采样值。无需用户手动 flush 才能处理正常总线 reset。软件 abort 与总线 reset 语义不同：已经呈现的 VALID 继续保持到握手，尚未呈现的项可结束。</p>
+<p><code>cfg.timing</code> 将五通道 valid/ready、B/R latency 和 R beat gap 分开控制，支持 ZERO/FIXED/RANGE/BURSTY。<code>timing.apply(...)</code> 提供组合预设。计数单位为 clock cycles，0 表示在产生资格的该边沿之后驱动，响应仍须满足 AXI 请求握手依赖。</p>
+<p>Manager <code>force_ready</code> 控制 B/R；subordinate 控制 AW/W/AR。<code>hold_responses(b,r)</code> 只阻止启动新响应或新 R beat，已经呈现的 VALID/payload 继续保持。关闭 force 后恢复 timing 规则。Callbacks 是非阻塞 function，提供 request、write_response、read_response；经 <code>add_callback</code> 注册，允许 callback_mode 启停。完成观察使用 <code>agent.ap</code> 或 sequence 的 <code>on_done</code> hook。需要等待事件的响应决策使用 USER API。</p>
+<h2 id="coverage-tracker">检查、coverage 和 tracker</h2>
+<p><code>checks_en</code> 控制协议检查，<code>x_checks_en</code> 控制原始四态检查，<code>cov_en</code> 控制采样。Monitor 在转换成二态 transaction 之前检查 X/Z；只对协议要求有效的数据 byte lanes 检查。检查包括 VALID/payload 停等稳定、B/R 请求依赖、LAST、同 ID 匹配、普通请求禁止 EXOKAY、size、FIXED/WRAP/INCR burst、4KB、exclusive、cache 和有效宽度。准确规则映射见 <a href="protocol-checks.html">protocol-checks.md</a>。外部真实 Arm Axi4PC 在自测绑定，源码由用户安装。</p>
+<p>Coverage 保留原 txn/zero-latency service 路径，并新增 burst/exclusive、response、zero/partial/full strobe、五通道 USER、stall、读写 outstanding、端到端 latency 原生 covergroup。计数和 <code>get_inst_coverage()</code> 报告可被测试检查。Latency 是 package ns，stall 是 cycles。提前 RLAST 只为已观察 beat 计入 response/USER。<code>--coverage</code> 保存 VCS 原生数据库，并请求 monitor 在 final_phase 导出一次 FC JSON；手工接入可使用 <code>+svip_fc_json=&lt;path&gt;</code>。显式 <code>write_json()</code> 仍可多次保存。Native covergroup 按实例统计；共享 service 的同名 group 在一个进程内按协议汇总，JSON 不携带逐实例统计身份。合并工具按 DATA、容器定义、SV 源码与外部 checker 身份划分 profile，验证 counts/schema/artifact hash，illegal bins 不进入合法分母。各 profile 单独报告，不生成跨不兼容配置的总覆盖率。百分比大于0不等于覆盖闭环。</p>
+<p><code>agent.ap</code> 发布完整 transaction，<code>agent.channel_ap</code> 发布逐握手四态快照。<code>tracker_mode</code> 取 OFF/TXN/CHANNEL，默认 OFF；文件可配置，TXN 记录方向、ID、地址、burst 和响应摘要；CHANNEL 另记录逐握手 DATA/STRB/USER，便于按引脚定位。Tracker 不承担 scoreboard 的数据正确性判定。</p>
+<h2 id="_4">验证边界</h2>
+<p>Testsuite 的唯一清单是 <code>testsuite/catalog.json</code>。<code>defines</code> 为需要额外编译容器的 case 指定独立构建，full suite 自动执行，例如 WR20/RD16 的 high-ID。编译 identity 包含源码、catalog、容器定义、物理宽度、wave/coverage 配置、真实 checker 依赖和可执行文件 hash；run-only 会拒绝过期构建。每个 seed、容量和 reset 落点保存独立日志。<code>regress.py --jobs N</code> 默认1，按编译组构建一次，再有限并发执行独立仿真；每个子进程返回指定的不可变结果文件，共享 latest manifest 不参与判定。仿真前后均复核冻结输入。</p>
+<p>自测 fixture 从实际 clock half-period 推导 offedge assertion 的整数 ps 偏移，满足 <code>0 &lt; offset &lt; half</code>；1ps 精度下 half=1ps 无严格 offedge 点，明确拒绝该组合。posedge/NBA placement 的 release 仍遵守原五个 negedge 契约。该配置属于测试平台，不增加 VIP 生产接口。</p>
+<p>首要发布矩阵是 DATA512/1024、VCS/UVM1.2、实际 Arm checker，另有小 DATA/独立窄宽容器的定向构建。完整 AMBA 认证、其他模拟器、ACE/AXI5、原生 DPI/C 后端和多端口一致性不在本轮验收声明中。完整执行结果和哈希见 <a href="../../scope.html#verification">round7-verification.md</a>。</p><footer>SVIP · syan · See LICENSE and NOTICE for source attribution.</footer></main></div></body></html>

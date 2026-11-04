@@ -1,0 +1,439 @@
+[
+  {
+    "id": "pvkit",
+    "name": "PVKit",
+    "category": "analysis",
+    "label": "PERFORMANCE & PROTOCOL",
+    "color": "lime",
+    "description": "从总线流量到性能指标，沿着每一笔事务追踪证据。",
+    "lead": "15 个 AXI4 / CXL Native 场景，将原始 CSV、交互报告、真实 TUI 和完整 tracker 放在同一个入口。",
+    "tags": [
+      "AXI4",
+      "CXL Native",
+      "HTML",
+      "TUI"
+    ],
+    "keywords": [
+      "性能",
+      "带宽",
+      "outstanding",
+      "tracker",
+      "WSTRB",
+      "credit"
+    ],
+    "format": "交互报告 / 终端回放",
+    "metric": "15",
+    "metricLabel": "release scenarios",
+    "primary": "pvkit/index.html",
+    "actions": [
+      {
+        "title": "全部场景",
+        "description": "7 个 AXI4 与 8 个 CXL Native 场景",
+        "path": "pvkit/index.html",
+        "type": "GALLERY"
+      },
+      {
+        "title": "AXI4 并发读写",
+        "description": "带宽、outstanding、背压与事务关联",
+        "path": "pvkit/examples/axi4/concurrent/traffic.pv.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "CXL 反复 EMPTY",
+        "description": "展开 slot，观察 credit EMPTY 的时间关系",
+        "path": "pvkit/examples/cxl_native/repeated_empty/traffic.pv.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "真实 TUI 打印",
+        "description": "3 种报告模式与 3 种终端列宽",
+        "path": "pvkit/examples/axi4/concurrent/tui.html",
+        "type": "TERMINAL"
+      },
+      {
+        "title": "分析日志",
+        "description": "完整模式与全部趋势的 UTF-8 输出",
+        "path": "pvkit/examples/axi4/concurrent/traffic.analyze.log",
+        "type": "LOG"
+      },
+      {
+        "title": "Tracker 日志",
+        "description": "原始采样事件和请求关联",
+        "path": "pvkit/examples/axi4/concurrent/traffic.tracker.log",
+        "type": "LOG"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "Performance → Debug",
+        "detail": "从指标概览进入协议事件，在相同数据上切换观察角度。"
+      },
+      {
+        "title": "同源多种输出",
+        "detail": "HTML、TUI、日志与 CSV 来自相同 release 数据，输入哈希可校验。"
+      },
+      {
+        "title": "完整的证据边界",
+        "detail": "保留缺失响应与 UNKNOWN，区分数据活动带宽窗口和完整采集范围。"
+      }
+    ],
+    "scope": "使用 xpvkit 0.5.5 release 的合成数据。响应未完成案例包含预期诊断；示例不代表真实 DUT 性能。"
+  },
+  {
+    "id": "bus-protocol-lab",
+    "name": "Bus Protocol Lab",
+    "category": "protocol",
+    "label": "BYTES → BURSTS → PACKETS",
+    "color": "blue",
+    "description": "让字节、AXI burst 与 PCIe TLP 的拆分过程一目了然。",
+    "lead": "通过三个独立的浏览器实验，探索 AXI 与 PCIe 的字节映射、Atomic 格式和请求/Completion 拆分。",
+    "tags": [
+      "AXI4",
+      "PCIe",
+      "TLP",
+      "Atomic"
+    ],
+    "keywords": [
+      "协议",
+      "MPS",
+      "MRRS",
+      "RCB",
+      "4KB",
+      "字节"
+    ],
+    "format": "浏览器交互工具",
+    "metric": "03",
+    "metricLabel": "interactive labs",
+    "primary": "bus-protocol-lab/axi-pcie-packet-studio.html",
+    "actions": [
+      {
+        "title": "AXI → PCIe Packet Studio",
+        "description": "联动内存、AXI 传输与 TLP 视图",
+        "path": "bus-protocol-lab/axi-pcie-packet-studio.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "AXI Atomic 格式",
+        "description": "观察 byte lane、WSTRB 与 WDATA 放置",
+        "path": "bus-protocol-lab/axi4-atomic-format-table.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "PCIe TLP Split",
+        "description": "调整 MPS / MRRS / RCB 与 4 KB 边界",
+        "path": "bus-protocol-lab/pcie-tlp-split-demo.html",
+        "type": "INTERACTIVE"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "三个视图，同一段数据",
+        "detail": "选中传输，沿内存地址、AXI burst 和 PCIe packet 跟踪相同的 payload。"
+      },
+      {
+        "title": "把边界条件变成实验",
+        "detail": "从内置预设开始，调整总线位宽、长度和拆分约束。"
+      },
+      {
+        "title": "打开即用",
+        "detail": "工具逻辑内嵌在 HTML 中，操作和计算在浏览器本地完成。"
+      }
+    ],
+    "scope": "用于协议学习与设计讨论的可视化模型。它解释所选场景的映射规则，不能替代完整协议验证。"
+  },
+  {
+    "id": "pg_gen",
+    "name": "PG Builder",
+    "category": "registers",
+    "label": "REGISTER → PROGRAMMING GUIDE",
+    "color": "amber",
+    "description": "从寄存器和 field 开始，把配置意图组织成可导出的步骤。",
+    "lead": "在浏览器中搜索寄存器、组合 field、编辑 read / write / rmw / poll，并预览 Programming Guide 和 SystemVerilog 输出。",
+    "tags": [
+      "Registers",
+      "JSON",
+      "SystemVerilog"
+    ],
+    "keywords": [
+      "寄存器",
+      "配置",
+      "编程指南",
+      "RDF",
+      "read",
+      "write",
+      "rmw",
+      "poll"
+    ],
+    "format": "浏览器交互工具",
+    "metric": "04",
+    "metricLabel": "register operations",
+    "primary": "pg_gen/index.html",
+    "actions": [
+      {
+        "title": "打开 PG Builder",
+        "description": "点击 Load Sample 载入虚构的演示寄存器",
+        "path": "pg_gen/index.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "样例与导出文件",
+        "description": "查看合成输入、PG 步骤与 SV 结果",
+        "path": "pg_gen/README.md",
+        "type": "GUIDE"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "Field 到操作",
+        "detail": "多 field 合成写值，保留 rmw 和 poll 的操作语义。"
+      },
+      {
+        "title": "可查看，也可继续编辑",
+        "detail": "预览 Guide / JSON / YAML / CSV / SV，保存 Config 后可重新载入。"
+      },
+      {
+        "title": "专门的公开样例",
+        "detail": "演示采用虚构控制器、传感器和地址映射，便于独立体验。"
+      }
+    ],
+    "scope": "浏览器版演示仅包含合成寄存器和地址映射。导出的访问 API 需要按实际工程接口适配。"
+  },
+  {
+    "id": "uvm_wiki",
+    "name": "UVM Wiki",
+    "category": "verification",
+    "label": "SOURCE → ARCHITECTURE",
+    "color": "violet",
+    "description": "进入一个 UVM 环境，沿层次、连接和源码证据探索它的结构。",
+    "lead": "从公开的 demo_uvm 源码真实生成统一 Wiki，将架构、Topology、类继承、TLM、Phase Map、关系图与 Code Explorer 连在一起。",
+    "tags": [
+      "UVM",
+      "SystemVerilog",
+      "Knowledge Graph"
+    ],
+    "keywords": [
+      "架构",
+      "拓扑",
+      "TLM",
+      "代码",
+      "知识图谱",
+      "phase"
+    ],
+    "format": "交互源码图谱",
+    "metric": "07",
+    "metricLabel": "connected views",
+    "primary": "uvm_wiki/uvm_wiki.html",
+    "actions": [
+      {
+        "title": "探索 UVM Wiki",
+        "description": "从 demo 环境进入组件、TLM 与源码片段",
+        "path": "uvm_wiki/uvm_wiki.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "样例与生成说明",
+        "description": "索引输入、生成方式与静态分析边界",
+        "path": "uvm_wiki/README.md",
+        "type": "GUIDE"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "从 env 逐层进入",
+        "detail": "在组件层次中聚焦 agent，再观察 driver、monitor 和 scoreboard 的关系。"
+      },
+      {
+        "title": "图与证据相连",
+        "detail": "点击类型、连接和 phase，查看索引记录的源码位置与片段。"
+      },
+      {
+        "title": "真实生成的样例",
+        "detail": "展示结果来自脱敏测试工程，保留原始输入便于核对。"
+      }
+    ],
+    "scope": "这是静态源码索引。运行时 factory override、动态实例及精确 DUT/BFM 绑定不由静态图推断。完整源码服务与全文搜索需本地运行。"
+  },
+  {
+    "id": "svip",
+    "name": "SVIP",
+    "category": "verification",
+    "label": "VERIFICATION BUILDING BLOCKS",
+    "color": "cyan",
+    "description": "从协议接入到时序控制，浏览可复用 VIP 的架构与用法。",
+    "lead": "精选 AXI4、APB、JTAG、SPI 和 Clock / Reset / Signal 的使用指南、架构页及操作 recipe，配套自有示例。",
+    "tags": [
+      "UVM",
+      "AXI4",
+      "APB",
+      "JTAG",
+      "SPI"
+    ],
+    "keywords": [
+      "验证",
+      "时钟",
+      "复位",
+      "clock",
+      "reset",
+      "signal",
+      "VIP"
+    ],
+    "format": "离线指南 / 源码示例",
+    "metric": "13",
+    "metricLabel": "selected guides",
+    "primary": "svip/index.html",
+    "actions": [
+      {
+        "title": "SVIP 指南目录",
+        "description": "选择协议，阅读接入与架构",
+        "path": "svip/index.html",
+        "type": "GUIDES"
+      },
+      {
+        "title": "AXI4 使用指南",
+        "description": "manager / subordinate / passive 的事务与配置",
+        "path": "svip/axi/doc/user-guide.html",
+        "type": "GUIDE"
+      },
+      {
+        "title": "Control Recipes",
+        "description": "Clock、Reset、Signal 的组合使用场景",
+        "path": "svip/control/doc/recipes.html",
+        "type": "GUIDE"
+      },
+      {
+        "title": "SPI 使用指南",
+        "description": "Mode 0–3、时序控制与 tracker",
+        "path": "svip/spi/doc/user-guide.html",
+        "type": "GUIDE"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "按任务查阅",
+        "detail": "从接入、配置、事务、时序控制到扩展和调试，沿真实使用流程组织。"
+      },
+      {
+        "title": "协议与通用控制",
+        "detail": "协议组件与 Clock / Reset / Signal 可分别理解，也可组合使用。"
+      },
+      {
+        "title": "可独立阅读的交付",
+        "detail": "HTML 指南与精选自有示例同时保留，便于从说明进入代码。"
+      }
+    ],
+    "scope": "此处为精选文档与自有示例，不在浏览器执行 UVM 仿真。实际使用需对应仿真器与 UVM 环境，协议支持范围以各指南为准。"
+  },
+  {
+    "id": "xpggen",
+    "name": "xpggen",
+    "category": "registers",
+    "label": "TERMINAL-FIRST WORKFLOW",
+    "color": "rose",
+    "description": "在终端里搜索寄存器、收集步骤，并查看完整的 PG 导出。",
+    "lead": "通过真实 TUI 预览和合成 RNOC 样例，了解寄存器检索、多 field 操作、步骤编排与 JSON / CSV / SV / Markdown 输出。",
+    "tags": [
+      "TUI",
+      "Textual",
+      "Registers",
+      "PG"
+    ],
+    "keywords": [
+      "终端",
+      "寄存器",
+      "read_check",
+      "rmw",
+      "poll",
+      "delay",
+      "编程指南"
+    ],
+    "format": "TUI 预览 / 导出案例",
+    "metric": "TUI",
+    "metricLabel": "preview & exports",
+    "primary": "xpggen/index.html",
+    "actions": [
+      {
+        "title": "TUI 与导出案例",
+        "description": "查看终端预览、演示输入及实际生成的文件",
+        "path": "xpggen/index.html",
+        "type": "TERMINAL"
+      },
+      {
+        "title": "数据与复现说明",
+        "description": "操作语义、演示来源与本地运行方法",
+        "path": "xpggen/README.md",
+        "type": "GUIDE"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "搜索到编排",
+        "detail": "查看寄存器和 field，然后将所选配置收集成 Programming Guide。"
+      },
+      {
+        "title": "多种操作保留语义",
+        "detail": "read、read_check、write、rmw、poll 和 delay 各自对应明确的执行意图。"
+      },
+      {
+        "title": "结果可以直接下载",
+        "detail": "用同一份合成输入检查 PG JSON、表格与 SystemVerilog 结果。"
+      }
+    ],
+    "scope": "网页展示 TUI 的预览与案例输出。真实 Textual 应用需要在本地 Python 终端运行，网页不模拟其输入执行。"
+  },
+  {
+    "id": "xDCT",
+    "name": "xDCT",
+    "category": "analysis",
+    "label": "INTERFACE CHANGE DETECTION",
+    "color": "orange",
+    "description": "对比两个 top interface，让影响集成的变化先被看见。",
+    "lead": "将两个 SystemVerilog top 的 manifest、语义 diff 与报告放在一起，逐项检查位宽、方向、modport、增删和顺序变化。",
+    "tags": [
+      "SystemVerilog",
+      "Interface Diff",
+      "CI"
+    ],
+    "keywords": [
+      "接口",
+      "变更",
+      "diff",
+      "breaking",
+      "port",
+      "width",
+      "方向"
+    ],
+    "format": "交互对比 / 原始报告",
+    "metric": "06",
+    "metricLabel": "breaking changes",
+    "primary": "xDCT/index.html",
+    "actions": [
+      {
+        "title": "对比接口变化",
+        "description": "筛选 breaking / 信息变化 / 仅顺序变化",
+        "path": "xDCT/index.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "输入与报告说明",
+        "description": "查看 prototype 范围和可核验的样例",
+        "path": "xDCT/README.md",
+        "type": "GUIDE"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "比较语义",
+        "detail": "区分端口位宽、方向和类型等变化，避免把文本重排当作同一类问题。"
+      },
+      {
+        "title": "Before / After",
+        "detail": "逐项查看两个版本的端口声明，并关联变化分类。"
+      },
+      {
+        "title": "报告与原始证据",
+        "detail": "保留已有 manifest、diff 和文本报告，方便验证页面展示。"
+      }
+    ],
+    "scope": "演示使用 v0.1.0-prototype 的已有合成案例。浏览器展示已生成的语义差异，不在前端执行 SystemVerilog elaboration。"
+  }
+]

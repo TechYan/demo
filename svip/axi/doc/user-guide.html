@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="syan"><title>SVIP AXI4 使用指导</title><style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--fg:#182739;--muted:#536579;--line:#dce4ed;--accent:#1459ad;--code:#f0f4f8}
+@media(prefers-color-scheme:dark){:root{--bg:#111a25;--panel:#172332;--fg:#e6edf5;--muted:#adbdce;--line:#35485b;--accent:#89baff;--code:#0f1b29}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+header{padding:22px max(24px,calc((100vw - 1440px)/2));background:var(--panel);border-bottom:1px solid var(--line)}
+header strong{font-size:20px}header p{margin:5px 0;color:var(--muted)}nav{display:flex;gap:22px;margin-top:12px}
+.layout{max-width:1488px;margin:28px auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;padding:0 24px}
+aside{align-self:start;position:sticky;top:20px;max-height:92vh;overflow:auto;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;line-height:1.6}
+aside ul{padding-left:20px}aside>div>ul{padding-left:14px}aside li{margin:8px 0}
+main{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:28px 34px}
+h1{font-size:29px;line-height:1.45;margin-top:0}h2{font-size:23px;margin-top:2.5em;border-bottom:1px solid var(--line);padding-bottom:8px}h3{font-size:19px;margin-top:2em}h1,h2,h3{scroll-margin-top:20px}
+a{color:var(--accent);text-underline-offset:3px}p{margin:1em 0}li{margin:.5em 0}
+table{display:block;overflow-x:auto;border-collapse:collapse;width:100%;font-size:14px;margin:20px 0}th,td{border:1px solid var(--line);padding:12px 14px;min-width:130px;vertical-align:top}th{background:var(--code);font-weight:600;text-align:left}
+code{font:0.9em/1.6 Consolas,'Cascadia Mono',monospace;background:var(--code);border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{padding:18px;overflow-x:auto;background:var(--code);border:1px solid var(--line);border-radius:8px;line-height:1.55}pre code{padding:0;white-space:pre;overflow-wrap:normal}
+footer{padding:20px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--line);margin-top:32px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;padding:0 12px}aside{position:static;max-height:none}main{padding:22px 18px}h1{font-size:25px}}
+@media print{aside,nav{display:none}.layout{display:block;padding:0;margin:0}main{border:0;padding:0}body{background:white;color:black}table{display:table;font-size:10px}pre{white-space:pre-wrap}a{color:inherit}}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}aside a{overflow-wrap:anywhere}
+</style></head><body><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><strong>SVIP AXI4 使用指导</strong><p>syan · VCS / UVM 1.2 · 2026-11-01</p><nav><a href="../../index.html">SVIP</a><a href="user-guide.html">本页文档</a><a href="architecture.html">架构</a><a href="../../examples.html#axi">Examples / compliance</a><a href="../../apb/doc/user-guide.html">APB 使用指导</a></nav></header><div class="layout"><aside aria-label="章节目录"><div class="toc">
+<ul>
+<li><a href="#svip-axi4">SVIP AXI4 使用指导</a><ul>
+<li><a href="#1">1. 产品能力与角色选择</a></li>
+<li><a href="#2">2. 安装检查与首次运行</a></li>
+<li><a href="#3-agent">3. 顶层连接与 agent 创建</a></li>
+<li><a href="#4">4. 配置参考与生效时机</a></li>
+<li><a href="#5-transaction-sequence">5. Transaction 与 sequence 的完成契约</a></li>
+<li><a href="#6-pattern-byte-lane">6. 指定 pattern、随机与 byte lane</a></li>
+<li><a href="#7-latency-runtime">7. Latency、反压和 runtime 控制</a></li>
+<li><a href="#8-subordinatememoryrandom-user">8. Subordinate：memory、RANDOM 与 USER</a></li>
+<li><a href="#9-callbackanalysis-porttracker">9. Callback、analysis port、tracker 与覆盖率</a></li>
+<li><a href="#10-resetchecker">10. Reset、checker 与故障定位</a></li>
+<li><a href="#11-examples">11. Examples、回归与支持边界</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside><main><h1 id="svip-axi4">SVIP AXI4 使用指导</h1>
+<p>Author: syan</p>
+<p>版本范围：当前仓库 AXI4 memory-mapped，VCS / UVM 1.2</p>
+<p>本指南按接入、激励、控制、扩展和调试组织。首次使用先完成第二章的 smoke，再选择 manager、subordinate 或 passive 的接入方式。架构实现见 <a href="architecture.html">架构</a>，全部可执行场景见 <a href="../../examples.html#axi">testsuite</a>。所有 shell 命令从产品仓库根执行。</p>
+<h2 id="1">1. 产品能力与角色选择</h2>
+<table>
+<thead>
+<tr>
+<th>验证任务</th>
+<th>使用组件</th>
+<th>驱动的信号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>验证 DUT slave</td>
+<td><code>svip_axi_mgr_agent</code></td>
+<td>AW/W/AR，以及 BREADY/RREADY</td>
+</tr>
+<tr>
+<td>验证 DUT master</td>
+<td><code>svip_axi_sub_agent</code></td>
+<td>AWREADY/WREADY/ARREADY，以及 B/R</td>
+</tr>
+<tr>
+<td>观察已有连接</td>
+<td>任一 agent，<code>cfg.is_active=UVM_PASSIVE</code></td>
+<td>只观察，不能使用主动控制接口</td>
+</tr>
+</tbody>
+</table>
+<p>支持 AXI4 FIXED/INCR/WRAP、窄和非对齐 transfer、独立读写 outstanding、跨 ID 响应乱序、可选 R beat interleave、exclusive、五通道 USER、SV memory、随机数据及用户接管响应。完整协议/profile 检查映射见 <a href="protocol-checks.html">protocol-checks</a>。ACE、AXI5、多端口一致性与其他模拟器不在当前验收声明中。</p>
+<pre><code class="language-text">业务 sequence -&gt; sequencer -&gt; manager channels -&gt; DUT slave
+DUT master -&gt; subordinate channels -&gt; memory / RANDOM / USER response
+                 |
+              raw pins -&gt; monitor -&gt; transaction/channel AP
+                             +----&gt; checker / coverage / tracker
+</code></pre>
+<h2 id="2">2. 安装检查与首次运行</h2>
+<p>准备 VCS、UVM1.2 和站点许可证环境。先查看实际测试清单，再运行 smoke：</p>
+<pre><code class="language-bash">python3 axi/scripts/regress.py --suite examples --list
+python3 axi/scripts/run.py all --width 512 --case smoke --checker /path/to/Axi4PC.sv
+</code></pre>
+<p><code>Axi4PC.sv</code> 及相邻依赖由项目自行安装，接入要求见 <a href="../../scope.html#checkers">AXI4PC</a>。不传 checker 的 <code>run.py</code> 可用于本地调试；发布回归要求真实 checker。先确认日志、tracker和精确PASS标记，再扩大配置。</p>
+<p>项目编译顺序是 interface → 公共coverage package → AXI package → 可选sequence package → 项目testbench：</p>
+<pre><code class="language-bash">vcs -full64 -sverilog -ntb_opts uvm-1.2 -timescale=1ns/1ps \
+  +incdir+common+common/cov+axi/src+axi/src/coverage+axi/sequence_lib \
+  axi/src/svip_axi_bus_if.sv common/cov/svip_fc_pkg.sv \
+  axi/src/svip_axi_pkg.sv axi/sequence_lib/svip_axi_seq_pkg.sv your_tb.sv
+</code></pre>
+<p>这条命令编译产品和项目top；不会自动把自测fixture的Arm bind移植到项目top。外部checker在项目中的连接应单独完成。使用独立vlogan分析时，先执行 <code>vlogan -full64 -ntb_opts uvm-1.2</code>，随后按相同顺序和include路径分析。</p>
+<h2 id="3-agent">3. 顶层连接与 agent 创建</h2>
+<p>顶层按默认容器实例化interface，配置到目标agent的cfg；以下代码分别放在模块和env的相应位置，<code>clk/resetn</code> 由工程提供：</p>
+<pre><code class="language-systemverilog">// 顶层模块
+import uvm_pkg::*;
+import svip_axi_pkg::*;
+svip_axi_bus_if axi_if(clk, resetn);
+initial begin
+  uvm_config_db#(svip_axi_vif_t)::set(null,&quot;uvm_test_top.env.mgr&quot;,&quot;dut_axi&quot;,axi_if);
+  run_test();
+end
+</code></pre>
+<pre><code class="language-systemverilog">// env 成员
+svip_axi_cfg cfg;
+svip_axi_mgr_agent mgr;
+// env.build_phase 内，在创建agent之前
+cfg = svip_axi_cfg::type_id::create(&quot;cfg&quot;);
+cfg.vif_key = &quot;dut_axi&quot;;
+cfg.data_bytes = 64; // DATA512；DATA1024使用128
+cfg.wr_id_width = 8; cfg.rd_id_width = 6;
+cfg.wr_addr_width = 64; cfg.rd_addr_width = 64;
+cfg.max_wr_outstanding = 32; cfg.max_rd_outstanding = 64;
+cfg.tracker_mode = SVIP_AXI_TRACKER_TXN;
+uvm_config_db#(svip_axi_cfg)::set(this,&quot;mgr&quot;,&quot;cfg&quot;,cfg);
+mgr = svip_axi_mgr_agent::type_id::create(&quot;mgr&quot;,this);
+</code></pre>
+<p>不同agent使用不同cfg和vif key。验证DUT master时替换为subordinate并将cfg交给该实例。纯passive设置 <code>is_active=UVM_PASSIVE</code> 并保留monitor；连接上只能有一方主动驱动每组输出。</p>
+<p>编译容器与运行时有效宽度不同：默认容器DATA1024、ADDR64、WR_ID12、RD_ID12、USER68。有效宽度在cfg中设置，窄DUT端口由top显式slice/zero extend。不要仅修改interface实例参数却仍使用默认virtual-interface类型；改变容器时，interface/package/top的 <code>SVIP_AXI_MAX_*</code> 编译定义必须一致。</p>
+<h2 id="4">4. 配置参考与生效时机</h2>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>用途与约束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>data_bytes</code></td>
+<td>W/R共同DATA，4..最大容器字节数内的2次幂；AxSIZE表示每beat实际transfer大小</td>
+</tr>
+<tr>
+<td><code>wr_id_width/rd_id_width</code></td>
+<td>方向独立；0表示该方向只用ID0；不能超过各自容器</td>
+</tr>
+<tr>
+<td><code>wr_addr_width/rd_addr_width</code></td>
+<td>方向独立，1..地址容器宽度；完整burst必须落在有效空间</td>
+</tr>
+<tr>
+<td><code>max_wr_outstanding/max_rd_outstanding</code></td>
+<td>独立读写在途上限，均大于0；subordinate也受资源上限约束</td>
+</tr>
+<tr>
+<td><code>max_pending</code></td>
+<td>UVM已接纳、尚未取得通道额度的队列上限，大于0</td>
+</tr>
+<tr>
+<td><code>max_per_id_outstanding</code></td>
+<td>0表示只受方向总量限制；非0时两个方向分别按ID计数，共用此配置值</td>
+</tr>
+<tr>
+<td><code>w_before_aw_en</code></td>
+<td>允许W早于AW；关闭后W等待自己的AW握手</td>
+</tr>
+<tr>
+<td><code>reorder_en/r_interleave_en</code></td>
+<td>subordinate跨ID乱序 / 可选不同ID的R beat交织；同ID保持顺序</td>
+</tr>
+<tr>
+<td><code>memory_mode/sub_response_mode</code></td>
+<td>MEMORY或RANDOM；AUTO或USER，两个维度独立</td>
+</tr>
+<tr>
+<td><code>checks_en/x_checks_en/cov_en</code></td>
+<td>内部协议检查、原始四态检查、覆盖率采样</td>
+</tr>
+<tr>
+<td><code>tracker_mode/tracker_filename</code></td>
+<td>OFF/TXN/CHANNEL；文件名按实例隔离</td>
+</tr>
+</tbody>
+</table>
+<p>角色、宽度、容量、memory/response模式及组件创建配置在build前确定。Timing和公开运行期控制在各自消费点生效；修改策略不会追溯改写已呈现或已选取的payload/延迟。force READY仍不能越过subordinate实际存储容量。</p>
+<h2 id="5-transaction-sequence">5. Transaction 与 sequence 的完成契约</h2>
+<p>随附sequence使用 <code>import svip_axi_seq_pkg::*</code>。将自定义类放在项目sequence package中，先import <code>uvm_pkg/svip_axi_pkg/svip_axi_seq_pkg</code>并include <code>uvm_macros.svh</code>；自定义manager sequence可派生 <code>svip_axi_base_seq</code>：</p>
+<pre><code class="language-systemverilog">class literal_seq extends svip_axi_base_seq;
+  `uvm_object_utils(literal_seq)
+  function new(string name=&quot;literal_seq&quot;); super.new(name); endfunction
+  task body();
+    svip_axi_txn t = new_txn(&quot;literal_write&quot;);
+    if (!t.randomize() with {
+          dir==SVIP_AXI_WR; addr=='h1000; id==1;
+          len==0; size==2; burst==SVIP_AXI_INCR; lock==0;
+        }) `uvm_fatal(&quot;PATTERN&quot;,&quot;randomize failed&quot;)
+    // 地址对齐到bus word的lane0；size=2为4个有效byte。
+    t.data[0]='0; t.data[0][31:0]=32'h12345678;
+    t.awuser='h25;
+    send(t);
+    wait_all();
+  endtask
+  virtual function void on_done(svip_axi_txn rsp);
+    if (rsp.aborted) `uvm_info(&quot;RESULT&quot;,&quot;reset aborted request&quot;,UVM_LOW)
+    else if (rsp.bresp!=SVIP_AXI_OKAY) `uvm_error(&quot;RESULT&quot;,rsp.convert2string())
+  endfunction
+endclass
+</code></pre>
+<p>在test的objection保护下调用 <code>seq.start(mgr.sqr)</code>。这里 <code>len=AxLEN=beats-1</code>，<code>size=log2(bytes per beat)</code>，不是DATA总位宽。<code>new_txn()</code>从sequencer cfg复制有效profile；直接factory创建时在randomize前调用 <code>cfg.configure_txn(t)</code>。</p>
+<p><strong>AXI的send只表示接纳。</strong> driver保留私有clone，完成通过UVM response进入 <code>on_done()</code>；<code>wait_all()</code>等待已发送项的终结。不要把原请求对象当成响应，也不要在send之后立即读取它判断完成。普通读检查 <code>rsp.data[]/rresp[]</code>；reset中止先检查 <code>aborted</code>，此时响应字段无效。</p>
+<h2 id="6-pattern-byte-lane">6. 指定 pattern、随机与 byte lane</h2>
+<p>随机约束涵盖burst、size、4KB边界、有效ID/地址、cache及exclusive规则。<code>post_randomize()</code>为写请求分配并随机填充 <code>data[]/strb[]</code>，默认有效lane全选；DATA数组不是rand字段。需要固定内容时在randomize之后覆盖。切换strobe调用 <code>fill_wdata(SVIP_AXI_STRB_FULL/RANDOM/MIXED)</code>，该方法也重新填充数据，因此固定数据要在其后设置。</p>
+<p>数据按bus lane表示：<code>data[beat][8*lane+:8]</code>；不能把每个窄beat都无条件放在lane0。用 <code>lane_mask(beat)</code> 和地址映射了解表示，数据正确性仍由独立模型判断。USER默认0，<code>awuser/aruser/buser</code>为标量，<code>wuser[]/ruser[]</code>按beat提供；写USER数组长度与W beat一致。</p>
+<p><code>svip_axi_rand_seq</code> 提供 <code>num_txns/num_slots/addr_lo/addr_hi/wr_pct/max_id/max_len/strb_mode</code> 等旋钮。每笔在飞事务独占4KB slot，slot数也限制实际并行度；提高outstanding时需提供足够地址空间和slot。它适用于避免重叠歧义的随机流量；特定地址依赖、重叠访问和小于一页的空间应使用自定义transaction sequence。小transfer分布详见该sequence源码与 <a href="../../examples.html#axi">examples</a>。</p>
+<h2 id="7-latency-runtime">7. Latency、反压和 runtime 控制</h2>
+<table>
+<thead>
+<tr>
+<th>控制位置</th>
+<th>配置/方法</th>
+<th>单位与含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Manager请求</td>
+<td><code>timing.aw_valid/w_valid/ar_valid</code></td>
+<td>呈现请求前的周期延迟，W按beat</td>
+</tr>
+<tr>
+<td>Manager响应反压</td>
+<td><code>timing.b_ready/r_ready</code></td>
+<td>上一次握手后READY保持低的周期数</td>
+</tr>
+<tr>
+<td>Subordinate接收</td>
+<td><code>timing.aw_ready/w_ready/ar_ready</code></td>
+<td>接收握手后的READY间隔</td>
+</tr>
+<tr>
+<td>Subordinate回复</td>
+<td><code>timing.b_lat/r_lat/r_beat</code></td>
+<td>AW/W收齐到B、AR到首R、R beat间隔</td>
+</tr>
+<tr>
+<td>强制反压</td>
+<td><code>mgr.force_ready(B/R,enable,value)</code></td>
+<td>manager只拥有BREADY/RREADY</td>
+</tr>
+<tr>
+<td>请求反压</td>
+<td><code>sub.force_ready(AW/W/AR,enable,value)</code></td>
+<td>subordinate只拥有这三组READY</td>
+</tr>
+<tr>
+<td>暂停回复</td>
+<td><code>sub.hold_responses(b,r)</code></td>
+<td>阻止启动新响应/新beat，已呈现VALID继续保持</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-systemverilog">cfg.timing.apply(SVIP_AXI_TIMING_RANDOM);
+cfg.timing.r_ready.set_bursty(0,1,20,8,16);
+cfg.timing.b_ready.set_fixed(3);
+// 运行期，持续若干项目时钟后释放；调用者负责安排等待。
+mgr.force_ready(SVIP_AXI_R,1,0);
+// ... wait for the desired clock events ...
+mgr.force_ready(SVIP_AXI_R,0,0);
+</code></pre>
+<p><code>set_zero/set_fixed/set_range/set_bursty</code>均按cycle计。0不消除AXI请求/响应依赖；“零延迟”也必须遵守合法握手。已呈现VALID不能因控制开关撤回，payload在VALID&amp;&amp;!READY期间保持。参考 <code>example_timing</code> 和control相关compliance的实际等待/稳定性断言。</p>
+<h2 id="8-subordinatememoryrandom-user">8. Subordinate：memory、RANDOM 与 USER</h2>
+<p>默认 MEMORY+AUTO 自动使用稀疏SV byte memory；未写字节由seed/address hash生成，同地址重复读一致。写尊重WSTRB，memory error region支持SLVERR/DECERR；reset保留字节、清exclusive reservation。</p>
+<p>外挂模型派生 <code>svip_axi_mem</code>，覆盖虚 <code>read_byte/write_byte/byte_resp</code>，build前赋给 <code>cfg.mem</code>。直接外部写入需调用 <code>invalidate_range()</code>，避免exclusive reservation失效遗漏；枚举/copy操作另见 <a href="architecture.html">架构memory契约</a>。</p>
+<p>RANDOM模式不访问memory，<code>cfg.mem</code>可为null；写不保存，读为新的随机active-lane数据且停等稳定。它适用于不检查读写关联的响应场景。</p>
+<p>USER模式在build前设置 <code>cfg.sub_response_mode=SVIP_AXI_SUB_USER</code>，上层task取得请求后自行安排响应：</p>
+<pre><code class="language-systemverilog">svip_axi_txn req, rsp;
+sub.get_request(req);
+rsp = sub.default_response(req); // 显式执行默认模型/回调副作用
+rsp.buser='h25;
+if (!sub.send_response(req,rsp))
+  `uvm_error(&quot;RESPONSE&quot;,&quot;request invalidated or already submitted&quot;)
+</code></pre>
+<p>写请求在AW与完整W收齐后交付，读请求在AR后交付。保留交付的<strong>确切req句柄</strong>关联响应；用clone构造rsp，不能用req clone替代关联凭据。helper同请求只执行默认副作用一次，后续返回缓存副本；完全自定义响应可以不调用helper。</p>
+<p>Read rsp必须提供完整 <code>data[]/rresp[]</code>；<code>ruser[]/rloop[]</code>可全空补零，非空则必须完整。send_response立即保存快照，调用后修改rsp不改变排队内容；重复或reset后的旧句柄被拒绝。同timestamp的Active/NBA提交在严格晚于提交时间的driver时钟消费，然后应用latency。示例和错误修正/重提交场景见 <code>example_slave_model</code> 与 <code>reactive_*</code>。</p>
+<h2 id="9-callbackanalysis-porttracker">9. Callback、analysis port、tracker 与覆盖率</h2>
+<p><code>add_callback(cb)</code>注册派生 <code>svip_axi_callbacks</code>；<code>request/read_response/write_response</code>是非阻塞function，适合呈现前整形。需要等待事件或由sequence决定回复时使用USER模式。不要在analysis subscriber里修改共享发布对象；需要修改时clone。</p>
+<table>
+<thead>
+<tr>
+<th>观察入口</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agent.ap</code></td>
+<td>monitor重建的完整transaction</td>
+</tr>
+<tr>
+<td><code>agent.channel_ap</code></td>
+<td>逐握手四态channel快照</td>
+</tr>
+<tr>
+<td>sequence <code>on_done</code></td>
+<td>manager提交项的响应/中止结果</td>
+</tr>
+<tr>
+<td><code>tracker_mode=TXN</code></td>
+<td>事务摘要；CHANNEL另加逐通道DATA/STRB/USER</td>
+</tr>
+<tr>
+<td><code>cov_en</code></td>
+<td>native covergroup与共享coverage service采样</td>
+</tr>
+</tbody>
+</table>
+<p>Tracker默认OFF；不同agent应隔离输出文件名。Tracker帮助定位握手，数据正确性由scoreboard/oracle判断。<code>--coverage</code>同时启用VCS数据库与校验后的 <code>fc.json</code>；手工工程用 <code>+svip_fc_json=&lt;path&gt;</code> 在final_phase导出。跨run合并使用 <a href="../../scope.html#runtime">common工具</a>，不兼容profile不能混成一个百分比。</p>
+<h2 id="10-resetchecker">10. Reset、checker 与故障定位</h2>
+<p>总线reset使用raw epoch guard和NBA后idle处理，终止旧请求/USER上下文并回收资源。Manager中止响应带aborted；旧USER句柄不能重用。Reset不承诺回滚已发生的DUT写副作用。软件停止/abort与共同bus reset语义不同，已经呈现的工作仍遵守握手稳定性。</p>
+<p>内部monitor检查未知值、VALID停等稳定、请求/响应依赖、ID顺序、beat/LAST、burst/profile和非法EXOKAY；外部Arm checker独立工作。故意违规用精确rule/scope/count预算，不能全局屏蔽错误。遇到挂起先查看READY控制、USER未提交请求、outstanding/slot及reset状态；遇到数据错先对照lane、WSTRB、RRESP和模型副作用。</p>
+<p>波形按接收方采样值判握手，区分raw pins与clocking block输入；时钟沿后的raw idle不等于本沿没有完成。保留seed、容器定义、完整命令与同次run的tracker/FSDB/manifest。</p>
+<h2 id="11-examples">11. Examples、回归与支持边界</h2>
+<pre><code class="language-bash">python3 axi/scripts/run.py all --width 1024 --case reactive_model \
+  --case random_traffic --coverage --checker /path/to/Axi4PC.sv
+python3 axi/scripts/regress.py --suite full --coverage --waves --jobs 4 \
+  --checker /path/to/Axi4PC.sv
+</code></pre>
+<p>当前具名case及适用组合以 <a href="../../examples.html#axi">catalog</a> 为准。示例按接入/时序/扩展学习，compliance用于参数、协议、reset与故障回归。512/1024 DATA是主验收矩阵；小DATA/不同容器只运行适用的定向case，不把含大transfer和高地址的整个矩阵机械搬过去。</p>
+<p>准确运行结果与限制见 <a href="../../scope.html#verification">当前验收记录</a>，配置细节见 <a href="../../scope.html#runtime">配置审计</a>，升级旧工程见 <a href="../../scope.html#runtime">迁移指南</a>。</p><footer>离线可读；支持能力与已测范围见对应协议的验收记录。</footer></main></div></body></html>

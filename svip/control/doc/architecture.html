@@ -1,0 +1,119 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SVIP Control · 架构与时序契约</title><style>
+:root{color-scheme:light;--ink:#17283c;--muted:#51657a;--line:#dce4eb;--brand:#116c71}
+*{box-sizing:border-box}body{margin:0;font:16px/1.75 system-ui,"Microsoft YaHei",sans-serif;color:var(--ink);background:#f5f7fa}
+header{padding:26px max(24px,calc((100vw - 1280px)/2));background:#122d3f;color:white}
+header small{letter-spacing:.16em;color:#a6dbd5}header strong{display:block;font-size:25px}
+.layout{display:grid;grid-template-columns:240px minmax(0,960px);gap:32px;max-width:1280px;padding:32px 24px;margin:auto}
+nav{position:sticky;top:20px;align-self:start;max-height:92vh;overflow:auto;font-size:14px}nav ul{padding-left:18px}nav a{color:var(--muted);text-decoration:none}
+main{background:white;padding:28px 42px;border:1px solid var(--line);border-radius:12px;min-width:0}h1{font-size:30px;line-height:1.3}h2{font-size:23px;padding-top:22px;border-top:1px solid var(--line);margin-top:34px}h3{font-size:19px}a{color:var(--brand)}
+pre{overflow:auto;padding:20px;background:#122638;color:#e1eef5;border-radius:8px;font:13px/1.6 Consolas,monospace}code{font-family:Consolas,monospace;overflow-wrap:anywhere}p code,li code{background:#eef3f6;padding:2px 5px;border-radius:4px}
+table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow:auto}th,td{border:1px solid var(--line);padding:9px 13px;text-align:left;vertical-align:top}th{background:#edf5f4}tr:nth-child(even){background:#fafcfd}
+footer{color:var(--muted);margin:32px 0;font-size:13px}blockquote{border-left:4px solid var(--brand);padding-left:16px;color:var(--muted)}
+@media(max-width:850px){.layout{grid-template-columns:1fr}nav{position:static;max-height:none}main{padding:22px}header{padding:20px}}
+</style><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><small>SVIP / CONTROL</small><strong>Clock · Reset · Signal</strong></header><div class="layout"><nav><p><a href="recipes.html">场景指南</a> · <a href="user-guide.html">使用指导</a> · <a href="architecture.html">架构</a> · <a href="../../scope.html#verification">验收</a></p><div class="toc">
+<ul>
+<li><a href="#clock-reset-signal">Clock / Reset / Signal 架构</a><ul>
+<li><a href="#1">1. 结构和取舍</a><ul>
+<li><a href="#adr-ctrl-002">ADR-CTRL-002：按控制职责独立编译</a></li>
+</ul>
+</li>
+<li><a href="#2">2. 资源和所有权</a></li>
+<li><a href="#3">3. 时间和两个观察视图</a></li>
+<li><a href="#4-clock">4. Clock</a></li>
+<li><a href="#5-reset-gap">5. Reset 和 gap</a></li>
+<li><a href="#6-signalprofile">6. Signal、profile 和生命周期</a></li>
+<li><a href="#7-csr">7. CSR 和结果</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><main><h1 id="clock-reset-signal">Clock / Reset / Signal 架构</h1>
+<p>Author: syan · ADR-CTRL-001 / ADR-CTRL-002 · 2026-11-02</p>
+<h2 id="1">1. 结构和取舍</h2>
+<p>沿用 SV/UVM1.2、VCS 和已有 APB/AXI。控制设施采用普通 SV 对象，放在 UVM test/env 中持有即可；每根 pin 不建立 agent 或 sequencer。</p>
+<pre><code class="language-text">Test / virtual sequence
+   |                            existing APB VIP
+   +-- ClockController              ^
+   +-- ResetController              | optional APB adapter
+   +-- SignalController &lt;---+        |             |
+   |  tieoff / fuse / IRQ   |    actual RTL CSR ---&gt; DUT output
+   +-- ControlCoordinator -+                         |
+          | resource/domain registry                |
+          v                                         v
+   endpoint + final stamp checks            passive bound interface
+          |                                         |
+   one physical writer                 independent pin observation
+          |                                 +-- HDL CAPTURE_VALUE
+       DUT input                            +-- VPI POST_SETTLE_VALUE
+</code></pre>
+<h3 id="adr-ctrl-002">ADR-CTRL-002：按控制职责独立编译</h3>
+<pre><code class="language-text">                    common &lt;--- optional APB adapter ---&gt; APB
+        pin / binding / registry / observation
+          result / stamp / clock_ref / DPI
+                    ^
+          +---------+---------+
+          |         |         |
+        clock     reset     signal
+          ^         ^         ^
+          +---------+---------+
+                coordinator
+                     ^
+        svip_control_pkg integration facade
+</code></pre>
+<p>箭头指向依赖。三个组件各有自己的 package、<code>files.f</code> 和可运行 example，均只依赖 common。Reset 和 Signal 的按边沿 API 接受公共的 <code>svip_control_clock_ref</code>，不依赖具体 Clock controller；<code>svip_clock_controller</code> 实现该 reference，项目已有 HDL clock 也可提供自己的实现。纯异步 Signal 与绝对时间 Reset 不需要 clock reference。</p>
+<p>coordinator 才导入三个具体组件，负责跨组件 recipe。<code>svip_control_pkg</code> 只 import/export 原始定义，保留既有集成 API 与类型身份，不再包含各 controller 的定义。不会因使用两个 package 产生两份 registry、result 或静态 tracker。</p>
+<p>每个独立 <code>files.f</code> 自包含 common 和自身 <code>sources.f</code>。组合时 common 只编译一次，再添加选定的 <code>sources.f</code>；根 <code>control/files.f</code> 提供完整组合。DPI 位于 <code>common/backend/</code>，由 common filelist 编译一次。源码目录和独立运行结果在 <a href="../../index.html">Control 入口</a> 中列出。</p>
+<p><code>signal/adapters/svip_control_apb_pkg.sv</code> 只导入 common 和现有 APB agent/sequence；无需 Clock、Reset 或 coordinator。testbench 中的 CSR、错误开关和延迟输出属于验证 fixture。</p>
+<h2 id="2">2. 资源和所有权</h2>
+<p><code>svip_control_pin_if#(W,INIT)</code> 绑定实际 pin 和 capture clock，<code>apply()</code> 是产品驱动变量的唯一赋值点。<code>svip_control_sv_binding</code> 隐藏参数化 interface 的类型差异。观察接口只导出读操作，不导出 <code>put()</code>。</p>
+<p>registry 使用 canonical packed-root、规范化的 low bit 和 width 识别物理范围；重复 interface handle 即使使用另一 root 名称也会归一。不同 interface 指向同一网或 slice 时，接入者仍须声明正确 canonical root/offset。这不是全芯片连通性发现器。</p>
+<p>同一物理 bank 仅一个 active writer。clock/reset 同样登记；DUT source 以 <code>drive_allowed=0</code> 绑定。CSR 输出必须 passive，不能再申请 DirectPin writer。P0 recipe 对整个 canonical bank 独占，全量申请或失败；不等待交叉资源，也不允许共享 clock 被另一个 recipe 提前恢复。</p>
+<p>clock/reset/bank 的绑定引用在构造后固定。tieoff lock、fuse window 和 control path 在 endpoint 的最终入口检查，普通 Signal API 不能绕过。</p>
+<h2 id="3">3. 时间和两个观察视图</h2>
+<p>单位固定为 <strong>1ps 整数 tick</strong>，VPI 检查全设计 precision 必须为 1ps。不能精确转换的 real 时间、零/负 high/low、超范围 value/mask 和未知控制字段均拒绝；不隐式截断。</p>
+<table>
+<thead>
+<tr>
+<th>API phase</th>
+<th>明确语义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ASYNC_AT</td>
+<td>指定绝对 tick 的可写阶段，不自动对齐 clock</td>
+</tr>
+<tr>
+<td>BEFORE_CAPTURE</td>
+<td><code>at_tick</code> 是目标 rising capture tick，提前正 <code>setup_ticks</code> 写入；目标必须匹配该 clock reference 的已知预测边界</td>
+</tr>
+<tr>
+<td>AFTER_SOURCE_EDGE</td>
+<td><code>target_edge</code> 是指定 clock 的未来 rising edge ID，实际边沿到来后跨 NBA 屏障写入，保持同 timestamp</td>
+</tr>
+</tbody>
+</table>
+<p>P0 的时序保证要求明确的实际 clock 绑定及有效 reference。Clock 组件提供已登记 TB engine 的 reference；外部规则 HDL clock 可用项目 reference 表达已知边界。后者的独立示例验证预测 capture 和真实 edge ID，但不承诺任意派生或变频时钟的预测能力；reference 必须如实拒绝无法预测的边界。未建立关系的外部 clock 与 ASYNC_AT 恰好同 Active timestamp 时，不承诺物理采样结果。跨 backend 的保证须另做 conformance，本版仅声明已测 VCS。</p>
+<p><code>CAPTURE_VALUE</code> 来自 interface 中真实 pin 的 HDL 边沿采样寄存器，带 capture tick/ID。<code>POST_SETTLE_VALUE</code> 来自 VPI <code>cbReadOnlySynch</code>，包含后续 NBA 迭代的最终状态。回调只读 HDL，SV 在下一 tick 取记录，记录保留原 timestamp。它们不读取 driver shadow、profile 值或 checker expected。</p>
+<h2 id="4-clock">4. Clock</h2>
+<p>engine 与观察分开。stop-low 在 high 中保留完整 high；在 low 中取消未来上升沿。ack 需要 engine 停止且真实 pin 的 ReadOnly 观测为 0。monitor 持续检查 stopped window 中的额外 edge，独立 timer 检查非 intentional clock loss。</p>
+<p>start/resume 从接受时刻起完整等待 low_ticks。重复 start 已运行时幂等，重复 stop 已停止时仍确认实际低。周期切换在完整旧周期结束的 rising boundary 生效，边界前的 low 仍是旧值，之后的 high/low 都采用新值。always-on reference 的普通 stop 被拒绝。</p>
+<h2 id="5-reset-gap">5. Reset 和 gap</h2>
+<p>source token 做逻辑合成；任何 source active 都保持物理 reset。实际 epoch 只来自真实 inactive→active transition，重复 assert 不增加 epoch。初始 active 建立 <code>INITIAL_ASSERTED</code> 状态和一次 epoch。</p>
+<p>TB assert 前先设置 pending 和取消 generation，阻止 monitor 回调之前的迟到写。实际 epoch、取消 generation、endpoint owner/command generation 各自独立。延迟 reset source 命令还检查 source generation；旧的定时 release 不覆盖新的同 source assertion。</p>
+<pre><code class="language-text">functional clocks: ... /\__ [all acknowledged stopped at 0] ______ /\...
+reference rising:          R0       R1 R2 R3       R4 R5
+reset assertion:           +offset ----- release +offset
+resume acceptance:                                  +offset
+first functional rising:                            +low_ticks
+</code></pre>
+<p>R0 严格晚于全部 stop acknowledgement。assert=R0+offset，release=Rpre+offset，resume 接受=Rpre+post+offset。100MHz reference 的 pre3/post2 对应 assert→resume 精确 50ns，首个 functional edge 另满足完整 low 和正 release_guard。</p>
+<p>reference 从 affected 集排除并冻结 period。同步 assertion 整段放在停钟窗口的 plan 被拒绝。source 在 gap 前已有效则 preflight 拒绝；执行中阻止物理释放则返回 partial，clock 留在 stopped 状态，调用方明确恢复。reference 丢失由独立 deadline 结束。此功能是 <strong>停钟窗口释放外部 reset</strong>。</p>
+<h2 id="6-signalprofile">6. Signal、profile 和生命周期</h2>
+<p>packed bank 的 masked update 在唯一 writer 内合并。用户输入和 phase、profile/plan 在接纳时冻结；最终写入再检查 stamp 和实际 reset。旧 pulse cleanup 无权修改新 generation。cycle pulse 等待 N 个未来 rising captures；停钟时等待到独立 deadline，仍有效时清到 idle，并返回 timeout。</p>
+<p>Profile 是目标组合；TransitionPlan 是转换步骤。<code>capture_coherent</code> 验证同 source clock、owner、kind 和 reset dependencies，所有成员在指定 edge 前完整稳定。跨域 transition 返回逐步骤进度，barrier 不代表同时生效。没有 DUT commit 协议时，多 CSR atomic 请求明确拒绝。</p>
+<p>tieoff 在 bootstrap 配置后 lock。fuse/strap mirror 只在指定 POR/load reset 的新实际 epoch 有效窗口装载，lock 后本 epoch 不能重开；普通 functional reset 保留 image。IRQ source 可驱动多线，IRQ observer 只观察 DUT 输出，清除走源条件或 CSR；不自动同步或拉长 pulse。</p>
+<h2 id="7-csr">7. CSR 和结果</h2>
+<p>APB adapter 使用原 agent 的 sequencer，支持完整 word、字节使能、W1C 和显式 read-clear 读；不做盲目 RMW。超时的 inflight 请求保留，transport 隔离到 drain；不杀死已有 driver，不假装 rollback。reset-aborted 和 SLVERR 保留真实状态。更多 AXI/RAL/ack 适配留到 P1。</p>
+<p>结果区分 requested、scheduled、PIN_WRITE_APPLIED / CSR_TRANSACTION_COMPLETED、actual observed 和经指定证据确认的 effective。bus done/readback 不设置 effective。tracker 的 local sequence 只表示日志顺序；同 timestamp 必须结合 phase、generation 和实际 edge ID。</p>
+<p>每个等待有绝对仿真 deadline，runner 另有 wall deadline。未验证或不支持的保证不能作为 P0 通过。实际验收见 <a href="../../scope.html#verification">verification</a>。</p><footer>Author: syan · 本地离线文档 · P0a/P0b</footer></main></div></html>

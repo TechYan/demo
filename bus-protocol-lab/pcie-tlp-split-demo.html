@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PCIe TLP Split Protocol Demo</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #121822;
+      --panel-2: #0f141c;
+      --line: #243041;
+      --text: #e8eef6;
+      --muted: #92a0b2;
+      --req: #43c59e;
+      --req-soft: rgba(67, 197, 158, 0.16);
+      --cpl: #5aa7ff;
+      --be: #1fbf75;
+      --be-hi: #35d987;
+      --be-soft: rgba(31, 191, 117, 0.18);
+      --active: rgba(31, 191, 117, 0.72);
+      --inactive: rgba(31, 191, 117, 0.24);
+      --cpl-active: rgba(133, 92, 230, 0.82);
+      --cpl-inactive: rgba(133, 92, 230, 0.42);
+      --cpl-soft: rgba(133, 92, 230, 0.2);
+      --accent: #f0b24b;
+      --danger: #ff6b6b;
+      --shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+      --radius: 10px;
+      --cell: 0.75rem;
+      --grid-gap: 0.125rem;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background:
+        linear-gradient(180deg, rgba(20, 25, 34, 0.96), rgba(9, 12, 17, 1)),
+        var(--bg);
+      color: var(--text);
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+    }
+
+    button, input, select {
+      font: inherit;
+    }
+
+    .app {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(18, 24, 34, 0.94);
+      box-shadow: var(--shadow);
+    }
+
+    .title h1 {
+      margin: 0 0 6px;
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      max-width: 900px;
+    }
+
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr);
+      gap: 14px;
+      min-height: calc(100vh - 116px);
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(15, 20, 28, 0.96);
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .controls {
+      padding: 14px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .group {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      display: grid;
+      gap: 10px;
+    }
+
+    .group h2,
+    .section h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .field .row {
+      display: grid;
+      grid-template-columns: 1fr 108px;
+      gap: 8px;
+      align-items: center;
+    }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0b1016;
+      color: var(--text);
+      outline: none;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--cpl);
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #171f2a;
+      color: var(--text);
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: background 120ms ease, transform 120ms ease, border-color 120ms ease;
+    }
+
+    button:hover {
+      background: #1b2431;
+      border-color: #39506e;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.primary {
+      background: #1b3856;
+      border-color: #345a85;
+    }
+
+    button.primary:hover {
+      background: #224367;
+    }
+
+    .workspace {
+      padding: 14px;
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .metric {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      min-width: 0;
+    }
+
+    .metric .k {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .metric .v {
+      font-size: 16px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .section {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .overview {
+      display: grid;
+      gap: 10px;
+    }
+
+    .overview-row {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+    }
+
+    .row-label {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      padding-top: 6px;
+    }
+
+    .dw-track {
+      display: grid;
+      grid-template-columns: 6.5rem repeat(var(--dw-per-row), var(--cell));
+      gap: var(--grid-gap);
+      align-items: center;
+      justify-content: start;
+      overflow: visible;
+      padding: 4px 6px;
+      min-width: 0;
+      min-height: 0;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.018), rgba(255, 255, 255, 0.008)),
+        radial-gradient(circle at 10px 10px, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px);
+      background-size: auto, 32px 32px;
+    }
+
+    .addr-row {
+      display: contents;
+    }
+
+    .addr-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .addr-grid {
+      display: contents;
+    }
+
+    .cards::-webkit-scrollbar,
+    .detail-grid::-webkit-scrollbar {
+      height: 10px;
+    }
+
+    .cards::-webkit-scrollbar-thumb,
+    .detail-grid::-webkit-scrollbar-thumb {
+      background: #334355;
+      border-radius: 999px;
+    }
+
+    .dw-cell {
+      position: relative;
+      width: var(--cell);
+      height: var(--cell);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 0;
+      overflow: hidden;
+      background: #0b1219;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: calc(var(--grid-gap) / 2);
+      padding: calc(var(--grid-gap) / 2);
+      min-width: var(--cell);
+      box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.08);
+      transition: transform 80ms ease, outline-color 80ms ease, border-color 80ms ease;
+      cursor: pointer;
+    }
+
+    .dw-cell.empty {
+      cursor: default;
+      background: #081018;
+      border-color: rgba(255, 255, 255, 0.04);
+      opacity: 0.5;
+    }
+
+    .dw-cell:hover {
+      border-color: rgba(255, 255, 255, 0.36);
+    }
+
+    .dw-cell.page-start {
+      border-left-color: rgba(240, 178, 75, 0.95);
+      border-left-width: 1px;
+      box-shadow: inset 2px 0 0 rgba(240, 178, 75, 0.65);
+    }
+
+    .dw-cell.selected {
+      outline: none;
+      border-color: rgba(53, 217, 135, 0.32);
+      background:
+        linear-gradient(180deg, rgba(53, 217, 135, 0.12), rgba(31, 191, 117, 0.08)),
+        #0b1714;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .dw-cell.dimmed-active {
+      opacity: 0.48;
+    }
+
+    .byte {
+      border-radius: 0;
+      background: #15202b;
+      box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.08);
+      min-width: 0;
+      min-height: 0;
+      image-rendering: pixelated;
+    }
+
+    .byte.req-on,
+    .byte.cpl-on {
+      background: var(--inactive);
+      box-shadow: none;
+    }
+
+    .dw-cell.cpl .byte.cpl-on {
+      background: color-mix(in srgb, var(--chunk-color, #5b3e9a) 44%, transparent);
+    }
+
+    .dw-cell.selected .byte.req-on,
+    .dw-cell.selected .byte.cpl-on {
+      background: var(--active);
+      box-shadow: none;
+    }
+
+    .dw-cell.selected.cpl .byte.cpl-on {
+      background: color-mix(in srgb, var(--chunk-color, #5b3e9a) 88%, transparent);
+    }
+
+    .dw-cell.related .byte.cpl-on {
+      background: var(--chunk-color, var(--cpl-active));
+      box-shadow: none;
+    }
+
+    .dw-cell.related .byte.req-on {
+      background: rgba(53, 217, 135, 0.64);
+      box-shadow: none;
+    }
+
+    .dw-cell.related {
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--chunk-color, #5b3e9a) 14%, transparent), transparent),
+        #0b1219;
+      border-color: color-mix(in srgb, var(--chunk-color, #5b3e9a) 38%, rgba(255, 255, 255, 0.07));
+    }
+    .byte.req-off,
+    .byte.cpl-pad {
+      background: #1a212d;
+      opacity: 0.42;
+    }
+
+    .dw-cell::after {
+      content: attr(data-mini);
+      position: absolute;
+      left: 0;
+      top: -11px;
+      font-size: 8px;
+      color: rgba(255, 255, 255, 0.62);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .cards {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      min-width: 0;
+    }
+
+    .tlp-card {
+      flex: 0 0 420px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      display: grid;
+      gap: 10px;
+      cursor: pointer;
+      min-width: 0;
+      text-align: left;
+      transition: flex-basis 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .tlp-card.req { border-color: rgba(67, 197, 158, 0.35); }
+    .tlp-card.cpl { border-color: rgba(133, 92, 230, 0.46); }
+    .tlp-card.selected {
+      outline: 2px solid rgba(255, 255, 255, 0.66);
+      outline-offset: 0;
+      flex-basis: min(920px, calc(100vw - 120px));
+    }
+
+    .tlp-card.related {
+      background: rgba(133, 92, 230, 0.13);
+      border-color: rgba(126, 87, 216, 0.48);
+    }
+
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .dump-table {
+      width: max-content;
+      min-width: 100%;
+      border-collapse: collapse;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(5, 9, 13, 0.48);
+      color: #b9c4d2;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12px;
+      table-layout: auto;
+    }
+
+    .dump-stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .tlp-card .dump-wrap {
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .tlp-card.selected .dump-wrap {
+      overflow-x: auto;
+    }
+
+    .tlp-card.req .dump-table {
+      border-color: rgba(67, 197, 158, 0.24);
+    }
+
+    .tlp-card.cpl .dump-table {
+      border-color: rgba(133, 92, 230, 0.32);
+    }
+
+    .dump-table th,
+    .dump-table td {
+      padding: 5px 7px;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tlp-card.selected .dump-table th,
+    .tlp-card.selected .dump-table td {
+      overflow: visible;
+      text-overflow: clip;
+    }
+
+    .dump-table th {
+      color: #8f9daf;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .dump-table td {
+      color: #d1d8e2;
+    }
+
+    .dump-table td.num,
+    .dump-table th.num {
+      text-align: right;
+    }
+
+    .dump-table .wide {
+      width: 150px;
+    }
+
+    .dump-table .mid {
+      width: 92px;
+    }
+
+    .dump-table .small {
+      width: 66px;
+    }
+
+    .detail {
+      display: grid;
+      gap: 10px;
+    }
+
+    .detail-top {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .detail-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .detail-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .field-pill {
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      min-width: 0;
+    }
+
+    .field-pill .k {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .field-pill .v {
+      font-size: 13px;
+      font-weight: 650;
+      word-break: break-word;
+    }
+
+    .logic {
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .logic code {
+      color: #dff3ff;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    .detail-grid-wrap {
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .detail-grid {
+      display: flex;
+      gap: 1px;
+      overflow: visible;
+      min-width: 0;
+    }
+
+    .dw-detail {
+      flex: 0 0 74px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0c1219;
+      padding: 6px;
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .dw-detail.page-start {
+      box-shadow: inset 2px 0 0 rgba(240, 178, 75, 0.8);
+    }
+
+    .dw-detail .hdr {
+      display: grid;
+      gap: 2px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.2;
+    }
+
+    .dw-detail .hdr strong {
+      color: var(--text);
+      font-size: 10px;
+    }
+
+    .bytes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+
+    .byte-box {
+      height: 18px;
+      border-radius: 0;
+      border: 1px solid transparent;
+      background: #1a2330;
+      color: rgba(255, 255, 255, 0.92);
+      display: grid;
+      place-items: center;
+      font-size: 9px;
+      line-height: 1;
+    }
+
+    .byte-box.req-on {
+      background: linear-gradient(180deg, #72f0a1, var(--be));
+      color: #042011;
+    }
+
+    .byte-box.cpl-on {
+      background: linear-gradient(180deg, #72f0a1, var(--be));
+      color: #04111f;
+    }
+
+    .byte-box.req-off {
+      background: #17202c;
+      opacity: 0.38;
+    }
+
+    .byte-box.cpl-pad {
+      background: #18212c;
+      opacity: 0.45;
+    }
+
+    .byte-box.selected-byte {
+      border-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .notes {
+      display: grid;
+      gap: 8px;
+    }
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .note-box {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .note-box strong {
+      color: var(--text);
+    }
+
+    .mono { font-variant-numeric: tabular-nums; }
+    .req-text { color: #aaf1d9; }
+    .cpl-text { color: #c4ddff; }
+    .accent-text { color: #ffd28c; }
+
+    @media (max-width: 1200px) {
+      .shell { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .detail-top { grid-template-columns: 1fr; }
+      .note-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .summary { grid-template-columns: 1fr; }
+      .overview-row { grid-template-columns: 1fr; }
+      .field .row { grid-template-columns: 1fr; }
+      .detail-fields { grid-template-columns: 1fr; }
+      .note-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+
+<style>
+.demo-back-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;padding:10px 18px;background:#101823;border-bottom:1px solid #334155;color:#cbd5e1;font:13px/1.5 system-ui,sans-serif}
+.demo-back-nav a,.demo-package-note a{color:#b4d8ff;text-decoration:none}.demo-back-nav a:hover,.demo-package-note a:hover{text-decoration:underline}.demo-back-nav a:focus-visible,.demo-package-note a:focus-visible{outline:2px solid #93c5fd;outline-offset:3px}
+.demo-package-note{padding:9px 18px;background:#172230;color:#cbd5e1;font:12px/1.6 system-ui,sans-serif}.demo-package-note a{margin-left:12px}
+</style>
+</head>
+<body>
+<nav class="demo-back-nav" aria-label="Project navigation"><a href="../">&larr; Project hub</a><a href="../projects/bus-protocol-lab/">Bus Protocol Lab overview</a><a href="index.html">All protocol tools</a></nav>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="title">
+        <h1>PCIe TLP Split Protocol Demo</h1>
+        <p>Type a byte address and a byte count. The page shows how PCIe turns that range into DW-aligned MemRd requests with FBE/LBE, then into CplD chunks with Byte Count and Lower Address.</p>
+      </div>
+      <div class="pills">
+        <span class="pill">Read request split: <span class="mono req-text">MRRS</span> + <span class="mono accent-text">4KB</span></span>
+        <span class="pill">Completion split: <span class="mono cpl-text">MPS</span> + <span class="mono accent-text">RCB</span> + <span class="mono accent-text">4KB</span></span>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="panel controls">
+        <div class="group">
+          <h2>Inputs</h2>
+          <div class="field">
+            <label for="startAddr">Start address</label>
+            <div class="row">
+              <input id="startAddr" type="text" value="0x1003" />
+              <input id="readBytes" type="number" min="1" max="8192" step="1" value="1536" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="mrrs">MRRS</label>
+            <div class="row">
+              <input id="mrrs" type="range" min="128" max="4096" step="128" value="512" />
+              <input id="mrrsNum" type="number" min="128" max="4096" step="128" value="512" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="mps">MPS</label>
+            <div class="row">
+              <input id="mps" type="range" min="128" max="4096" step="128" value="128" />
+              <input id="mpsNum" type="number" min="128" max="4096" step="128" value="128" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="rcb">RCB</label>
+            <div class="row">
+              <select id="rcb">
+                <option value="64">64 B</option>
+                <option value="128" selected>128 B</option>
+              </select>
+              <div></div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="rowBytes">Address coverage row size</label>
+            <div class="row">
+              <select id="rowBytes">
+                <option value="64" selected>64 B / row</option>
+                <option value="128">128 B / row</option>
+                <option value="256">256 B / row</option>
+              </select>
+              <div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <h2>Presets</h2>
+          <div class="buttons">
+            <button class="primary" id="presetA">Unaligned 512B</button>
+            <button id="presetB">3 x 512B</button>
+            <button id="presetC">Cross 4KB</button>
+          </div>
+          <div class="subtle">
+            The default case is deliberately unaligned so you can see FBE/LBE being used on the first and last DW.
+          </div>
+        </div>
+
+        <div class="group">
+          <h2>Reading guide</h2>
+          <div class="subtle">
+            <strong class="req-text">MemRd</strong> cards show the request header fields: aligned Address, Length in DW, and FBE/LBE masks.
+            <br /><br />
+            <strong class="cpl-text">CplD</strong> cards show the returned Byte Count and Lower Address. The returned bytes may be padded to the DW envelope.
+          </div>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <section class="summary">
+          <div class="metric"><span class="k">Requested bytes</span><span class="v mono" id="sumBytes">-</span></div>
+          <div class="metric"><span class="k">MemRd TLPs</span><span class="v mono" id="sumReqCount">-</span></div>
+          <div class="metric"><span class="k">CplD TLPs</span><span class="v mono" id="sumCplCount">-</span></div>
+          <div class="metric"><span class="k">Request overhead</span><span class="v mono" id="sumReqOver">-</span></div>
+        </section>
+
+        <section class="section overview">
+          <div class="section-head">
+            <h2>Address coverage</h2>
+            <div class="subtle" id="rangeLine"></div>
+          </div>
+          <div class="overview-row">
+            <div class="row-label">MemRd split. Each tile is one aligned DW. Green byte lanes mean BE=1.</div>
+            <div class="dw-track" id="reqOverview"></div>
+          </div>
+          <div class="overview-row">
+            <div class="row-label">CplD split. Same DW grid; green byte lanes are valid returned bytes.</div>
+            <div class="dw-track" id="cplOverview"></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>MemRd TLPs</h2>
+            <div class="subtle">Click a card to inspect its DW envelope and byte-enable pattern.</div>
+          </div>
+          <div class="cards" id="reqCards"></div>
+        </section>
+
+        <section class="section">
+          <div class="section-head">
+            <h2>CplD TLPs</h2>
+            <div class="subtle">Click a card to inspect the returned Byte Count and Lower Address.</div>
+          </div>
+          <div class="cards" id="cplCards"></div>
+        </section>
+
+        <section class="detail">
+          <div class="detail-top">
+            <div class="detail-card">
+              <div class="section-head">
+                <h2>Selected TLP</h2>
+                <div class="subtle" id="selectedHint"></div>
+              </div>
+              <div class="detail-fields" id="detailFields"></div>
+            </div>
+            <div class="detail-card">
+              <h2>Split logic</h2>
+              <div class="logic" id="logicBox"></div>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <div class="section-head">
+              <h2>DW envelope</h2>
+            <div class="subtle">Green means enabled/valid. Dark bytes are masked in a request or padded in a completion.</div>
+            </div>
+            <div class="detail-grid-wrap">
+              <div class="detail-grid" id="detailGrid"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="notes">
+          <div class="note-grid">
+            <div class="note-box">
+              <strong>MemRd request fields</strong><br />
+              PCIe read requests are DW-oriented. The address field is DW aligned, while FBE/LBE describe the real byte window in the first and last DW.
+            </div>
+            <div class="note-box">
+              <strong>Completion fields</strong><br />
+              Completions use Byte Count and Lower Address, not BE. The data payload may still occupy a partial last DW.
+            </div>
+            <div class="note-box">
+              <strong>4KB rule</strong><br />
+              Read requests do not cross a 4KB boundary. Completions also stop at a 4KB boundary.
+            </div>
+            <div class="note-box">
+              <strong>What the colors mean</strong><br />
+              Green byte lanes are enabled by BE or returned as valid completion bytes. Amber marks 4KB page starts.
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const els = {
+      startAddr: document.getElementById('startAddr'),
+      readBytes: document.getElementById('readBytes'),
+      mrrs: document.getElementById('mrrs'),
+      mrrsNum: document.getElementById('mrrsNum'),
+      mps: document.getElementById('mps'),
+      mpsNum: document.getElementById('mpsNum'),
+      rcb: document.getElementById('rcb'),
+      rowBytes: document.getElementById('rowBytes'),
+      presetA: document.getElementById('presetA'),
+      presetB: document.getElementById('presetB'),
+      presetC: document.getElementById('presetC'),
+      sumBytes: document.getElementById('sumBytes'),
+      sumReqCount: document.getElementById('sumReqCount'),
+      sumCplCount: document.getElementById('sumCplCount'),
+      sumReqOver: document.getElementById('sumReqOver'),
+      rangeLine: document.getElementById('rangeLine'),
+      reqOverview: document.getElementById('reqOverview'),
+      cplOverview: document.getElementById('cplOverview'),
+      reqCards: document.getElementById('reqCards'),
+      cplCards: document.getElementById('cplCards'),
+      selectedHint: document.getElementById('selectedHint'),
+      detailFields: document.getElementById('detailFields'),
+      logicBox: document.getElementById('logicBox'),
+      detailGrid: document.getElementById('detailGrid'),
+    };
+
+    const state = {
+      selectedKind: 'req',
+      selectedIndex: 0,
+      selectedReqIndex: 0,
+    };
+
+    const requestPalette = ['#3bc89a', '#36b7ac', '#43c59e', '#2fbf86', '#4fbf7e', '#59c7b9', '#6ac6a5'];
+    const completionPalette = ['#5aa7ff', '#6b9cf7', '#4ea9e6', '#7a8fff', '#58c0ff', '#6aaedb', '#84b8ff'];
+    const cplChunkPalette = ['#6540c6', '#7049d2', '#7a52de', '#855cea', '#9066f4', '#9a72f7', '#a47df9', '#ad88fb'];
+
+    function clamp(n, min, max) {
+      return Math.min(max, Math.max(min, n));
+    }
+
+    function parseHexAddress(text) {
+      const cleaned = String(text).trim().replace(/^0x/i, '');
+      if (!cleaned) return 0;
+      const value = Number.parseInt(cleaned, 16);
+      return Number.isFinite(value) && value >= 0 ? value : 0;
+    }
+
+    function hex(value, width = 8) {
+      return '0x' + value.toString(16).toUpperCase().padStart(width, '0');
+    }
+
+    function maskBits(mask) {
+      return [3, 2, 1, 0].map(bit => (mask & (1 << bit)) ? '1' : '0').join('');
+    }
+
+    function bytesToPage(addr) {
+      return 4096 - (addr % 4096);
+    }
+
+    function pageStart(addr) {
+      return Math.floor(addr / 4096) * 4096;
+    }
+
+    function lineStart(addr, rowBytes) {
+      return Math.floor(addr / rowBytes) * rowBytes;
+    }
+
+    function alignDw(addr) {
+      return Math.floor(addr / 4) * 4;
+    }
+
+    function dwCountForRange(start, endExclusive) {
+      return Math.floor((endExclusive - 1) / 4) - Math.floor(start / 4) + 1;
+    }
+
+    function byteMaskForDw(dwBase, start, endExclusive) {
+      let mask = 0;
+      for (let bit = 0; bit < 4; bit++) {
+        const addr = dwBase + bit;
+        if (addr >= start && addr < endExclusive) mask |= 1 << bit;
+      }
+      return mask;
+    }
+
+    function byteCountInDw(dwBase, start, endExclusive) {
+      let count = 0;
+      for (let bit = 0; bit < 4; bit++) {
+        const addr = dwBase + bit;
+        if (addr >= start && addr < endExclusive) count++;
+      }
+      return count;
+    }
+
+    function splitRange(start, bytes, limit, boundary = 4096) {
+      const out = [];
+      let addr = start;
+      let remaining = bytes;
+      while (remaining > 0) {
+        const toBoundary = bytesToPage(addr);
+        const chunk = Math.min(remaining, limit, toBoundary);
+        const reasons = [];
+        if (chunk === limit) reasons.push('limit');
+        if (chunk === toBoundary) reasons.push('4KB');
+        if (chunk === remaining) reasons.push('tail');
+        out.push({
+          start: addr,
+          end: addr + chunk,
+          bytes: chunk,
+          reasons,
+        });
+        addr += chunk;
+        remaining -= chunk;
+      }
+      return out;
+    }
+
+    function envelopeBytes(start, bytes) {
+      return dwCountForRange(start, start + bytes) * 4;
+    }
+
+    function maxExactBytesForEnvelope(start, remaining, limit) {
+      let best = 1;
+      const maxTry = Math.min(remaining, limit);
+      for (let bytes = 1; bytes <= maxTry; bytes++) {
+        if (envelopeBytes(start, bytes) <= limit) best = bytes;
+        else break;
+      }
+      return best;
+    }
+
+    function normalizePayloadSize(value) {
+      const legal = [128, 256, 512, 1024, 2048, 4096];
+      return legal.reduce((best, candidate) =>
+        Math.abs(candidate - value) < Math.abs(best - value) ? candidate : best
+      , legal[0]);
+    }
+
+    function splitByDwEnvelope(start, bytes, limit, boundary = 4096) {
+      const out = [];
+      let addr = start;
+      let remaining = bytes;
+      while (remaining > 0) {
+        const toBoundary = bytesToPage(addr);
+        const byteLimit = Math.min(remaining, toBoundary);
+        let chunk = maxExactBytesForEnvelope(addr, byteLimit, limit);
+        chunk = Math.max(1, chunk);
+        const reasons = [];
+        if (envelopeBytes(addr, chunk) === limit) reasons.push('limit');
+        if (chunk === toBoundary) reasons.push('4KB');
+        if (chunk === remaining) reasons.push('tail');
+        out.push({
+          start: addr,
+          end: addr + chunk,
+          bytes: chunk,
+          reasons,
+        });
+        addr += chunk;
+        remaining -= chunk;
+      }
+      return out;
+    }
+
+    function buildRequests(start, bytes, mrrs) {
+      const exact = splitByDwEnvelope(start, bytes, mrrs, 4096);
+      return exact.map((seg, index) => {
+        const dwBase = alignDw(seg.start);
+        const lastByte = seg.end - 1;
+        const dwEnd = alignDw(lastByte);
+        const dwCount = dwCountForRange(seg.start, seg.end);
+        const firstMask = byteMaskForDw(dwBase, seg.start, seg.end);
+        const lastMask = dwCount === 1 ? 0 : byteMaskForDw(dwEnd, seg.start, seg.end);
+        const envelopeBytes = dwCount * 4;
+        return {
+          kind: 'req',
+          index,
+          start: seg.start,
+          end: seg.end,
+          bytes: seg.bytes,
+          dwBase,
+          dwEnd,
+          dwCount,
+          envelopeBytes,
+          overheadBytes: envelopeBytes - seg.bytes,
+          firstMask,
+          lastMask,
+          reasons: seg.reasons.includes('4KB') ? ['4KB'] : ['MRRS'],
+        };
+      });
+    }
+
+    function splitCompletionsForRequest(req, mps, rcb) {
+      const out = [];
+      let addr = req.start;
+      let remaining = req.bytes;
+      while (remaining > 0) {
+        const toBoundary = bytesToPage(addr);
+        const byteLimit = Math.min(remaining, toBoundary);
+        const maxChunk = maxExactBytesForEnvelope(addr, byteLimit, mps);
+        let chunk = maxChunk;
+        while (chunk > 1) {
+          const end = addr + chunk;
+          if (chunk === remaining || end % rcb === 0 || chunk === toBoundary) break;
+          chunk--;
+        }
+
+        const reasons = [];
+        if (envelopeBytes(addr, chunk) === mps) reasons.push('MPS');
+        if ((addr + chunk) % rcb === 0 && chunk !== remaining) reasons.push('RCB');
+        if (chunk === toBoundary) reasons.push('4KB');
+        if (chunk === remaining) reasons.push('tail');
+
+        out.push({
+          start: addr,
+          end: addr + chunk,
+          bytes: chunk,
+          reasons,
+        });
+        addr += chunk;
+        remaining -= chunk;
+      }
+      return out;
+    }
+
+    function buildCompletions(requests, mps, rcb) {
+      const out = [];
+      requests.forEach((req, reqIndex) => {
+        const chunks = splitCompletionsForRequest(req, mps, rcb);
+        chunks.forEach((seg, seqIndex) => {
+          const dwBase = alignDw(seg.start);
+          const lastByte = seg.end - 1;
+          const dwEnd = alignDw(lastByte);
+          const dwCount = dwCountForRange(seg.start, seg.end);
+          const payloadBytes = seg.bytes;
+          const byteCount = req.end - seg.start;
+          out.push({
+            kind: 'cpl',
+            index: out.length,
+            reqIndex,
+            seqIndex,
+            start: seg.start,
+            end: seg.end,
+            bytes: payloadBytes,
+            payloadBytes,
+            byteCount,
+            dwBase,
+            dwEnd,
+            dwCount,
+            paddingBytes: dwCount * 4 - payloadBytes,
+            lowerAddr: seg.start & 0x7f,
+            reasons: seg.reasons.length ? seg.reasons : ['CplD'],
+          });
+        });
+      });
+      return out;
+    }
+
+    function fmtReasons(list) {
+      return list.map(x => x.toUpperCase()).join(' + ');
+    }
+
+    function palette(kind, index) {
+      const src = kind === 'req' ? requestPalette : completionPalette;
+      return src[index % src.length];
+    }
+
+    function setSelected(kind, index, reqIndex = null) {
+      state.selectedKind = kind;
+      state.selectedIndex = index;
+      state.selectedReqIndex = kind === 'req' ? index : reqIndex;
+      render();
+      requestAnimationFrame(() => {
+        const node = document.querySelector(`.tlp-card.selected[data-kind="${kind}"][data-index="${index}"]`);
+        node?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      });
+    }
+
+    function byteClass(kind, inside) {
+      if (kind === 'req') return inside ? 'req-on' : 'req-off';
+      return inside ? 'cpl-on' : 'cpl-pad';
+    }
+
+    function h(value, width = 8) {
+      return value.toString(16).toUpperCase().padStart(width, '0');
+    }
+
+    function hx(value, width = 8) {
+      return `0x${h(value, width)}`;
+    }
+
+    function appendRow(table, cells, tag = 'td') {
+      const row = document.createElement('tr');
+      cells.forEach(cell => {
+        const node = document.createElement(tag);
+        node.textContent = cell.value;
+        if (cell.className) node.className = cell.className;
+        if (cell.title) node.title = cell.title;
+        row.appendChild(node);
+      });
+      table.appendChild(row);
+    }
+
+    function tableCell(value, className = '') {
+      return { value, className };
+    }
+
+    function makeTable() {
+      const table = document.createElement('table');
+      table.className = 'dump-table';
+      return table;
+    }
+
+    function buildDumpTables(tlp, kind) {
+      const wrap = document.createElement('div');
+      wrap.className = 'dump-stack';
+      if (kind === 'req') {
+        const headerTable = makeTable();
+        appendRow(headerTable, [
+          tableCell('fmt/type', 'mid'),
+          tableCell('length', 'num small'),
+          tableCell('address', 'mid'),
+          tableCell('first_be', 'small'),
+          tableCell('last_be', 'small'),
+          tableCell('bytes', 'num small'),
+          tableCell('envelope', 'num small'),
+          tableCell('masked', 'num small'),
+        ], 'th');
+        appendRow(headerTable, [
+          tableCell('MemRd', 'mid'),
+          tableCell(tlp.dwCount, 'num small'),
+          tableCell(hx(tlp.dwBase), 'mid'),
+          tableCell(maskBits(tlp.firstMask), 'small'),
+          tableCell(maskBits(tlp.lastMask), 'small'),
+          tableCell(tlp.bytes, 'num small'),
+          tableCell(tlp.envelopeBytes, 'num small'),
+          tableCell(tlp.overheadBytes, 'num small'),
+        ]);
+        const rangeTable = makeTable();
+        appendRow(rangeTable, [
+          tableCell('field', 'small'),
+          tableCell('start', 'mid'),
+          tableCell('end', 'mid'),
+          tableCell('dw_start', 'mid'),
+          tableCell('dw_end', 'mid'),
+          tableCell('split', 'mid'),
+        ], 'th');
+        appendRow(rangeTable, [
+          tableCell('range', 'mid'),
+          tableCell(hx(tlp.start), 'mid'),
+          tableCell(hx(tlp.end - 1), 'mid'),
+          tableCell(hx(tlp.dwBase), 'mid'),
+          tableCell(hx(tlp.dwEnd), 'mid'),
+          tableCell(fmtReasons(tlp.reasons), 'mid'),
+        ]);
+        wrap.appendChild(headerTable);
+        wrap.appendChild(rangeTable);
+        return wrap;
+      }
+
+      const headerTable = makeTable();
+      appendRow(headerTable, [
+        tableCell('fmt/type', 'mid'),
+        tableCell('payload', 'num small'),
+        tableCell('byte_cnt', 'num small'),
+        tableCell('lower_addr', 'small'),
+        tableCell('req_idx', 'num small'),
+        tableCell('cpl_idx', 'num small'),
+        tableCell('reason', 'mid'),
+      ], 'th');
+      appendRow(headerTable, [
+        tableCell('CplD', 'mid'),
+        tableCell(tlp.payloadBytes, 'num small'),
+        tableCell(tlp.byteCount, 'num small'),
+        tableCell(hx(tlp.lowerAddr, 2), 'small'),
+        tableCell(tlp.reqIndex, 'num small'),
+        tableCell(tlp.seqIndex, 'num small'),
+        tableCell(fmtReasons(tlp.reasons), 'mid'),
+      ]);
+      const rangeTable = makeTable();
+      appendRow(rangeTable, [
+        tableCell('field', 'small'),
+        tableCell('start', 'mid'),
+        tableCell('end', 'mid'),
+        tableCell('dw_start', 'mid'),
+        tableCell('dw_end', 'mid'),
+        tableCell('padding', 'mid'),
+      ], 'th');
+      appendRow(rangeTable, [
+        tableCell('range', 'mid'),
+        tableCell(hx(tlp.start), 'mid'),
+        tableCell(hx(tlp.end - 1), 'mid'),
+        tableCell(hx(tlp.dwBase), 'mid'),
+        tableCell(hx(tlp.dwEnd), 'mid'),
+        tableCell(`${tlp.paddingBytes} B`, 'mid'),
+      ]);
+      wrap.appendChild(headerTable);
+      wrap.appendChild(rangeTable);
+      return wrap;
+    }
+
+    function buildCard(tlp, kind) {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = `tlp-card ${kind}`;
+      if (state.selectedKind === kind && state.selectedIndex === tlp.index) card.classList.add('selected');
+      else if (relatedToSelection(tlp, kind)) card.classList.add('related');
+      card.dataset.kind = kind;
+      card.dataset.index = tlp.index;
+      card.addEventListener('click', () => setSelected(kind, tlp.index, tlp.reqIndex ?? null));
+
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      const label = kind === 'req' ? `MemRd #${tlp.index + 1}` : `CplD #${tlp.index + 1}`;
+      const extra = kind === 'req' ? `${tlp.bytes} B exact` : `${tlp.payloadBytes} B payload`;
+      title.innerHTML = `<span>${label}</span><span class="subtle mono">${extra}</span>`;
+      card.appendChild(title);
+
+      const dumpWrap = document.createElement('div');
+      dumpWrap.className = 'dump-wrap';
+      dumpWrap.appendChild(buildDumpTables(tlp, kind));
+      card.appendChild(dumpWrap);
+
+      return card;
+    }
+
+    function relatedToSelection(tlp, kind) {
+      if (state.selectedKind === 'req') {
+        if (kind === 'req') return tlp.index === state.selectedIndex;
+        return tlp.reqIndex === state.selectedIndex;
+      }
+      if (state.selectedKind === 'cpl') {
+        if (kind === 'cpl') return tlp.index === state.selectedIndex;
+        return tlp.index === state.selectedReqIndex;
+      }
+      return false;
+    }
+
+    function shouldDimCell(tlp, kind) {
+      if (state.selectedKind === 'req') {
+        if (kind === 'req') return tlp.index !== state.selectedIndex;
+        return tlp.reqIndex !== state.selectedIndex;
+      }
+      if (state.selectedKind === 'cpl') {
+        if (kind === 'cpl') return tlp.index !== state.selectedIndex;
+        return tlp.index !== state.selectedReqIndex;
+      }
+      return false;
+    }
+
+    function renderOverviewCell(tlp, kind, dwBase) {
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = `dw-cell ${kind}`;
+      cell.style.borderColor = kind === 'req' ? 'rgba(67, 197, 158, 0.26)' : 'rgba(133, 92, 230, 0.38)';
+      cell.dataset.kind = kind;
+      cell.dataset.index = tlp.index;
+      cell.dataset.dw = dwBase;
+      cell.title = kind === 'req'
+        ? `MemRd #${tlp.index + 1}\nDW ${hex(dwBase)}-${hex(dwBase + 3)}\nBE ${maskBits(byteMaskForDw(dwBase, tlp.start, tlp.end))}\nGreen lanes have BE=1`
+        : `CplD #${tlp.index + 1}\n${hex(dwBase)}-${hex(dwBase + 3)}\nByte Count slice`;
+      if (kind === 'cpl') {
+        cell.style.setProperty('--chunk-color', cplChunkPalette[tlp.seqIndex % cplChunkPalette.length]);
+      }
+      if (pageStart(dwBase) === dwBase && dwBase !== tlp.start) cell.classList.add('page-start');
+      if (state.selectedKind === kind && state.selectedIndex === tlp.index) cell.classList.add('selected');
+      else if (relatedToSelection(tlp, kind)) cell.classList.add('related');
+      else if (shouldDimCell(tlp, kind)) cell.classList.add('dimmed-active');
+      cell.addEventListener('click', () => setSelected(kind, tlp.index, tlp.reqIndex ?? null));
+      cell.dataset.mini = (dwBase === tlp.dwBase || dwBase === tlp.dwEnd || dwBase % 128 === 0) ? hex(dwBase, 4) : '';
+      for (let b = 0; b < 4; b++) {
+        const addr = dwBase + b;
+        const byte = document.createElement('div');
+        const inside = addr >= tlp.start && addr < tlp.end;
+        byte.className = `byte ${byteClass(kind, inside)}`;
+        cell.appendChild(byte);
+      }
+      return cell;
+    }
+
+    function renderEmptyOverviewCell(kind, dwBase) {
+      const cell = document.createElement('div');
+      cell.className = `dw-cell empty ${kind}`;
+      cell.title = `DW ${hex(dwBase)}-${hex(dwBase + 3)}\nNo byte enabled in this address window`;
+      if (pageStart(dwBase) === dwBase) cell.classList.add('page-start');
+      for (let b = 0; b < 4; b++) {
+        const byte = document.createElement('div');
+        byte.className = 'byte req-off';
+        cell.appendChild(byte);
+      }
+      return cell;
+    }
+
+    function renderOverview(track, list, kind, start, end, rowBytes) {
+      track.innerHTML = '';
+      track.style.setProperty('--dw-per-row', String(rowBytes / 4));
+      const firstLine = lineStart(start, rowBytes);
+      const lastLine = lineStart(end - 1, rowBytes);
+      for (let rowBase = firstLine; rowBase <= lastLine; rowBase += rowBytes) {
+        const row = document.createElement('div');
+        row.className = 'addr-row';
+        const label = document.createElement('div');
+        label.className = 'addr-label';
+        label.textContent = hex(rowBase, 8);
+        const grid = document.createElement('div');
+        grid.className = 'addr-grid';
+
+        for (let dwBase = rowBase; dwBase < rowBase + rowBytes; dwBase += 4) {
+          const tlp = list.find(seg => dwBase >= seg.dwBase && dwBase <= seg.dwEnd);
+          if (tlp) grid.appendChild(renderOverviewCell(tlp, kind, dwBase));
+          else grid.appendChild(renderEmptyOverviewCell(kind, dwBase));
+        }
+
+        row.appendChild(label);
+        row.appendChild(grid);
+        track.appendChild(row);
+      }
+    }
+
+    function renderDetail(tlp, kind) {
+      els.selectedHint.textContent = kind === 'req'
+        ? `MemRd #${tlp.index + 1} selected`
+        : `CplD #${tlp.index + 1} selected, from MemRd #${tlp.reqIndex + 1}`;
+
+      els.detailFields.innerHTML = '';
+      const fields = kind === 'req'
+        ? [
+            ['Type', 'MemRd'],
+            ['Address field', hex(tlp.dwBase)],
+            ['Start byte', hex(tlp.start)],
+            ['End byte', hex(tlp.end - 1)],
+            ['Length', `${tlp.dwCount} DW`],
+            ['FBE', maskBits(tlp.firstMask)],
+            ['LBE', maskBits(tlp.lastMask)],
+            ['Envelope', `${tlp.envelopeBytes} B`],
+            ['Masked bytes', `${tlp.overheadBytes} B`],
+          ]
+        : [
+            ['Type', 'CplD'],
+            ['Start address', hex(tlp.start)],
+            ['Start byte', hex(tlp.start)],
+            ['End byte', hex(tlp.end - 1)],
+            ['Payload in this CplD', `${tlp.payloadBytes} B`],
+            ['Byte Count field', `${tlp.byteCount} B`],
+            ['Lower Address[6:0]', hex(tlp.lowerAddr, 2)],
+            ['DW envelope', `${tlp.dwCount} DW`],
+            ['Payload padding', `${tlp.paddingBytes} B`],
+            ['Source request', `MemRd #${tlp.reqIndex + 1}`],
+          ];
+      fields.forEach(([k, v]) => {
+        const pill = document.createElement('div');
+        pill.className = 'field-pill';
+        pill.innerHTML = `<span class="k">${k}</span><span class="v mono">${v}</span>`;
+        els.detailFields.appendChild(pill);
+      });
+
+      els.logicBox.innerHTML = kind === 'req'
+        ? `
+          <div><code>request DW envelope <= MRRS and must not cross 4KB</code></div>
+          <div>Here that becomes <code>${tlp.bytes} B</code> enabled data in <code>${tlp.dwCount} DW</code> of envelope, so the first/last DW masks are <code>${maskBits(tlp.firstMask)}</code> and <code>${maskBits(tlp.lastMask)}</code>.</div>
+          <div>The address field is DW aligned: <code>${hex(tlp.dwBase)}</code>. FBE/LBE carry the byte window that starts at <code>${hex(tlp.start)}</code> and ends at <code>${hex(tlp.end - 1)}</code>.</div>
+        `
+        : `
+          <div><code>completion payload <= MPS, must not cross 4KB, and intermediate completions end on RCB</code></div>
+          <div>Here this CplD carries <code>${tlp.payloadBytes} B</code> of payload in <code>${tlp.dwCount} DW</code> of envelope, with <code>${tlp.paddingBytes} B</code> of last-DW padding if the payload is not a multiple of 4.</div>
+          <div>The completion header carries <code>Byte Count = ${tlp.byteCount}</code> for the request bytes remaining from this completion onward, plus <code>Lower Address = ${hex(tlp.lowerAddr, 2)}</code>.</div>
+        `;
+
+      els.detailGrid.innerHTML = '';
+      for (let i = 0; i < tlp.dwCount; i++) {
+        const dwBase = tlp.dwBase + i * 4;
+        const cell = document.createElement('div');
+        cell.className = 'dw-detail';
+        if (pageStart(dwBase) === dwBase && dwBase !== tlp.start) cell.classList.add('page-start');
+        const isSelectedDw = dwBase >= tlp.start && dwBase < tlp.end;
+        const hdr = document.createElement('div');
+        hdr.className = 'hdr';
+        const kindLabel = kind === 'req' ? 'MemRd' : 'CplD';
+        hdr.innerHTML = `<strong>${kindLabel} DW ${i + 1}</strong><span>${hex(dwBase)}</span><span>${hex(dwBase + 3)}</span>`;
+        cell.appendChild(hdr);
+
+        const bytes = document.createElement('div');
+        bytes.className = 'bytes';
+        for (let b = 0; b < 4; b++) {
+          const addr = dwBase + b;
+          const inside = addr >= tlp.start && addr < tlp.end;
+          const box = document.createElement('div');
+          box.className = `byte-box ${byteClass(kind, inside)}`;
+          if (inside && isSelectedDw && addr === tlp.start) box.classList.add('selected-byte');
+          box.textContent = inside ? addr.toString(16).toUpperCase().slice(-1) : '';
+          box.title = hex(addr);
+          bytes.appendChild(box);
+        }
+        cell.appendChild(bytes);
+        cell.title = `${hex(dwBase)}-${hex(dwBase + 3)}`;
+        els.detailGrid.appendChild(cell);
+      }
+    }
+
+    function render() {
+      const start = parseHexAddress(els.startAddr.value);
+      const bytes = clamp(Number.parseInt(els.readBytes.value, 10) || 1, 1, 8192);
+      const mrrs = normalizePayloadSize(clamp(Number.parseInt(els.mrrsNum.value, 10) || 512, 128, 4096));
+      const mps = normalizePayloadSize(clamp(Number.parseInt(els.mpsNum.value, 10) || 128, 128, 4096));
+      const rcb = clamp(Number.parseInt(els.rcb.value, 10) || 128, 64, 128);
+      const rowBytes = clamp(Number.parseInt(els.rowBytes.value, 10) || 64, 64, 256);
+
+      els.startAddr.value = hex(start);
+      els.readBytes.value = bytes;
+      els.mrrs.value = mrrs;
+      els.mrrsNum.value = mrrs;
+      els.mps.value = mps;
+      els.mpsNum.value = mps;
+      els.rcb.value = String(rcb);
+      els.rowBytes.value = String(rowBytes);
+
+      const requests = buildRequests(start, bytes, mrrs);
+      const completions = buildCompletions(requests, mps, rcb);
+      const end = start + bytes;
+      const reqOverhead = requests.reduce((sum, seg) => sum + seg.overheadBytes, 0);
+      const cplPad = completions.reduce((sum, seg) => sum + seg.paddingBytes, 0);
+      const pages = Math.floor((end - 1) / 4096) - Math.floor(start / 4096) + 1;
+
+      els.sumBytes.textContent = `${bytes} B`;
+      els.sumReqCount.textContent = `${requests.length}`;
+      els.sumCplCount.textContent = `${completions.length}`;
+      els.sumReqOver.textContent = `${reqOverhead} B`;
+      els.rangeLine.textContent = `display base ${hex(lineStart(start, rowBytes))}, ${rowBytes}B per row | actual range ${hex(start)} .. ${hex(end - 1)} | pages spanned: ${pages}`;
+
+      renderOverview(els.reqOverview, requests, 'req', start, end, rowBytes);
+      renderOverview(els.cplOverview, completions, 'cpl', start, end, rowBytes);
+
+      els.reqCards.innerHTML = '';
+      requests.forEach(req => {
+        els.reqCards.appendChild(buildCard(req, 'req'));
+      });
+
+      els.cplCards.innerHTML = '';
+      completions.forEach(cpl => {
+        els.cplCards.appendChild(buildCard(cpl, 'cpl'));
+      });
+
+      let selected = null;
+      if (state.selectedKind === 'req') selected = requests[state.selectedIndex] || requests[0] || null;
+      if (state.selectedKind === 'cpl') selected = completions[state.selectedIndex] || completions[0] || null;
+      if (!selected) {
+        els.detailFields.innerHTML = '';
+        els.logicBox.innerHTML = '';
+        els.detailGrid.innerHTML = '';
+        return;
+      }
+      renderDetail(selected, state.selectedKind);
+    }
+
+    function syncPair(rangeEl, numEl) {
+      const value = clamp(Number.parseInt(rangeEl.value, 10) || 0, Number.parseInt(rangeEl.min, 10), Number.parseInt(rangeEl.max, 10));
+      rangeEl.value = value;
+      numEl.value = value;
+    }
+
+    function bindPair(rangeEl, numEl) {
+      const onInput = () => {
+        syncPair(rangeEl, numEl);
+        render();
+      };
+      rangeEl.addEventListener('input', onInput);
+      numEl.addEventListener('input', onInput);
+    }
+
+    bindPair(els.mrrs, els.mrrsNum);
+    bindPair(els.mps, els.mpsNum);
+
+    els.startAddr.addEventListener('input', render);
+    els.readBytes.addEventListener('input', render);
+    els.rcb.addEventListener('change', render);
+    els.rowBytes.addEventListener('change', render);
+
+    els.presetA.addEventListener('click', () => {
+      els.startAddr.value = '0x1003';
+      els.readBytes.value = '512';
+      els.mrrs.value = els.mrrsNum.value = '512';
+      els.mps.value = els.mpsNum.value = '128';
+      els.rcb.value = '128';
+      els.rowBytes.value = '64';
+      state.selectedKind = 'req';
+      state.selectedIndex = 0;
+      state.selectedReqIndex = 0;
+      render();
+    });
+
+    els.presetB.addEventListener('click', () => {
+      els.startAddr.value = '0x1003';
+      els.readBytes.value = '1536';
+      els.mrrs.value = els.mrrsNum.value = '512';
+      els.mps.value = els.mpsNum.value = '128';
+      els.rcb.value = '128';
+      els.rowBytes.value = '64';
+      state.selectedKind = 'req';
+      state.selectedIndex = 0;
+      state.selectedReqIndex = 0;
+      render();
+    });
+
+    els.presetC.addEventListener('click', () => {
+      els.startAddr.value = '0x1F80';
+      els.readBytes.value = '768';
+      els.mrrs.value = els.mrrsNum.value = '512';
+      els.mps.value = els.mpsNum.value = '128';
+      els.rcb.value = '128';
+      els.rowBytes.value = '64';
+      state.selectedKind = 'req';
+      state.selectedIndex = 0;
+      state.selectedReqIndex = 0;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="浏览 xpggen 的真实 Textual TUI 截图、合成 RNOC 寄存器目录，以及六种操作的原始 PG 导出。">
+  <title>xpggen · Register in, guide out</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="data.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+<nav class="nav"><a class="brand" href="../index.html">TECHYAN <span>/ DEMO</span></a><a href="README.md">说明与复现 ↗</a></nav>
+<main>
+  <header class="hero">
+    <div class="eyebrow"><span class="signal"></span> TEXTUAL TUI · SYNTHETIC RNOC</div>
+    <h1>Register in.<br><span>Programming guide out.</span></h1>
+    <p class="lead">从寄存器搜索到多字段操作，把初始化意图整理成可检查、可导出的 Programming Guide。</p>
+    <div class="actions"><a class="primary" href="#walkthrough">浏览真实 TUI <span>↓</span></a><a class="secondary" href="#exports">查看六步导出 ↗</a></div>
+    <div class="metrics"><div><strong>288</strong><span>合成寄存器</span></div><div><strong>1,296</strong><span>字段定义</span></div><div><strong>6</strong><span>操作语义</span></div><div><strong>4</strong><span>导出格式</span></div></div>
+  </header>
+
+  <section id="walkthrough" aria-labelledby="walkthrough-title">
+    <div class="section-head"><div><div class="eyebrow">01 / THE TERMINAL WORKSPACE</div><h2 id="walkthrough-title">走一遍真实工作流</h2></div><span class="pill">180 × 52 terminal cells</span></div>
+    <p class="section-intro">以下五帧由当前提交的 <code>XpgGenApp</code> 实际运行并导出。切换场景查看界面；这里是截图回放，交互编辑与保存发生在本地 Python TUI 中。</p>
+    <div id="frame-buttons" class="segmented" role="group" aria-label="TUI 场景"></div>
+    <div class="terminal-shell">
+      <div class="terminal-bar"><span class="window-dots" aria-hidden="true">● ● ●</span><span>xpggen / RNOC register guide console</span><a id="full-frame" href="captures/home.svg" target="_blank" rel="noopener">打开原始尺寸 ↗</a></div>
+      <div class="capture-scroll"><img id="capture" src="captures/home.svg" width="2212" height="1318" alt="xpggen 载入合成 RNOC 目录后的真实 TUI 首页"></div>
+    </div>
+    <div class="frame-caption"><p id="frame-caption" aria-live="polite">载入 288 个合成寄存器，选择 Register 或 PGGen。</p><div class="frame-controls"><button id="previous-frame" aria-label="上一个场景">←</button><span id="frame-position">1 / 5</span><button id="next-frame" aria-label="下一个场景">→</button></div></div>
+    <div class="workflow"><article><span>LOAD</span><h3>扁平 RNOC 目录</h3><p>直接读取上游已展开的寄存器 JSON，搜索名称、字段、偏移和描述。</p></article><article><span>COMPOSE</span><h3>保留字段意图</h3><p>多个字段组成一次 RMW、read_check 或 poll，保留字段赋值及解析后的掩码。</p></article><article><span>EXPORT</span><h3>同一流程，多种视图</h3><p>JSON 保留流程语义；CSV、Markdown 与 SystemVerilog 方便检查、交流和接入。</p></article></div>
+  </section>
+
+  <section id="exports" aria-labelledby="export-title">
+    <div class="section-head"><div><div class="eyebrow">02 / AUTHENTIC EXPORTS</div><h2 id="export-title">一个六步流程，四份原始输出</h2></div><span class="pill">xpggen.pg.v2</span></div>
+    <p class="section-intro">使用仓库当前的 <code>make_step</code> 与四个 <code>render_*</code> 导出函数生成。示例先读控制寄存器，再写入、修改字段、检查、轮询，最后等待 25 μs。</p>
+    <div class="table-scroll"><table class="steps"><thead><tr><th>#</th><th>操作</th><th>目标与值</th><th>语义</th></tr></thead><tbody id="steps-body"></tbody></table></div>
+    <div class="export-toolbar"><div class="segmented" role="group" aria-label="导出格式"><button class="selected" data-format="json" aria-pressed="true">JSON</button><button data-format="csv" aria-pressed="false">CSV</button><button data-format="sv" aria-pressed="false">SystemVerilog</button><button data-format="md" aria-pressed="false">Markdown</button></div><div class="export-actions"><button id="copy-export">复制内容</button><a id="download-export" class="download" href="examples/bringup.pg.json" download>下载 JSON ↓</a></div></div>
+    <div class="code-heading"><span id="export-filename">bringup.pg.json</span><span id="copy-status" role="status"></span></div>
+    <pre id="export-code" class="code-panel" tabindex="0" aria-label="原始导出内容"></pre>
+    <aside class="note"><strong>示例边界</strong><p>目录由项目内的合成数据脚本生成，仅包含寄存器偏移，没有最终硬件地址。SystemVerilog 是导出器的接入预览，需要项目提供寄存器宏、<code>regval</code> 和 <code>read_reg / write_reg</code>；本演示没有执行 DUT 访问或仿真。</p></aside>
+  </section>
+
+  <section aria-labelledby="original-title">
+    <div class="section-head"><div><div class="eyebrow">03 / ORIGINAL REPOSITORY PREVIEWS</div><h2 id="original-title">原仓库的四张预览</h2></div><span class="muted">原文件保留，不改画面</span></div>
+    <p class="section-intro">这些 SVG 直接来自固定提交的 <code>previews/</code>，反映项目原有的预览状态。上方五帧则为本次运行当前代码的新截图。</p>
+    <div class="original-grid">
+      <a class="preview-card" href="previews/xpggen-gruvbox-welcome.svg" target="_blank" rel="noopener"><img src="previews/xpggen-gruvbox-welcome.svg" loading="lazy" alt="原仓库欢迎页 SVG 预览"><span>Welcome <small>原始 SVG ↗</small></span></a>
+      <a class="preview-card" href="previews/xpggen-gruvbox-loaded.svg" target="_blank" rel="noopener"><img src="previews/xpggen-gruvbox-loaded.svg" loading="lazy" alt="原仓库载入目录后的 SVG 预览"><span>Catalog loaded <small>原始 SVG ↗</small></span></a>
+      <a class="preview-card" href="previews/xpggen-gruvbox-mouse.svg" target="_blank" rel="noopener"><img src="previews/xpggen-gruvbox-mouse.svg" loading="lazy" alt="原仓库鼠标操作 SVG 预览"><span>Mouse interaction <small>原始 SVG ↗</small></span></a>
+      <a class="preview-card" href="previews/xpggen-home-buddy.svg" target="_blank" rel="noopener"><img src="previews/xpggen-home-buddy.svg" loading="lazy" alt="原仓库带交互提示伙伴的主页 SVG 预览"><span>Home buddy <small>原始 SVG ↗</small></span></a>
+    </div>
+  </section>
+
+  <section class="reproduce" aria-labelledby="run-title"><div><div class="eyebrow">04 / TAKE IT LOCAL</div><h2 id="run-title">在本地继续操作</h2><p>完整搜索、字段组合、排序与保存功能运行在 Textual TUI。获得源码后，安装依赖即可载入内置目录。</p><a href="README.md">阅读复现说明 ↗</a></div><pre class="command">python -m pip install -e .
+python -m xpggen --demo</pre></section>
+  <div class="resource-links"><a href="examples/rnoc.sample.json" download>RNOC 合成目录 ↓</a><a href="examples/bringup.pg.json" download>PG JSON ↓</a><a href="examples/bringup.csv" download>CSV ↓</a><a href="examples/bringup.sv" download>SystemVerilog ↓</a><a href="examples/bringup.md" download>Markdown ↓</a><a href="provenance.json">来源与 SHA-256 ↗</a><a href="LICENSE">MIT License ↗</a></div>
+  <noscript><p class="note">启用 JavaScript 可切换截图和导出预览。所有原始截图、合成目录和四种导出仍可通过页面链接直接打开。</p></noscript>
+  <footer><span>xpggen · Source <code>42417d3</code></span><span>静态演示 · 无需安装 · 可离线浏览</span></footer>
+</main>
+</body>
+</html>

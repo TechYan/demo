@@ -1,0 +1,41 @@
+{
+  "repository": "TechYan/bus-protocol-lab",
+  "visibility": "public",
+  "ref": "c32bed2023b2cec82ecf683e8b78ab107c27217d",
+  "copied_files": [
+    {
+      "source_path": "index.html",
+      "source_sha256": "f520fd7bf7f5773eadea85fecdb1954a04361cdddf027dea83367cd11bdaa7e4",
+      "published_path": "index.html"
+    },
+    {
+      "source_path": "axi-pcie-packet-studio.html",
+      "source_sha256": "adc3a3c453462102fedac2dcc8a740cb0e8f77331ed8542fccd245b70f9eef9a",
+      "published_path": "axi-pcie-packet-studio.html"
+    },
+    {
+      "source_path": "axi4-atomic-format-table.html",
+      "source_sha256": "b0dca7590bddb7327262a95d1d8d5e4946d7978a4ac23ab853a254e4fe02bda6",
+      "published_path": "axi4-atomic-format-table.html"
+    },
+    {
+      "source_path": "pcie-tlp-split-demo.html",
+      "source_sha256": "21b2030441d5f6e6548bf9461a75a88884795d8025b51f0a1fa7c36ce8996a69",
+      "published_path": "pcie-tlp-split-demo.html"
+    },
+    {
+      "source_path": "assets/axi-pcie-packet-studio-overview.png",
+      "source_sha256": "427a2077f33ea6d04a9be0771a37e57f2bf87c858de3cde36dacfad8740c9d07",
+      "published_path": "assets/axi-pcie-packet-studio-overview.png"
+    }
+  ],
+  "modifications": [
+    "Added scoped navigation CSS and relative links to the hub, project overview, and lab index.",
+    "Added package README and machine-readable tool/preset manifest."
+  ],
+  "generated_files": [
+    "README.md",
+    "manifest.json",
+    "provenance.json"
+  ]
+}

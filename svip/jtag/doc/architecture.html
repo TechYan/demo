@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="syan"><title>SVIP JTAG 架构与时序契约</title><style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--fg:#182739;--muted:#536579;--line:#dce4ed;--accent:#1459ad;--code:#f0f4f8}
+@media(prefers-color-scheme:dark){:root{--bg:#111a25;--panel:#172332;--fg:#e6edf5;--muted:#adbdce;--line:#35485b;--accent:#89baff;--code:#0f1b29}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+header{padding:22px max(24px,calc((100vw - 1440px)/2));background:var(--panel);border-bottom:1px solid var(--line)}
+header strong{font-size:20px}header p{margin:5px 0;color:var(--muted)}nav{display:flex;gap:22px;margin-top:12px}
+.layout{max-width:1488px;margin:28px auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;padding:0 24px}
+aside{align-self:start;position:sticky;top:20px;max-height:92vh;overflow:auto;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;line-height:1.6}
+aside ul{padding-left:20px}aside>div>ul{padding-left:14px}aside li{margin:8px 0}
+main{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:28px 34px}
+h1{font-size:29px;line-height:1.45;margin-top:0}h2{font-size:23px;margin-top:2.5em;border-bottom:1px solid var(--line);padding-bottom:8px}h3{font-size:19px;margin-top:2em}h1,h2,h3{scroll-margin-top:20px}
+a{color:var(--accent);text-underline-offset:3px}p{margin:1em 0}li{margin:.5em 0}
+table{display:block;overflow-x:auto;border-collapse:collapse;width:100%;font-size:14px;margin:20px 0}th,td{border:1px solid var(--line);padding:12px 14px;min-width:130px;vertical-align:top}th{background:var(--code);font-weight:600;text-align:left}
+code{font:0.9em/1.6 Consolas,'Cascadia Mono',monospace;background:var(--code);border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{padding:18px;overflow-x:auto;background:var(--code);border:1px solid var(--line);border-radius:8px;line-height:1.55}pre code{padding:0;white-space:pre;overflow-wrap:normal}
+footer{padding:20px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--line);margin-top:32px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;padding:0 12px}aside{position:static;max-height:none}main{padding:22px 18px}h1{font-size:25px}}
+@media print{aside,nav{display:none}.layout{display:block;padding:0;margin:0}main{border:0;padding:0}body{background:white;color:black}table{display:table;font-size:10px}pre{white-space:pre-wrap}a{color:inherit}}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}aside a{overflow-wrap:anywhere}
+</style></head>
+<body><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><strong>SVIP · JTAG 0.2.0</strong><p>syan · master / passive / device · chain helper · VCS / UVM1.2</p><nav><a href="user-guide.html">使用指导</a><a href="architecture.html">架构</a><a href="../../scope.html#verification">验收记录</a><a href="architecture.html">文档页</a></nav></header>
+<div class="layout"><aside aria-label="目录"><div class="toc">
+<ul>
+<li><a href="#svip-jtag">SVIP JTAG 架构与时序契约</a><ul>
+<li><a href="#_1">核心结构</a></li>
+<li><a href="#_2">设计取舍</a></li>
+<li><a href="#bit">一个bit的事件顺序</a></li>
+<li><a href="#reset">reset与观察</a></li>
+<li><a href="#_3">资源与扩展</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside><main><h1 id="svip-jtag">SVIP JTAG 架构与时序契约</h1>
+<p>Author: syan</p>
+<h2 id="_1">核心结构</h2>
+<pre><code class="language-text">sequence helper / user sequence
+  optional chain.pack_ir/pack_dr (physical TDI -&gt; TDO topology)
+             |
+     standard UVM sequencer
+             |
+driver: stage -&gt; callback -&gt; freeze -&gt; validate -&gt; execute -&gt; terminal
+             |                          |
+        TAP owner                  serial bit_cycle
+             |                          |
+             +---------- pins ----------+
+                           |
+             four-state pin monitor (independent TAP model)
+                |                    |
+             event_ap             scan_ap
+                +----- checker / tracker / coverage / user subscriber
+
+top-level svip_jtag_sva: pin-only rules, independently instantiated
+external reset_n &amp; commanded trst_n -&gt; effective reset -&gt; interface epoch
+
+optional device (separate TDO owner, no shared driver TAP state):
+  TCK/TMS/TDI -&gt; Capture/Shift -&gt; ring buffer -&gt; Update -&gt; user register hooks
+                            \-&gt; negedge + tco -&gt; TDO (reset generation guard)
+  passive agent on these pins -&gt; existing tracker / coverage / SVA
+</code></pre>
+<h2 id="_2">设计取舍</h2>
+<p>保留OCAH的TAP表/BFS、串行scan路线、最后一位TMS和原始引脚观察思路。TAP导航状态从sequence收拢到driver，sequence不保存权威模型。fresh scan维持RTI前置条件；resume仅从同种Shift/Pause恢复。raw/navigation可到其他状态，显式控制可能发生的Update。</p>
+<p>命令不做异步接纳队列，不修改UVM sequencer内部握手。正常完成、拒绝、X结果和复位中止统一终结；每笔get_next_item对应一次item_done。callback先操作staging，再深拷贝执行；post/AP不再拥有修改执行状态的权限。</p>
+<h2 id="bit">一个bit的事件顺序</h2>
+<pre><code class="language-text">TCK low: optional clock hold, then wait drive_delay
+         TMS/TDI &lt;= value
+         wait selected_t_low - drive_delay; recheck clock hold
+         sample TDO if sample_delay == 0 (value from preceding fall)
+         TCK &lt;= 1       &lt;- DUT captures/shifts; monitor retains pre-shift sample
+         if sample_delay &gt; 0: wait sample_delay, sample current TDO
+         wait selected_t_high - sample_delay
+         TCK &lt;= 0       &lt;- DUT Update/TDO; monitor commits pending scan
+         settle NBA
+</code></pre>
+<p>package和interface使用1ps单位/精度。未采样的rx尾部不可使用。采样通过引用写入工作结果，任务取消不会丢失已经采到的位。模拟器不能取消已排队NBA，reset结束执行分支后先等NBA，再压安全idle。</p>
+<h2 id="reset">reset与观察</h2>
+<p>interface依据真实effective reset边沿生成epoch。monitor在posedge保存四态样本，在同一时刻NBA后确认reset/epoch，再发布STEP，不把旧STEP留到下一fall。异步reset丢弃pending Update并发布已有scan的abort，下一epoch从TLR开始。Update scan只在实际下降沿、reset未生效且epoch一致时提交。</p>
+<p>外部reset对在飞命令优先；命令自己的TRST不自中止。abort无法撤销此前的DUT Update。TCK停止时仍观察异步reset；idle期间的reset会在下一笔命令前同步driver状态。软件恢复TMS5也可从未知状态收敛。</p>
+<h2 id="_3">资源与扩展</h2>
+<p>TMS5是串行协议路径，不是异步取消。它可能在TLR前经过Update，不能用来保证撤销部分scan；引脚reset epoch仅由真实effective reset切换。</p>
+<p>动态数组是payload的唯一权威表示。64bit仅是scalar helper和日志摘要容器；TAP的16态/32出边是协议常数。passive scan超过max_scan_bits时只保存前缀，报告一次资源错误，输出n_shifted/truncated，不伪装成完整scan。</p>
+<p>P1不建立通用transport或chain调度器。chain helper按物理TDI到TDO顺序配置、反序节点拼装，节点内仍LSB-first；动态宽度拒绝静默截断。device围绕Capture/Shift/Update扩展，Shift为环形存储，业务register持有存储与零时间hook；独立manual master和literal RTL chain提供oracle。DMI/JTAG2AXI等业务协议留在独立层。</p>
+<p>分段scan的DONE表示本段采样与声明结束态已完成，不自动表示已Update；查看update_seen或最终monitor scan。dwell只允许TLR/RTI/Pause；clock_hold不改变TAP，外部reset仍优先中止。默认固定时序不额外消耗RNG，随机范围与offset在命令开始冻结。</p>
+<p>TDO expected/mask属于用户显式业务比较，只有采样完成的命令执行比较，不改变monitor/SVA的四态检查；X_RESPONSE优先。tracker同时记录resume、请求结束态、compare开关和mismatch数量。FSDB直接导出，波形格式进入编译身份，runner核验实际文件；settled波形与原生NBA/reset断言共同使用。</p>
+<p>Pin SVA在上升沿锁存pre-edge Shift窗口，TDI/TDO的高相检查包括最后一位进入Exit1后的高相，不会因更新后的state漏检；Capture进入Shift的合法相邻窗口也单独验证。known properties保持原上升沿采样锚点，同沿NBA毛刺通过原生用例资格确认。</p><footer>支持与实测范围分别声明；不代表完整IEEE认证。</footer></main></div></body></html>

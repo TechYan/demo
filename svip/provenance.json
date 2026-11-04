@@ -1,0 +1,178 @@
+{
+  "project": "svip",
+  "source_repository": "TechYan/svip",
+  "source_repository_visibility": "private (unchanged)",
+  "source_revision": "b3347d005d05ef3dd88b8c45f1588540062e9f40",
+  "published_at": "2026-11-04T08:14:04.983098+00:00",
+  "publication_scope": "Owner-authorized documentation and reusable own examples only",
+  "simulation_run": false,
+  "guide_count": 13,
+  "example_count": 17,
+  "guide_modifications": [
+    "Local relative links",
+    "Documentation snapshot banner",
+    "Markdown navigation labels updated to HTML"
+  ],
+  "source_guides": [
+    {
+      "path": "axi/doc/user-guide.html",
+      "sha256": "dfc519369a27b4cdd933010159645762dbb535c402a0c93a8af25717007668f9",
+      "bytes": 21825
+    },
+    {
+      "path": "axi/doc/architecture.html",
+      "sha256": "ff9f5b45312c84f2cff73d57331bb3622918f8e7bb02105eabe941dbe7d88baa",
+      "bytes": 18400
+    },
+    {
+      "path": "axi/doc/protocol-checks.html",
+      "sha256": "1f324cf4d0e01560173ee367d55f665a6c6f20d1279c1ae05cca4ce84f2873ba",
+      "bytes": 6862
+    },
+    {
+      "path": "apb/doc/user-guide.html",
+      "sha256": "8192953d08e6aae651ab2cc718eafbc741252e47dd442f7a33e99aaf89cf292b",
+      "bytes": 18875
+    },
+    {
+      "path": "apb/doc/architecture.html",
+      "sha256": "e0b1265d4d1e16fb9d8ad0d8b3b60f4d0b32baa00f8ee9e40e6ec0a6c65968ec",
+      "bytes": 14028
+    },
+    {
+      "path": "apb/doc/usage-cookbook.html",
+      "sha256": "b9e60dd6b2c68fff63c2a4982e8678063ba1caecce1b0069683f9d62b41a3fdc",
+      "bytes": 14688
+    },
+    {
+      "path": "jtag/doc/user-guide.html",
+      "sha256": "ddfc66c2a2e248a228c70a50154a917d606e1d3c46f466273d665de26b4571f1",
+      "bytes": 23579
+    },
+    {
+      "path": "jtag/doc/architecture.html",
+      "sha256": "eb4a1b00ad982e77a9bd18dc44598cece89148a2260d4c7fd5853545f8afbd1a",
+      "bytes": 8928
+    },
+    {
+      "path": "spi/doc/user-guide.html",
+      "sha256": "0b4b2a8982d8da0701facc533d6e1064aacedf53813053b747aae950305c63b7",
+      "bytes": 16902
+    },
+    {
+      "path": "spi/doc/architecture.html",
+      "sha256": "c328464403c79944e4b11fd44dc819432ef63ea99feccb79261ccabb2a0bc04c",
+      "bytes": 12351
+    },
+    {
+      "path": "control/doc/user-guide.html",
+      "sha256": "82787053b8112582c7d1fc17a6059b44c8edcbeefc7a1facfa2d7368131f3edb",
+      "bytes": 20596
+    },
+    {
+      "path": "control/doc/architecture.html",
+      "sha256": "1ec4c7c859f19bd161e6f8a1b42fb7d830216db14c02e3aa360390f21c4d7cc4",
+      "bytes": 13034
+    },
+    {
+      "path": "control/doc/recipes.html",
+      "sha256": "333d9e03ddb74228f13365c67f4e4713958621d204fecc0cfd73fceb5aff27ce",
+      "bytes": 12352
+    }
+  ],
+  "published_examples": [
+    {
+      "path": "axi/testsuite/examples/svip_axi_callbacks_example.svh",
+      "sha256": "c9dfe90855d64c46e582149d644395efbab93a024f1576a0c8cecccfb7a1ba47",
+      "bytes": 1925
+    },
+    {
+      "path": "axi/testsuite/examples/svip_axi_controls_example.svh",
+      "sha256": "3e6e4a7eba80696a0ebcc4984d2ea4ff31e01256aed6df0d8f8f656ccd946357",
+      "bytes": 1469
+    },
+    {
+      "path": "axi/testsuite/examples/svip_axi_observation_example.svh",
+      "sha256": "fac2e02031c240747ab651e516a649f62db8d287bdc509b9c1061d43377824a9",
+      "bytes": 1924
+    },
+    {
+      "path": "axi/testsuite/examples/svip_axi_patterns_example.svh",
+      "sha256": "89a3503f092e410b80b254588db413ca6fe6196ebf48674c3f5690bf5eb0ea02",
+      "bytes": 1833
+    },
+    {
+      "path": "axi/testsuite/examples/svip_axi_reset_example.svh",
+      "sha256": "078228c52265c2b98940485093cb1760bc71034b9799ca249b59319757b18a07",
+      "bytes": 1297
+    },
+    {
+      "path": "axi/testsuite/examples/svip_axi_slave_model_example.svh",
+      "sha256": "9c21502e5208fb77a78162574313a3e7aba5f3739a5fdbacebfcef069bad72d2",
+      "bytes": 2648
+    },
+    {
+      "path": "axi/testsuite/examples/svip_axi_timing_example.svh",
+      "sha256": "5f452b3b92c23a812d12bac0601501b5899fa9549d3268dc02f56a32c3c36d38",
+      "bytes": 1726
+    },
+    {
+      "path": "apb/testsuite/examples/svip_apb_control_examples.svh",
+      "sha256": "262b66f94ada38726ff3548ad15cc7560cf40e5d6d050e111421096369bfa1b0",
+      "bytes": 7200
+    },
+    {
+      "path": "apb/testsuite/examples/svip_apb_examples.svh",
+      "sha256": "f18fc89f85b485db91aab1fa115bfd1d84de35ce08312b42a262d43610e0d692",
+      "bytes": 10569
+    },
+    {
+      "path": "jtag/testsuite/examples/svip_jtag_examples.svh",
+      "sha256": "20cfeea12243944961eeb01c8e9a32591d441ec1b0dd6912686be07d63cecef5",
+      "bytes": 1829
+    },
+    {
+      "path": "spi/testsuite/examples/svip_spi_examples.svh",
+      "sha256": "b20b4ce948bac12170539dc236662b18b8b6f06fac41f76b974828f8dff16c9d",
+      "bytes": 2584
+    },
+    {
+      "path": "control/clock/examples/svip_clock_example.sv",
+      "sha256": "1c02f831c4d51ff7339acd872e67bfe178091967e8c1cdaf93cb5012a5f3cd5a",
+      "bytes": 2164
+    },
+    {
+      "path": "control/reset/examples/svip_reset_example.sv",
+      "sha256": "12837d5ab5239d83bffdae862af8773e979be0dcbd6267dce62105ebac03290d",
+      "bytes": 3435
+    },
+    {
+      "path": "control/signal/examples/svip_signal_example.sv",
+      "sha256": "1c5530e67f079105f977c5777582ce779da35801a3bfbedcfcc7c5a3d93073ae",
+      "bytes": 2931
+    },
+    {
+      "path": "control/coordinator/examples/svip_clock_signal_example.sv",
+      "sha256": "b0263319930a789f62bac08a00a5c37ea3894cc949dc901934113bf57dd7f37c",
+      "bytes": 1983
+    },
+    {
+      "path": "control/testsuite/examples/svip_control_examples.svh",
+      "sha256": "e403c65a2d4a6400bca56fc6df7fc4ea0128629733e598d460b9c8f6d3d27c6a",
+      "bytes": 9370
+    },
+    {
+      "path": "control/testbench/svip_control_quickstart.sv",
+      "sha256": "29cd98e53a541c479ac04a98d5de72b49159f32b3958ce0cd116625125bb7830",
+      "bytes": 2620
+    }
+  ],
+  "excluded": [
+    "Full VIP runtime",
+    "Commercial checker implementation",
+    "Internal DUT/integration source",
+    "Historical verification records",
+    "Credentials/site configuration",
+    "Compliance tests/private-run catalogs"
+  ]
+}

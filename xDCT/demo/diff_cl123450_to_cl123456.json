@@ -1,0 +1,301 @@
+{
+  "top_module": "chip_top",
+  "old_p4_cl": "123450",
+  "new_p4_cl": "123456",
+  "old_port_count": 9,
+  "new_port_count": 9,
+  "changes": [
+    {
+      "name": "legacy_mode",
+      "categories": [
+        "REMOVED"
+      ],
+      "breaking": true,
+      "old": {
+        "name": "legacy_mode",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic",
+        "bitstream_width": 1,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 8
+      },
+      "new": null
+    },
+    {
+      "name": "link_up",
+      "categories": [
+        "ADDED"
+      ],
+      "breaking": false,
+      "old": null,
+      "new": {
+        "name": "link_up",
+        "kind": "port",
+        "direction": "output",
+        "storage": "variable",
+        "resolved_type": "logic",
+        "bitstream_width": 1,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 8
+      }
+    },
+    {
+      "name": "clk",
+      "categories": [
+        "ORDER_ONLY"
+      ],
+      "breaking": false,
+      "old": {
+        "name": "clk",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic",
+        "bitstream_width": 1,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 0
+      },
+      "new": {
+        "name": "clk",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic",
+        "bitstream_width": 1,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 1
+      }
+    },
+    {
+      "name": "ctrl",
+      "categories": [
+        "MODPORT_CHANGED",
+        "ORDER_CHANGED"
+      ],
+      "breaking": true,
+      "old": {
+        "name": "ctrl",
+        "kind": "interface",
+        "direction": "interface",
+        "storage": null,
+        "resolved_type": null,
+        "bitstream_width": null,
+        "signed": null,
+        "interface_type": "ctrl_if",
+        "modport": "master",
+        "declaration_order": 6
+      },
+      "new": {
+        "name": "ctrl",
+        "kind": "interface",
+        "direction": "interface",
+        "storage": null,
+        "resolved_type": null,
+        "bitstream_width": null,
+        "signed": null,
+        "interface_type": "ctrl_if",
+        "modport": "slave",
+        "declaration_order": 5
+      }
+    },
+    {
+      "name": "lanes",
+      "categories": [
+        "WIDTH_CHANGED",
+        "TYPE_CHANGED"
+      ],
+      "breaking": true,
+      "old": {
+        "name": "lanes",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic[7:0]$[0:1]",
+        "bitstream_width": 16,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 7
+      },
+      "new": {
+        "name": "lanes",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic[7:0]$[0:3]",
+        "bitstream_width": 32,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 7
+      }
+    },
+    {
+      "name": "pad",
+      "categories": [
+        "ORDER_ONLY"
+      ],
+      "breaking": false,
+      "old": {
+        "name": "pad",
+        "kind": "port",
+        "direction": "inout",
+        "storage": "net",
+        "resolved_type": "logic",
+        "bitstream_width": 1,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 5
+      },
+      "new": {
+        "name": "pad",
+        "kind": "port",
+        "direction": "inout",
+        "storage": "net",
+        "resolved_type": "logic",
+        "bitstream_width": 1,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 6
+      }
+    },
+    {
+      "name": "rst_n",
+      "categories": [
+        "ORDER_ONLY"
+      ],
+      "breaking": false,
+      "old": {
+        "name": "rst_n",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic",
+        "bitstream_width": 1,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 1
+      },
+      "new": {
+        "name": "rst_n",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic",
+        "bitstream_width": 1,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 0
+      }
+    },
+    {
+      "name": "rx_data",
+      "categories": [
+        "WIDTH_CHANGED",
+        "TYPE_CHANGED"
+      ],
+      "breaking": true,
+      "old": {
+        "name": "rx_data",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic[15:0]",
+        "bitstream_width": 16,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 2
+      },
+      "new": {
+        "name": "rx_data",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic[31:0]",
+        "bitstream_width": 32,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 2
+      }
+    },
+    {
+      "name": "status",
+      "categories": [
+        "DIRECTION_CHANGED"
+      ],
+      "breaking": true,
+      "old": {
+        "name": "status",
+        "kind": "port",
+        "direction": "output",
+        "storage": "variable",
+        "resolved_type": "logic[3:0]",
+        "bitstream_width": 4,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 4
+      },
+      "new": {
+        "name": "status",
+        "kind": "port",
+        "direction": "input",
+        "storage": "variable",
+        "resolved_type": "logic[3:0]",
+        "bitstream_width": 4,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 4
+      }
+    },
+    {
+      "name": "tx_data",
+      "categories": [
+        "WIDTH_CHANGED",
+        "TYPE_CHANGED"
+      ],
+      "breaking": true,
+      "old": {
+        "name": "tx_data",
+        "kind": "port",
+        "direction": "output",
+        "storage": "variable",
+        "resolved_type": "logic[15:0]",
+        "bitstream_width": 16,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 3
+      },
+      "new": {
+        "name": "tx_data",
+        "kind": "port",
+        "direction": "output",
+        "storage": "variable",
+        "resolved_type": "logic[31:0]",
+        "bitstream_width": 32,
+        "signed": false,
+        "interface_type": null,
+        "modport": null,
+        "declaration_order": 3
+      }
+    }
+  ]
+}

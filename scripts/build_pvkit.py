@@ -222,42 +222,6 @@ python scripts/build_pvkit.py --release /path/to/xpvkit-0.5.5.zip
 '''
     write('pvkit/index.html', page('PVKit · AXI4 / CXL Native 示例', body, '../'))
     write('pvkit/README.md', readme)
-    write('index.html', page('TechYan Demo', '''<div class="eyebrow">TECHYAN / DEMO</div><h1>Demo 目录</h1>
-<p>按项目浏览可直接打开的演示。每个项目使用独立目录，后续示例从这里进入。</p>
-<div class="grid"><article class="card"><div class="tag">PVKIT · XPVKIT 0.5.5</div><h2>总线性能与协议分析</h2><p>15 个 AXI4 / CXL Native 场景，包含交互 HTML、真实 TUI 打印、分析日志与 tracker。</p><div class="links"><a href="pvkit/">打开 PVKit →</a><a href="https://github.com/TechYan/demo/tree/main/pvkit">查看文件</a></div></article></div>'''))
-    write('README.md', f'''# Demo
-
-**[打开在线 Demo 首页]({BASE_URL})**
-
-本仓库按项目保存可直接浏览的演示；每个项目有独立目录、说明和网页入口，方便后续加入其他 demo。
-
-| 项目 | 内容 | 在线访问 | 说明与文件 |
-|---|---|---|---|
-| PVKit | 7 个 AXI4、8 个 CXL Native 场景：交互 HTML、TUI 打印、分析日志、Tracker 和原始 CSV | [打开场景目录]({BASE_URL}pvkit/) | [PVKit README](pvkit/README.md) · [示例文件](pvkit/examples/) |
-
-## 快速开始
-
-1. 打开 [PVKit 场景目录]({BASE_URL}pvkit/)，选择感兴趣的 AXI4 或 CXL Native 场景。
-2. 点 **HTML 报告** 操作图表、时间窗口和事务查询；点 **TUI 打印** 浏览终端输出。
-3. 点 **分析日志** 或 **Tracker** 查看、复制文本，或下载原始 CSV 重新分析。
-
-所有展示均为静态文件，浏览者无需安装工具。示例来自 xpvkit v0.5.5 release 的合成数据，
-不代表真实 DUT 性能。完整场景表、指标口径和复现方式见 [PVKit README](pvkit/README.md)。
-
-## 仓库结构
-
-```text
-index.html        # 所有 demo 的网页入口
-README.md         # 所有 demo 的 GitHub 入口
-assets/           # 导航与 TUI 回放的静态样式/脚本
-pvkit/            # PVKit 场景、报告、日志与说明
-scripts/          # 从已有 release 重建演示的脚本
-```
-
-后续项目放到新的顶级目录，并在本 README 和 `index.html` 中增加入口。
-GitHub Pages 从 `main` 分支根目录发布，`.nojekyll` 保留原始静态文件。
-下载仓库 ZIP、解压并打开 `index.html` 也可以离线浏览。
-''')
     checksums = []
     for path in sorted((ROOT / 'pvkit').rglob('*')):
         if path.is_file() and path.name != 'SHA256SUMS':

@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="syan"><title>SVIP APB 客户用例与特殊控制</title><style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--fg:#182739;--muted:#536579;--line:#dce4ed;--accent:#1459ad;--code:#f0f4f8}
+@media(prefers-color-scheme:dark){:root{--bg:#111a25;--panel:#172332;--fg:#e6edf5;--muted:#adbdce;--line:#35485b;--accent:#89baff;--code:#0f1b29}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+header{padding:22px max(24px,calc((100vw - 1440px)/2));background:var(--panel);border-bottom:1px solid var(--line)}
+header strong{font-size:20px}header p{margin:5px 0;color:var(--muted)}nav{display:flex;gap:22px;margin-top:12px}
+.layout{max-width:1488px;margin:28px auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;padding:0 24px}
+aside{align-self:start;position:sticky;top:20px;max-height:92vh;overflow:auto;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;line-height:1.6}
+aside ul{padding-left:20px}aside>div>ul{padding-left:14px}aside li{margin:8px 0}
+main{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:28px 34px}
+h1{font-size:29px;line-height:1.45;margin-top:0}h2{font-size:23px;margin-top:2.5em;border-bottom:1px solid var(--line);padding-bottom:8px}h3{font-size:19px;margin-top:2em}h1,h2,h3{scroll-margin-top:20px}
+a{color:var(--accent);text-underline-offset:3px}p{margin:1em 0}li{margin:.5em 0}
+table{display:block;overflow-x:auto;border-collapse:collapse;width:100%;font-size:14px;margin:20px 0}th,td{border:1px solid var(--line);padding:12px 14px;min-width:130px;vertical-align:top}th{background:var(--code);font-weight:600;text-align:left}
+code{font:0.9em/1.6 Consolas,'Cascadia Mono',monospace;background:var(--code);border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{padding:18px;overflow-x:auto;background:var(--code);border:1px solid var(--line);border-radius:8px;line-height:1.55}pre code{padding:0;white-space:pre;overflow-wrap:normal}
+footer{padding:20px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--line);margin-top:32px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;padding:0 12px}aside{position:static;max-height:none}main{padding:22px 18px}h1{font-size:25px}}
+@media print{aside,nav{display:none}.layout{display:block;padding:0;margin:0}main{border:0;padding:0}body{background:white;color:black}table{display:table;font-size:10px}pre{white-space:pre-wrap}a{color:inherit}}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}
+</style></head><body><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><strong>SVIP · APB 客户用法与验证</strong><p>syan · 2026-11-01 · requester / passive</p><nav><a href="usage-cookbook.html">本页文档</a><a href="architecture.html">架构</a><a href="usage-cookbook.html">客户用法</a><a href="../../scope.html#verification">第二轮验收</a><a href="../../examples.html#apb">Testsuite</a></nav></header><div class="layout"><aside aria-label="目录"><div class="toc">
+<ul>
+<li><a href="#svip-apb">SVIP APB 客户用例与特殊控制</a><ul>
+<li><a href="#_1">先确认信号的控制权</a></li>
+<li><a href="#sequence">指定内容：直接使用便利 sequence</a></li>
+<li><a href="#bit">固定部分 bit，其余充分随机</a></li>
+<li><a href="#byte-lane-strobe">Byte lane 与零 strobe</a></li>
+<li><a href="#_2">强制反压与复位中止</a></li>
+<li><a href="#holdidle-latency-back-to-back">Hold、idle latency 和 back-to-back</a></li>
+<li><a href="#_3">错误、观察与波形</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside><main><h1 id="svip-apb">SVIP APB 客户用例与特殊控制</h1>
+<p>Author: syan</p>
+<p>本页面向 APB3/APB4 requester/passive，例子从产品仓库根运行。公开用法仍是 <code>cfg + transaction + UVM sequence + analysis port</code>。完整可执行代码在 <a href="../../sources.html#apb-testsuite-examples-svip-apb-control-examples-svh">control examples</a> 和 <a href="../../sources.html#apb-testsuite-examples-svip-apb-examples-svh">原有 examples</a>，清单以 <a href="../../examples.html#apb">catalog</a> 为准。</p>
+<h2 id="_1">先确认信号的控制权</h2>
+<table>
+<thead>
+<tr>
+<th>目的</th>
+<th>实际控制方与入口</th>
+<th>使用边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>指定地址、数据、方向、PPROT、PSTRB</td>
+<td>用户 sequence / <code>svip_apb_txn</code> 或 <code>svip_apb_rw_seq</code></td>
+<td>requester 驱动；<code>cfg.create_txn()</code> 带有效位宽和对齐约束</td>
+</tr>
+<tr>
+<td>暂停新请求</td>
+<td><code>cfg.hold</code></td>
+<td>已呈现的 SETUP/ACCESS 继续完成；不撤回正在等待的请求</td>
+</tr>
+<tr>
+<td>请求间隔、连续传输</td>
+<td><code>cfg.back_to_back</code>、<code>min_idle_cycles/max_idle_cycles</code></td>
+<td>不改变当前等待周期，不省略 SETUP</td>
+</tr>
+<tr>
+<td>返回等待、反压、PSLVERR、PRDATA</td>
+<td>DUT 或外部响应模型</td>
+<td>PREADY 属于响应端；requester 无法强迫 DUT 产生合法反压</td>
+</tr>
+<tr>
+<td>观察实际事务</td>
+<td><code>agent.mon.ap</code>、<code>reg_ap</code>、<code>abort_ap</code> / driver <code>done_ap</code></td>
+<td>analysis 快照只读；需要修改时自行 clone；不能据此接管响应</td>
+</tr>
+<tr>
+<td>检查、等待 watchdog</td>
+<td><code>agent.set_checks()</code>、<code>cfg.max_wait_cycles</code></td>
+<td>watchdog 超限只报告，仍等待完成/reset</td>
+</tr>
+</tbody>
+</table>
+<p>自测 <code>testbench/</code> 的 <code>ctrl.wait_cycles</code>、<code>manual_response/manual_ready/manual_error/manual_data</code> 是独立 fixture 的控制入口，仅用于例子和验证 VIP。产品当前没有 subordinate、memory backdoor 或“接收请求后由 sequence 回复”的服务接口。</p>
+<h2 id="sequence">指定内容：直接使用便利 sequence</h2>
+<p>在 UVM sequence/test 中导入 <code>svip_apb_pkg</code> 和可选的 <code>svip_apb_seq_pkg</code>，<code>cfg</code> 与 <code>agent</code> 已配置：</p>
+<pre><code class="language-systemverilog">svip_apb_rw_seq seq = svip_apb_rw_seq::type_id::create(&quot;literal&quot;);
+seq.cfg = cfg;
+seq.addr = 'h40;             // 当前 profile 要求按 data word 对齐
+seq.write = 1;
+seq.data = 'h01234567;
+seq.strb = '1;               // 有效 lane 全部写入
+seq.prot = cfg.apb4 ? 3'b101 : 3'b000;
+seq.start(agent.sqr);
+if (seq.result.status != SVIP_APB_OK)
+  `uvm_fatal(&quot;LITERAL&quot;, seq.result.convert2string())
+
+seq.write = 0;
+seq.start(agent.sqr);
+// seq.data 和 seq.result.data 是实际返回值，按业务模型检查。
+</code></pre>
+<p><code>finish_item()</code>/<code>seq.start()</code> 同步返回终结结果，无需额外 <code>get_response()</code>。<code>prot</code> 默认0；APB3 必须为0。读请求的 PSTRB 自动为0。示例 <code>example_directed_pattern</code> 发送6组 literal 地址/数据并逐笔读回，同时检查实际引脚的 PPROT，而非只比较配置对象。</p>
+<pre><code class="language-bash">python3 apb/scripts/run.py all --case example_directed_pattern --version 4 --coverage
+</code></pre>
+<h2 id="bit">固定部分 bit，其余充分随机</h2>
+<p>不需要额外 pattern 类型。以下代码位于用户 <code>uvm_sequence #(svip_apb_txn)</code> 的 body，<code>cfg</code> 已提供：</p>
+<pre><code class="language-systemverilog">svip_apb_txn t;
+svip_apb_strb_t full_strb = 0;
+logic [2:0] protection = cfg.apb4 ? 3'b101 : 3'b000;
+for (int lane=0; lane&lt;cfg.data_width/8; lane++) full_strb[lane]=1;
+t = cfg.create_txn(&quot;fixed_nibble_random&quot;);
+start_item(t);
+if (!t.randomize() with {
+      write == 1;
+      addr inside {['h40:'h7f]};
+      data[7:4] == 4'ha;
+      strb == local::full_strb;
+      prot == local::protection;
+    }) `uvm_fatal(&quot;PATTERN&quot;, &quot;constraints have no solution&quot;)
+finish_item(t);
+if (t.status != SVIP_APB_OK) `uvm_fatal(&quot;PATTERN&quot;, t.convert2string())
+</code></pre>
+<p><code>cfg.create_txn()</code> 将有效 ADDR/DATA、协议版本和自然对齐传入 transaction，随机过程不能产生超出有效位宽的地址。业务约束应与这些约束求交；始终检查 randomize 返回值。直接 <code>type_id::create()</code> 则需自行提供 profile。</p>
+<p><code>example_constrained_pattern</code> 连续40次随机写和读回，独立 byte oracle 检数据，实际 monitor 数据检查固定 nibble、地址/低 nibble 的变化；<code>example_random</code> 另覆盖方向、data、prot、strobe 和随机 response wait。覆盖更多 seed 可以发现组合问题，不能代替业务 oracle。</p>
+<pre><code class="language-bash">python3 apb/scripts/run.py all --case example_constrained_pattern --version 4 \
+  --addr-width 20 --data-width 16 --clock-half-ps 250 --coverage
+python3 apb/scripts/regress.py --suite examples --seed 7 --coverage
+</code></pre>
+<h2 id="byte-lane-strobe">Byte lane 与零 strobe</h2>
+<p>APB4 对齐 word 的第 <code>lane</code> 个 byte 使用 <code>seq.strb = svip_apb_strb_t'(1) &lt;&lt; lane</code>，将数据放在 <code>seq.data[lane*8 +: 8]</code>，其他数据位也要在 ACCESS 停等期间保持稳定。PSTRB=0 是合法传输，memory 型 fixture 不更新任何 byte。实际外设的副作用由其寄存器定义决定。</p>
+<p><code>example_byte_lanes</code> 从零初始化，依次写5a/6b/7c/8d；32-bit 读回应为8d7c6b5a。随后发送全1数据、零 strobe，读回保持不变。支持8/16/32-bit，lane 数量从有效 DATA 派生。APB3 没有 byte strobe，该例只适用 APB4。</p>
+<pre><code class="language-bash">python3 apb/scripts/run.py all --case example_byte_lanes --version 4 --coverage
+</code></pre>
+<p>本 profile 不提供 unaligned API；修改 word 内某个 byte 使用对齐地址 + PSTRB。便利 sequence 不会把最低 byte 自动搬到指定 lane。</p>
+<h2 id="_2">强制反压与复位中止</h2>
+<p>在自测 fixture 中，<code>ctrl.manual_response=1; ctrl.manual_ready=0;</code> 覆盖实际总线响应，requester 必须保持整个请求。等待不是新的事务；只有 <code>PSEL &amp;&amp; PENABLE &amp;&amp; PREADY</code> 的采样才是完成候选。</p>
+<p><code>example_backpressure</code> 先预写13579bdf，随后保持一笔2468ace0写连续16个 ACCESS 等待样本，检查 payload 稳定、无提前完成；释放READY后只完成一次，再读回新值。<code>backpressure_reset_write</code> 在同样的停等中 reset，只有一次 RESET_ABORTED，恢复后读回旧值。</p>
+<pre><code class="language-bash">python3 apb/scripts/run.py all --case example_backpressure --version 4 --coverage --waves fsdb
+python3 apb/scripts/run.py all --case backpressure_reset_write --version 4 \
+  --clock-half-ps 250 --coverage --waves fsdb
+</code></pre>
+<p>这里的旧值承诺来自 fixture 的“实际总线完成且无错误才提交 memory”策略。VIP 的 RESET_ABORTED 本身不承诺 DUT 回滚写副作用。实际项目请使用 DUT 的响应控制、独立 slave 模型或外部 force，并清楚区分协议违规注入和合法反压。</p>
+<h2 id="holdidle-latency-back-to-back">Hold、idle latency 和 back-to-back</h2>
+<p><code>cfg.hold=1</code> 阻止新请求呈现。若已经进入 SETUP/ACCESS，hold 不撤回该请求，完成后停在 idle；<code>cfg.hold=0</code> 允许后续工作。</p>
+<p><code>cfg.back_to_back=0</code> 时，在完成后选择 <code>[min_idle_cycles,max_idle_cycles]</code> 的整数周期延迟；相等时不额外抽随机数。<code>back_to_back=1</code> 不插入额外 idle，但每笔仍有 SETUP。配置在 driver 对应消费点读取；切换业务段时先等待当前段同步完成，再修改。已选定的 idle 间隔不会重新抽样，不能假设 <code>finish_item()</code> 返回后改配置会追溯改变该完成点选出的间隔；<code>example_timing</code> 检查新段内部的后续 gap，不把两段交界处作为新范围的证据。动态 hold 会在 pull 等待之后、呈现之前再确认。</p>
+<table>
+<thead>
+<tr>
+<th>配置/开关</th>
+<th>消费点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vif、active/passive、位宽、APB版本</td>
+<td>build 前确定</td>
+</tr>
+<tr>
+<td>tracker/coverage 开关及文件名</td>
+<td>build 前确定；文件名按 agent/run 隔离</td>
+</tr>
+<tr>
+<td>hold</td>
+<td>拉取新请求及正式呈现之前检查；对已呈现请求无取消作用</td>
+</tr>
+<tr>
+<td>idle 范围、back_to_back</td>
+<td>当前请求终结后选择后续间隔</td>
+</tr>
+<tr>
+<td>set_checks()</td>
+<td>同步更新 IF checker 和 monitor watchdog 的运行期开关</td>
+</tr>
+<tr>
+<td>max_wait_cycles</td>
+<td>monitor 每个等待采样检查；0关闭</td>
+</tr>
+<tr>
+<td>fixture.wait_cycles</td>
+<td>fixture 在 SETUP 的响应准备点读取</td>
+</tr>
+<tr>
+<td>fixture.manual_*</td>
+<td>连续作用于 TB 的响应 mux；本轮例子避开采样沿变更</td>
+</tr>
+</tbody>
+</table>
+<p><code>example_hold</code> 也验证已呈现请求继续完成，<code>example_timing</code> 前16笔固定gap=2、后16笔gap=2..5且实际变化、每笔wait=3；<code>example_back_to_back</code> 检查真实零额外 bubble。</p>
+<h2 id="_3">错误、观察与波形</h2>
+<p><code>example_error</code> 演示真实 PSLVERR 读写响应、允许 error read 数据为X和随后的恢复。<code>check_*</code> 是 checker 资格测试，直接用故障 fixture 驱动非法引脚并检查精确报告预算；它们不是让产品 requester 发送非法流量的公开 API。<code>example_passive</code> 演示独立 requester 下的被动观察。</p>
+<p>裸 <code>--waves</code> 与 <code>--waves vcd</code> 保持 VCD。<code>--waves fsdb</code> 使用 VCS/Verdi 的原生 FSDB 支持，要求站点环境已配置；格式进入编译身份及 per-run manifest，缺少所请求格式的文件会失败。</p>
+<pre><code class="language-bash">python3 apb/scripts/run.py all --case example_timing --version 4 \
+  --addr-width 20 --data-width 16 --clock-half-ps 250 --coverage --waves fsdb
+</code></pre>
+<p>波形验收选择 raw pre-edge 与 <code>mon_cb</code> 捕获输入在 edge+1ps 的观测交叉核对。不要用时钟沿后的 raw idle 判定本沿没有完成。FSDB 的 settled 数据无法恢复未记录的 delta/NBA 顺序；reset 与 READY 同 tick 的结果同时依据明确的 reset-priority 契约和原生 SV 检查。实际执行结果见 <a href="../../scope.html#verification">第二轮验收记录</a>。</p><footer>能力与已测范围见对应验收记录。</footer></main></div></body></html>

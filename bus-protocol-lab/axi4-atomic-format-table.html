@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AXI4 Atomic Format Table</title>
+  <style>
+    :root {
+      --bg: #0e141b;
+      --panel: #111a23;
+      --panel-2: #0b1118;
+      --table-bg: #071019;
+      --line: #1d4350;
+      --line-soft: #1a2a34;
+      --text: #d7e7f4;
+      --muted: #8ea9bc;
+      --dnoc-lane: rgba(57, 211, 83, 0.34);
+      --dnoc-lane-alt: rgba(57, 211, 83, 0.16);
+      --axi-lane: rgba(191, 123, 255, 0.36);
+      --axi-lane-alt: rgba(191, 123, 255, 0.18);
+      --dnoc-select: rgba(57, 211, 83, 1);
+      --dnoc-select-alt: rgba(57, 211, 83, 0.60);
+      --axi-select: rgba(191, 123, 255, 1);
+      --axi-select-alt: rgba(191, 123, 255, 0.62);
+      --mem-lane: rgba(142, 169, 188, 0.26);
+      --mem-lane-hover: rgba(142, 169, 188, 0.44);
+      --mem-select: rgba(255, 255, 255, 0.96);
+      --mem-select-alt: rgba(255, 255, 255, 0.58);
+      --mem-disabled: rgba(27, 36, 46, 0.44);
+      --lane-dim: #1b242e;
+      --head: #112638;
+      --accent: #f5c45d;
+      --select: #7cff8b;
+      --select-soft: rgba(124, 255, 139, 0.26);
+      --select-glow: rgba(124, 255, 139, 0.38);
+      --ok: #2de18b;
+      --bad: #ff625f;
+      --glow: rgba(18, 242, 176, 0.18);
+      --shadow: 0 16px 42px rgba(0, 0, 0, 0.38);
+      --cell: 7px;
+      --row-h: 16px;
+      --label: 112px;
+      --gap: 1px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+        radial-gradient(circle at 14% 0%, rgba(18, 242, 176, 0.12), transparent 24rem),
+        radial-gradient(circle at 90% 16%, rgba(74, 195, 255, 0.08), transparent 24rem),
+        linear-gradient(180deg, #0f1a24, var(--bg));
+      background-size: 34px 34px, 34px 34px, auto, auto, auto;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Calibri, Arial, sans-serif;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1880px;
+      margin: 0 auto;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .topbar,
+    .status,
+    .format-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.6fr) minmax(0, 2fr);
+      gap: 12px;
+      align-items: end;
+      padding: 12px;
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 21px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(96px, 1fr));
+      gap: 8px;
+      align-items: end;
+      min-width: 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    select,
+    input,
+    button.control {
+      width: 100%;
+      min-width: 0;
+      min-height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0a1118;
+      color: var(--text);
+      padding: 5px 8px;
+      outline: none;
+    }
+
+    select:focus,
+    input:focus,
+    button.control:focus-visible {
+      border-color: var(--select);
+      box-shadow: 0 0 0 3px var(--select-soft);
+    }
+
+    button.control {
+      cursor: pointer;
+      color: #dbf4ff;
+      background: #10324a;
+      border-color: rgba(88, 166, 255, 0.68);
+    }
+
+    button.control:hover {
+      background: #174463;
+    }
+
+    .addr-stepper {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 30px;
+      gap: 4px;
+    }
+
+    .addr-buttons {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 3px;
+    }
+
+    .addr-step {
+      min-width: 0;
+      min-height: 0;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: #0d2434;
+      color: var(--text);
+      padding: 0;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .addr-step:hover {
+      background: #15384f;
+    }
+
+    .status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0;
+      overflow-x: hidden;
+      background: var(--panel);
+    }
+
+    .metric {
+      flex: 0 0 auto;
+      min-width: 0;
+      padding: 6px 10px;
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line-soft);
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .metric .k {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .metric .v {
+      color: var(--text);
+      font-family: Consolas, Monaco, monospace;
+      font-size: 14px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .tables {
+      display: grid;
+      gap: 12px;
+    }
+
+    .format-panel {
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-2);
+    }
+
+    .panel-head h2 {
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .panel-head .meta {
+      color: var(--muted);
+      font-family: Consolas, Monaco, monospace;
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .table-scroll {
+      overflow-x: hidden;
+      background:
+        linear-gradient(90deg, rgba(18, 242, 176, 0.045), transparent 18rem),
+        var(--table-bg);
+      padding: 12px;
+    }
+
+    .format-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: var(--label) repeat(var(--cols), var(--cell));
+      grid-auto-rows: var(--row-h);
+      align-items: center;
+      justify-content: start;
+      gap: var(--gap);
+    }
+
+    .memory-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: var(--label) repeat(var(--mem-cols), var(--cell));
+      grid-auto-rows: var(--row-h);
+      align-items: center;
+      justify-content: start;
+      gap: var(--gap);
+    }
+
+    .row-label,
+    .lane-head,
+    .mem-head,
+    .slot,
+    .mem-cell {
+      width: 100%;
+      height: var(--row-h);
+      border: 0;
+      display: grid;
+      place-items: center;
+      line-height: 1;
+      overflow: hidden;
+    }
+
+    .row-label {
+      position: sticky;
+      left: 0;
+      z-index: 4;
+      justify-items: start;
+      padding: 0 7px;
+      background: var(--table-bg);
+      color: #b9d3e8;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .lane-head {
+      background: transparent;
+      color: #9fb7ca;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .lane-head.marker {
+      overflow: visible;
+      z-index: 2;
+    }
+
+    .mem-head {
+      color: #9fb7ca;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 10px;
+      font-weight: 600;
+      overflow: visible;
+    }
+
+    .slot,
+    .mem-cell {
+      position: relative;
+      appearance: none;
+      -webkit-appearance: none;
+      min-height: 0;
+      width: var(--cell);
+      height: var(--cell);
+      margin: 0;
+      padding: 0;
+      border: 0;
+      border-radius: 1px;
+      background: var(--slot-color, var(--dnoc-lane));
+      color: transparent;
+      cursor: pointer;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: none;
+      text-shadow: none;
+      transition: filter 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    .mem-cell {
+      background: var(--mem-lane);
+    }
+
+    .slot.even {
+      background: var(--slot-color);
+    }
+
+    .slot.odd {
+      background: var(--slot-color);
+    }
+
+    .slot .txt {
+      display: none;
+    }
+
+    .slot.dim {
+      background: var(--lane-dim);
+      color: transparent;
+      cursor: default;
+    }
+
+    .mem-cell.disabled {
+      background: var(--mem-disabled);
+      cursor: default;
+      opacity: 0.58;
+    }
+
+    .mem-cell.selected {
+      background: var(--mem-cell-select, var(--mem-select));
+    }
+
+    .slot.mask-selected {
+      background: var(--slot-select, var(--dnoc-select));
+      box-shadow: none;
+      filter: none;
+    }
+
+    .slot.data-selected {
+      background: var(--slot-select, var(--dnoc-select));
+      box-shadow: none;
+      filter: none;
+    }
+
+    .slot.mask-selected.edge-high,
+    .slot.data-selected.edge-high {
+      box-shadow: none;
+    }
+
+    .slot.mask-selected.edge-low,
+    .slot.data-selected.edge-low {
+      box-shadow: none;
+    }
+
+    .slot:hover:not(.dim),
+    .mem-cell:hover:not(.disabled) {
+      filter: brightness(1.16);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 1120px) {
+      :root {
+        --label: 100px;
+        --cell: 6px;
+        --row-h: 15px;
+        --gap: 1px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      :root {
+        --label: 84px;
+        --cell: 5px;
+        --row-h: 13px;
+      }
+
+      .app {
+        padding: 10px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .lane-head {
+        font-size: 8px;
+      }
+
+      .row-label {
+        padding: 0 4px;
+        font-size: 11px;
+      }
+    }
+  </style>
+
+<style>
+.demo-back-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;padding:10px 18px;background:#101823;border-bottom:1px solid #334155;color:#cbd5e1;font:13px/1.5 system-ui,sans-serif}
+.demo-back-nav a,.demo-package-note a{color:#b4d8ff;text-decoration:none}.demo-back-nav a:hover,.demo-package-note a:hover{text-decoration:underline}.demo-back-nav a:focus-visible,.demo-package-note a:focus-visible{outline:2px solid #93c5fd;outline-offset:3px}
+.demo-package-note{padding:9px 18px;background:#172230;color:#cbd5e1;font:12px/1.6 system-ui,sans-serif}.demo-package-note a{margin-left:12px}
+</style>
+</head>
+<body>
+<nav class="demo-back-nav" aria-label="Project navigation"><a href="../">&larr; Project hub</a><a href="../projects/bus-protocol-lab/">Bus Protocol Lab overview</a><a href="index.html">All protocol tools</a></nav>
+
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <h1>AXI4 Two-Operand Atomic Format</h1>
+        <p class="subtitle">Only the DNOC internal format and the IP-facing AXI write format are shown.</p>
+      </div>
+      <div class="controls">
+        <div class="field">
+          <label for="operandBits">Operand</label>
+          <select id="operandBits">
+            <option value="16">16 bit</option>
+            <option value="32">32 bit</option>
+            <option value="64" selected>64 bit</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="atomicType">Atomic type</label>
+          <select id="atomicType">
+            <option value="scalar" selected>scalar</option>
+            <option value="vector">vector</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="busBits">WDATA bus</label>
+          <select id="busBits">
+            <option value="512" selected>512 bit / 64 B</option>
+            <option value="256">256 bit / 32 B</option>
+            <option value="128">128 bit / 16 B</option>
+            <option value="1024">1024 bit / 128 B</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="awaddr">AWADDR</label>
+          <div class="addr-stepper">
+            <input id="awaddr" value="0x10000" />
+            <div class="addr-buttons" aria-label="AWADDR step controls">
+              <button class="addr-step" id="awaddrUp" type="button" aria-label="Increase AWADDR">&uarr;</button>
+              <button class="addr-step" id="awaddrDown" type="button" aria-label="Decrease AWADDR">&darr;</button>
+            </div>
+          </div>
+        </div>
+        <button class="control" id="autoDemo" type="button">Auto Demo</button>
+        <button class="control" id="resetView" type="button">Reset</button>
+      </div>
+    </header>
+
+    <section class="status" aria-label="Selected atomic status">
+      <div class="metric"><span class="k">Atomic</span><span class="v" id="sumSelected">-</span></div>
+      <div class="metric"><span class="k">AWUSER.RO</span><span class="v" id="sumRo">-</span></div>
+      <div class="metric"><span class="k">Address</span><span class="v" id="sumAddress">-</span></div>
+      <div class="metric"><span class="k">data slot</span><span class="v" id="sumData">-</span></div>
+      <div class="metric"><span class="k">AWSIZE</span><span class="v" id="sumAwsize">-</span></div>
+    </section>
+
+    <section class="tables" aria-label="Atomic format tables">
+      <article class="format-panel">
+        <div class="panel-head">
+          <h2>256B Memory Byte Map</h2>
+          <div class="meta" id="memMeta">-</div>
+        </div>
+        <div class="table-scroll">
+          <div class="memory-grid" id="memoryTable"></div>
+        </div>
+      </article>
+
+      <article class="format-panel">
+        <div class="panel-head">
+          <h2>DNOC Internal Format</h2>
+          <div class="meta" id="dnocMeta">-</div>
+        </div>
+        <div class="table-scroll">
+          <div class="format-grid" id="dnocTable"></div>
+        </div>
+      </article>
+
+      <article class="format-panel">
+        <div class="panel-head">
+          <h2>IP-Facing AXI Write Format</h2>
+          <div class="meta" id="axiMeta">-</div>
+        </div>
+        <div class="table-scroll">
+          <div class="format-grid" id="axiTable"></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const els = {
+      operandBits: document.getElementById('operandBits'),
+      atomicType: document.getElementById('atomicType'),
+      busBits: document.getElementById('busBits'),
+      awaddr: document.getElementById('awaddr'),
+      awaddrUp: document.getElementById('awaddrUp'),
+      awaddrDown: document.getElementById('awaddrDown'),
+      autoDemo: document.getElementById('autoDemo'),
+      resetView: document.getElementById('resetView'),
+      sumSelected: document.getElementById('sumSelected'),
+      sumRo: document.getElementById('sumRo'),
+      sumAddress: document.getElementById('sumAddress'),
+      sumData: document.getElementById('sumData'),
+      sumAwsize: document.getElementById('sumAwsize'),
+      memMeta: document.getElementById('memMeta'),
+      memoryTable: document.getElementById('memoryTable'),
+      dnocMeta: document.getElementById('dnocMeta'),
+      axiMeta: document.getElementById('axiMeta'),
+      dnocTable: document.getElementById('dnocTable'),
+      axiTable: document.getElementById('axiTable'),
+    };
+
+    const state = {
+      dataSlot: 0,
+      clickedKind: 'reqdata_mask',
+      selectedOps: [],
+      selectedMemAddrs: [],
+    };
+
+    const dnocVectorColors = [
+      'var(--dnoc-select)',
+      'var(--dnoc-select-alt)',
+    ];
+
+    const axiVectorColors = [
+      'var(--axi-select)',
+      'var(--axi-select-alt)',
+    ];
+
+    const memVectorColors = [
+      'var(--mem-select)',
+      'var(--mem-select-alt)',
+    ];
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function parseHexAddress(text) {
+      const value = Number.parseInt(String(text).trim().replace(/^0x/i, ''), 16);
+      return Number.isFinite(value) ? Math.max(0, value) : 0;
+    }
+
+    function hex(value, width = 8) {
+      return `0x${value.toString(16).toUpperCase().padStart(width, '0')}`;
+    }
+
+    function log2(value) {
+      return Math.round(Math.log2(value));
+    }
+
+    function alignDown(value, align) {
+      return Math.floor(value / align) * align;
+    }
+
+    function config() {
+      const operandBits = Number.parseInt(els.operandBits.value, 10);
+      const operandBytes = operandBits / 8;
+      const busBits = Number.parseInt(els.busBits.value, 10);
+      const busBytes = busBits / 8;
+      const awaddr = parseHexAddress(els.awaddr.value);
+      const rawBusBase = alignDown(awaddr, busBytes);
+      const busBase = busBytes === 128
+        ? alignDown(awaddr, busBytes)
+        : rawBusBase;
+      const normalizedAwaddr = busBytes === 128
+        ? busBase + Math.floor((awaddr - busBase) / 64) * 64
+        : awaddr;
+      const offsetInBus = normalizedAwaddr - busBase;
+      const activeBytes = busBytes === 128 ? 64 : busBytes;
+      const half = busBytes === 128 ? Math.floor(offsetInBus / 64) : 0;
+      const halfLaneBase = busBytes === 128 ? half * 64 : 0;
+      const tupleBytes = operandBytes * 2;
+      const opSlots = activeBytes / operandBytes;
+      const tupleSlots = activeBytes / tupleBytes;
+      const selectedSources = state.selectedMemAddrs.length
+        ? state.selectedMemAddrs.map(address => {
+          const activeBase = busBytes === 128
+            ? alignDown(address, 128) + Math.floor((address % 128) / 64) * 64
+            : alignDown(address, busBytes);
+          return clamp(Math.floor((address - activeBase) / operandBytes), 0, opSlots - 1);
+        })
+        : state.selectedOps;
+      const ro = selectedSources.length
+        ? opToRo({ tupleSlots }, selectedSources[0])
+        : opToRo({ tupleSlots }, state.dataSlot);
+      const dataSlot = clamp(
+        selectedSources.length ? opToDataSlot({ tupleSlots }, selectedSources[0]) : state.dataSlot,
+        0,
+        tupleSlots - 1,
+      );
+      const selectedOp = ro * tupleSlots + dataSlot;
+      const halfMBase = 0;
+      const selectedM = halfMBase + selectedOp;
+      const atomicType = els.atomicType.value;
+      const maxSelectedOps = atomicType === 'vector' ? tupleSlots : 1;
+      const awsizeBytes = atomicType === 'scalar' ? operandBytes : busBytes;
+      return {
+        operandBits,
+        operandBytes,
+        busBits,
+        busBytes,
+        awaddr: normalizedAwaddr,
+        busBase,
+        offsetInBus,
+        activeBytes,
+        half,
+        halfLaneBase,
+        tupleBytes,
+        opSlots,
+        tupleSlots,
+        ro,
+        dataSlot,
+        selectedOp,
+        halfMBase,
+        selectedM,
+        atomicType,
+        maxSelectedOps,
+        awsizeBytes,
+        awsize: log2(awsizeBytes),
+      };
+    }
+
+    function actualMForDataSlot(cfg, dataSlot) {
+      return cfg.halfMBase + cfg.ro * cfg.tupleSlots + dataSlot;
+    }
+
+    function selectedRanges(cfg) {
+      const maskLow = cfg.halfLaneBase + cfg.selectedOp * cfg.operandBytes;
+      const maskHigh = maskLow + cfg.operandBytes - 1;
+      const dataLow = cfg.halfLaneBase + cfg.dataSlot * cfg.tupleBytes;
+      const dataHigh = dataLow + cfg.tupleBytes - 1;
+      return { maskLow, maskHigh, dataLow, dataHigh };
+    }
+
+    function selectedOps(cfg) {
+      const fromMemory = state.selectedMemAddrs
+        .map(address => addressToLocalOp(cfg, address));
+      const source = fromMemory.length ? fromMemory : state.selectedOps;
+      const unique = Array.from(new Set(source
+        .map(value => clamp(value, 0, cfg.opSlots - 1))));
+      if (!unique.length) return [];
+      if (cfg.atomicType !== 'vector') return [unique[0]];
+      return unique.slice(0, cfg.maxSelectedOps).sort((a, b) => a - b);
+    }
+
+    function clearSelection() {
+      state.dataSlot = 0;
+      state.clickedKind = els.atomicType.value === 'vector' ? 'memory_vector' : 'reqdata_mask';
+      state.selectedOps = [];
+      state.selectedMemAddrs = [];
+    }
+
+    function opToDataSlot(cfg, opIndex) {
+      return opIndex % cfg.tupleSlots;
+    }
+
+    function opToRo(cfg, opIndex) {
+      return Math.floor(opIndex / cfg.tupleSlots);
+    }
+
+    function selectedColor(index, palette) {
+      if (palette && palette.vector) return palette.vector[index % palette.vector.length];
+      if (palette && palette.selected) return palette.selected;
+      return dnocVectorColors[index % dnocVectorColors.length];
+    }
+
+    function opSelectionIndex(cfg, kind, info) {
+      const ops = selectedOps(cfg);
+      if (kind === 'reqdata_mask') {
+        return ops.indexOf(info.slotIndex);
+      }
+      const selectedIndex = ops.findIndex(opIndex => opToDataSlot(cfg, opIndex) === info.slotIndex);
+      return selectedIndex;
+    }
+
+    function vectorWindow(cfg) {
+      const ops = selectedOps(cfg);
+      if (cfg.atomicType !== 'vector' || !ops.length) return null;
+      const firstAddress = state.selectedMemAddrs[0] ?? memoryAddressForOp(cfg, ops[0]);
+      const ro = opToRo(cfg, ops[0]);
+      return {
+        ro,
+        activeBase: Number.isFinite(firstAddress) ? activeBaseForAddress(cfg, firstAddress) : cfg.awaddr,
+        low: ro * cfg.tupleSlots,
+        high: ro * cfg.tupleSlots + cfg.tupleSlots - 1,
+      };
+    }
+
+    function memoryBase(cfg) {
+      return alignDown(cfg.awaddr, 256);
+    }
+
+    function memCols(cfg) {
+      return cfg.busBytes;
+    }
+
+    function memRows(cfg) {
+      return 256 / cfg.busBytes;
+    }
+
+    function memoryCellToAddress(cfg, row, col) {
+      return memoryBase(cfg) + row * cfg.busBytes + col;
+    }
+
+    function operandBaseForAddress(cfg, address) {
+      return alignDown(address, cfg.operandBytes);
+    }
+
+    function selectedOperandBases() {
+      return Array.from(new Set(state.selectedMemAddrs)).sort((a, b) => a - b);
+    }
+
+    function operandSelectionIndexForAddress(cfg, address) {
+      const operandBase = operandBaseForAddress(cfg, address);
+      return selectedOperandBases().indexOf(operandBase);
+    }
+
+    function activeBaseForAddress(cfg, address) {
+      return cfg.busBytes === 128
+        ? alignDown(address, 128) + (Math.floor((address % 128) / 64) * 64)
+        : alignDown(address, cfg.busBytes);
+    }
+
+    function addressToLocalOp(cfg, address) {
+      const activeBase = activeBaseForAddress(cfg, address);
+      const offset = address - activeBase;
+      return clamp(Math.floor(offset / cfg.operandBytes), 0, cfg.opSlots - 1);
+    }
+
+    function applyAddressSelection(cfg, address, localOp) {
+      const activeBase = activeBaseForAddress(cfg, address);
+      els.awaddr.value = hex(activeBase);
+      state.dataSlot = opToDataSlot(cfg, localOp);
+    }
+
+    function canSelectMemoryOp(cfg, localOp) {
+      const window = vectorWindow(cfg);
+      if (!window) return true;
+      return localOp >= window.low && localOp <= window.high;
+    }
+
+    function canSelectMemoryAddress(cfg, address) {
+      const window = vectorWindow(cfg);
+      if (!window) return true;
+      const localOp = addressToLocalOp(cfg, address);
+      return activeBaseForAddress(cfg, address) === window.activeBase
+        && localOp >= window.low
+        && localOp <= window.high;
+    }
+
+    function memoryAddressForOp(cfg, opIndex) {
+      return cfg.awaddr + opIndex * cfg.operandBytes;
+    }
+
+    function canSelectOp(cfg, opIndex, address = memoryAddressForOp(cfg, opIndex)) {
+      return canSelectMemoryAddress(cfg, address);
+    }
+
+    function toggleVectorOp(cfg, opIndex, address = memoryAddressForOp(cfg, opIndex)) {
+      if (!canSelectOp(cfg, opIndex, address)) return false;
+      const existingOp = state.selectedOps.indexOf(opIndex);
+      if (existingOp >= 0) {
+        state.selectedOps.splice(existingOp, 1);
+        state.selectedMemAddrs = state.selectedMemAddrs.filter(memAddr => addressToLocalOp(cfg, memAddr) !== opIndex);
+      } else if (state.selectedOps.length < cfg.maxSelectedOps) {
+        state.selectedOps.push(opIndex);
+        state.selectedMemAddrs.push(address);
+      }
+      state.selectedOps = Array.from(new Set(state.selectedOps)).sort((a, b) => a - b);
+      state.selectedMemAddrs = Array.from(new Set(state.selectedMemAddrs)).sort((a, b) => a - b);
+      if (state.selectedMemAddrs.length) {
+        applyAddressSelection(cfg, state.selectedMemAddrs[0], addressToLocalOp(cfg, state.selectedMemAddrs[0]));
+      }
+      return true;
+    }
+
+    function randomItem(items) {
+      return items[Math.floor(Math.random() * items.length)];
+    }
+
+    function setControlValue(el, value) {
+      el.value = String(value);
+    }
+
+    function runAutoDemo() {
+      const operand = randomItem(['16', '32', '64']);
+      const bus = randomItem(['128', '256', '512', '1024']);
+      const atomicType = randomItem(['scalar', 'vector']);
+      setControlValue(els.operandBits, operand);
+      setControlValue(els.busBits, bus);
+      setControlValue(els.atomicType, atomicType);
+      els.awaddr.value = hex(0x10000 + randomItem([0, 0x40, 0x80, 0xC0]));
+      clearSelection();
+
+      let cfg = config();
+      const action = randomItem(['memory', 'dnoc', 'axi']);
+      const opLimit = action === 'memory' ? cfg.opSlots : cfg.tupleSlots;
+      const opBase = Math.floor(Math.random() * opLimit);
+      const opCount = atomicType === 'vector'
+        ? clamp(1 + Math.floor(Math.random() * Math.min(3, cfg.maxSelectedOps)), 1, cfg.maxSelectedOps)
+        : 1;
+      const roBase = opToRo(cfg, opBase);
+      const windowLow = atomicType === 'vector' ? roBase * cfg.tupleSlots : 0;
+      const windowHigh = atomicType === 'vector' ? windowLow + cfg.tupleSlots - 1 : cfg.opSlots - 1;
+      const firstOp = atomicType === 'vector'
+        ? clamp(opBase, windowLow, windowHigh)
+        : opBase;
+      const ops = [firstOp];
+      for (let i = 1; i < opCount; i++) {
+        const nextOp = windowLow + ((firstOp - windowLow + i) % cfg.tupleSlots);
+        if (!ops.includes(nextOp)) ops.push(nextOp);
+      }
+
+      if (action === 'memory') {
+        ops.forEach(opIndex => {
+          cfg = config();
+          const address = memoryAddressForOp(cfg, opIndex);
+          const row = Math.floor((address - memoryBase(cfg)) / cfg.busBytes);
+          const col = address % cfg.busBytes;
+          selectMemoryCell(row, col);
+        });
+        return;
+      }
+
+      ops.forEach(opIndex => {
+        cfg = config();
+        if (action === 'dnoc') {
+          selectCell(randomItem(['reqdata_mask', 'reqdata_data']), opIndex, opToDataSlot(cfg, opIndex));
+        } else {
+          selectCell(randomItem(['wstrb', 'wdata']), opIndex, opToDataSlot(cfg, opIndex));
+        }
+      });
+    }
+
+    function cellInfo(cfg, kind, lane) {
+      if (kind === 'header') return { text: String(lane), active: true };
+
+      const localLane = lane - cfg.halfLaneBase;
+      const isMask = kind === 'reqdata_mask' || kind === 'wstrb';
+      const isReqMask = kind === 'reqdata_mask';
+      const isTuple = kind === 'reqdata_data' || kind === 'wstrb' || kind === 'wdata';
+      const span = isReqMask ? cfg.operandBytes : cfg.tupleBytes;
+
+      if (localLane < 0 || localLane >= cfg.activeBytes) return { active: false };
+
+      const slotIndex = Math.floor(localLane / span);
+      if (isReqMask && slotIndex >= cfg.opSlots) return { active: false };
+      if (isTuple && slotIndex >= cfg.tupleSlots) return { active: false };
+      const low = cfg.halfLaneBase + slotIndex * span;
+      const high = low + span - 1;
+      const m = isReqMask
+        ? cfg.halfMBase + slotIndex
+        : actualMForDataSlot(cfg, slotIndex);
+      const visibleIndex = isReqMask ? m : slotIndex;
+      const selected = isReqMask
+        ? slotIndex === cfg.selectedOp
+        : slotIndex === cfg.dataSlot;
+      return {
+        active: true,
+        m,
+        visibleIndex,
+        slotIndex,
+        isReqMask,
+        isTuple,
+        low,
+        high,
+        text: lane === high ? String(visibleIndex) : '',
+        selected,
+      };
+    }
+
+    function makeLabel(text) {
+      const node = document.createElement('div');
+      node.className = 'row-label';
+      node.textContent = text;
+      return node;
+    }
+
+    function makeHeaderCell(lane, maxLane) {
+      const cell = document.createElement('div');
+      cell.className = 'lane-head';
+      if (lane === 0 || lane === maxLane || lane < 10 || lane % 8 === 0) {
+        cell.classList.add('marker');
+        cell.textContent = lane;
+      }
+      return cell;
+    }
+
+    function makeMemoryHeaderCell(index, maxIndex) {
+      const cell = document.createElement('div');
+      cell.className = 'mem-head';
+      if (index === 0 || index === maxIndex || index % 8 === 0) cell.textContent = index;
+      return cell;
+    }
+
+    function makeMemoryCell(cfg, row, col) {
+      const address = memoryCellToAddress(cfg, row, col);
+      const localOp = addressToLocalOp(cfg, address);
+      const selectedIndex = operandSelectionIndexForAddress(cfg, address);
+      const disabled = cfg.atomicType === 'vector' && !canSelectMemoryAddress(cfg, address);
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'mem-cell';
+      cell.dataset.address = hex(address);
+      cell.dataset.operandBase = hex(operandBaseForAddress(cfg, address));
+      cell.dataset.op = String(localOp);
+      cell.dataset.testid = `mem-cell-${row}-${col}`;
+      cell.title = `${hex(address)} / operand ${hex(operandBaseForAddress(cfg, address))} / local operand ${localOp}`;
+      cell.setAttribute('aria-label', `memory byte ${hex(address)} operand ${hex(operandBaseForAddress(cfg, address))} local operand ${localOp}`);
+      if (disabled) {
+        cell.classList.add('disabled');
+        cell.tabIndex = -1;
+      }
+      if (selectedIndex >= 0) {
+        cell.classList.add('selected');
+        cell.style.setProperty('--mem-cell-select', selectedColor(selectedIndex, { vector: memVectorColors }));
+      }
+      cell.addEventListener('click', () => selectMemoryCell(row, col));
+      return cell;
+    }
+
+    function renderMemoryTable(cfg) {
+      const cols = memCols(cfg);
+      els.memoryTable.innerHTML = '';
+      els.memoryTable.style.setProperty('--mem-cols', String(cols));
+      els.memoryTable.appendChild(makeLabel('addr'));
+      for (let col = cols - 1; col >= 0; col--) {
+        els.memoryTable.appendChild(makeMemoryHeaderCell(col, cols - 1));
+      }
+      for (let row = 0; row < memRows(cfg); row++) {
+        els.memoryTable.appendChild(makeLabel(hex(memoryBase(cfg) + row * cfg.busBytes)));
+        for (let col = cols - 1; col >= 0; col--) {
+          els.memoryTable.appendChild(makeMemoryCell(cfg, row, col));
+        }
+      }
+    }
+
+    function makeSlotCell(cfg, kind, lane, palette) {
+      const info = cellInfo(cfg, kind, lane);
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'slot';
+
+      if (!info.active) {
+        cell.classList.add('dim');
+        cell.tabIndex = -1;
+        return cell;
+      }
+
+      const selectionIndex = opSelectionIndex(cfg, kind, info);
+      if (selectionIndex >= 0 && kind === 'reqdata_mask') {
+        cell.classList.add('mask-selected');
+        if (lane === info.high) cell.classList.add('edge-high');
+        if (lane === info.low) cell.classList.add('edge-low');
+      }
+      if (selectionIndex >= 0 && (kind === 'reqdata_data' || kind === 'wstrb' || kind === 'wdata')) {
+        cell.classList.add('data-selected');
+        if (lane === info.high) cell.classList.add('edge-high');
+        if (lane === info.low) cell.classList.add('edge-low');
+      }
+
+      const text = document.createElement('span');
+      text.className = 'txt';
+      text.textContent = info.text;
+      cell.appendChild(text);
+      const colorIndex = kind === 'reqdata_mask' ? info.visibleIndex : info.slotIndex;
+      const isOdd = Math.abs(colorIndex) % 2 === 1;
+      cell.classList.add(isOdd ? 'odd' : 'even');
+      cell.style.setProperty('--slot-color', isOdd ? palette.odd : palette.even);
+      cell.style.setProperty('--slot-select', cfg.atomicType === 'vector' ? selectedColor(Math.max(0, selectionIndex), palette) : palette.selected);
+      cell.dataset.m = String(info.m);
+      cell.dataset.slot = String(info.slotIndex);
+      cell.dataset.kind = kind;
+      cell.dataset.lane = String(lane);
+      cell.dataset.testid = `cell-${kind}-m${info.m}-slot${info.slotIndex}-lane${lane}`;
+      cell.title = `${kind}: shown ${info.visibleIndex}, actual m${info.m}, byte lane ${lane}`;
+      cell.setAttribute('aria-label', `${kind} shown ${info.visibleIndex} actual m${info.m} byte lane ${lane}`);
+      cell.addEventListener('click', () => selectCell(kind, info.m, info.slotIndex));
+      return cell;
+    }
+
+    function appendRow(cfg, root, label, kind, palette) {
+      root.appendChild(makeLabel(label));
+      for (let lane = cfg.busBytes - 1; lane >= 0; lane--) {
+        root.appendChild(kind === 'header' ? makeHeaderCell(lane, cfg.busBytes - 1) : makeSlotCell(cfg, kind, lane, palette));
+      }
+    }
+
+    function renderTable(cfg, root, channelLabel, rows, palette) {
+      root.innerHTML = '';
+      root.style.setProperty('--cols', String(cfg.busBytes));
+      appendRow(cfg, root, channelLabel, 'header', palette);
+      rows.forEach(row => appendRow(cfg, root, row.label, row.kind, palette));
+    }
+
+    function renderStatus(cfg) {
+      const ranges = selectedRanges(cfg);
+      const ops = selectedOps(cfg);
+      const hasSelection = ops.length > 0;
+      const addressText = cfg.busBytes === 128
+        ? `${hex(cfg.awaddr)} / ${cfg.half ? 'high' : 'low'} 512b`
+        : hex(cfg.awaddr);
+      els.sumSelected.textContent = `${hasSelection ? ops.map(op => `m${op}`).join(',') : '-'} / ${cfg.atomicType}`;
+      els.sumRo.textContent = hasSelection ? String(cfg.ro) : '-';
+      els.sumAddress.textContent = addressText;
+      els.sumData.textContent = hasSelection ? `slot${cfg.dataSlot} ${ranges.dataHigh}:${ranges.dataLow}` : '-';
+      els.sumAwsize.textContent = `${cfg.awsize} (${cfg.awsizeBytes}B)`;
+      els.awaddr.value = hex(cfg.awaddr);
+      els.memMeta.textContent = `${cfg.atomicType}, ${cfg.operandBits}b operand, ${state.selectedMemAddrs.length} selected`;
+      els.dnocMeta.textContent = hasSelection
+        ? `m${cfg.selectedM}: mask ${ranges.maskHigh}:${ranges.maskLow}, reqdata_data slot ${cfg.dataSlot}`
+        : '-';
+      els.axiMeta.textContent = hasSelection
+        ? `AXI slot ${cfg.dataSlot}, AWUSER.RO=${cfg.ro}, 1024 half=${cfg.half ? 'high' : 'low'}, AWADDR=${hex(cfg.awaddr)}`
+        : '-';
+    }
+
+    function render() {
+      const cfg = config();
+      state.dataSlot = cfg.dataSlot;
+      renderStatus(cfg);
+      renderMemoryTable(cfg);
+      const byteLabel = `W${cfg.busBytes}R${cfg.busBytes}`;
+      const dnocPalette = { even: 'var(--dnoc-lane)', odd: 'var(--dnoc-lane-alt)', selected: 'var(--dnoc-select)', vector: dnocVectorColors };
+      const axiPalette = { even: 'var(--axi-lane)', odd: 'var(--axi-lane-alt)', selected: 'var(--axi-select)', vector: axiVectorColors };
+      renderTable(cfg, els.dnocTable, `NTP(${byteLabel})`, [
+        { label: 'reqdata_mask', kind: 'reqdata_mask' },
+        { label: 'reqdata_data', kind: 'reqdata_data' },
+      ], dnocPalette);
+      renderTable(cfg, els.axiTable, `AXI(${byteLabel})`, [
+        { label: 'wstrb', kind: 'wstrb' },
+        { label: 'wdata', kind: 'wdata' },
+      ], axiPalette);
+    }
+
+    function selectCell(kind, m, slotIndex) {
+      const cfg = config();
+      const localOpFromCell = kind === 'reqdata_mask'
+        ? clamp(m - cfg.halfMBase, 0, cfg.opSlots - 1)
+        : clamp(cfg.ro * cfg.tupleSlots + slotIndex, 0, cfg.opSlots - 1);
+
+      if (cfg.atomicType === 'vector') {
+        toggleVectorOp(cfg, localOpFromCell);
+        state.clickedKind = kind;
+        render();
+        return;
+      }
+
+      if (kind === 'reqdata_mask') {
+        const localOp = localOpFromCell;
+        state.dataSlot = localOp % cfg.tupleSlots;
+        state.selectedOps = [localOp];
+        state.selectedMemAddrs = [memoryAddressForOp(cfg, localOp)];
+      } else {
+        state.dataSlot = clamp(slotIndex, 0, cfg.tupleSlots - 1);
+        state.selectedOps = [cfg.ro * cfg.tupleSlots + state.dataSlot];
+        state.selectedMemAddrs = [memoryAddressForOp(cfg, state.selectedOps[0])];
+      }
+      state.clickedKind = kind;
+      render();
+    }
+
+    function selectMemoryCell(row, col) {
+      const cfg = config();
+      const address = memoryCellToAddress(cfg, row, col);
+      const operandBase = operandBaseForAddress(cfg, address);
+      const localOp = addressToLocalOp(cfg, operandBase);
+      if (cfg.atomicType === 'vector' && !canSelectMemoryAddress(cfg, operandBase)) return;
+
+      if (cfg.atomicType === 'scalar') {
+        state.selectedMemAddrs = [operandBase];
+        state.selectedOps = [localOp];
+      } else {
+        toggleVectorOp(cfg, localOp, operandBase);
+      }
+
+      if (state.selectedMemAddrs.length) {
+        applyAddressSelection(cfg, state.selectedMemAddrs[0], addressToLocalOp(cfg, state.selectedMemAddrs[0]));
+      }
+      state.clickedKind = cfg.atomicType === 'vector' ? 'memory_vector' : 'memory_scalar';
+      render();
+    }
+
+    els.atomicType.addEventListener('change', () => {
+      clearSelection();
+      render();
+    });
+    [els.operandBits, els.busBits].forEach(el => {
+      el.addEventListener('input', render);
+      el.addEventListener('change', render);
+    });
+    els.awaddr.addEventListener('change', () => {
+      clearSelection();
+      render();
+    });
+    els.awaddr.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        clearSelection();
+        render();
+      }
+    });
+    function stepAwaddr(direction) {
+      const cfg = config();
+      const stepBytes = cfg.busBytes === 128 ? 64 : cfg.operandBytes;
+      const next = Math.max(0, cfg.awaddr + direction * stepBytes);
+      els.awaddr.value = hex(next);
+      clearSelection();
+      render();
+    }
+    els.awaddrUp.addEventListener('click', () => stepAwaddr(1));
+    els.awaddrDown.addEventListener('click', () => stepAwaddr(-1));
+    els.autoDemo.addEventListener('click', runAutoDemo);
+    els.resetView.addEventListener('click', () => {
+      els.operandBits.value = '64';
+      els.atomicType.value = 'scalar';
+      els.busBits.value = '512';
+      els.awaddr.value = '0x10000';
+      clearSelection();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

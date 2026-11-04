@@ -1,0 +1,49 @@
+{
+  "registers": "demo_sensor_reg",
+  "reg_field_out": true,
+  "reg_addr_width": 32,
+  "reg_data_width": "32",
+  "map_to": "demoDecoder",
+  "hdl_path": "demo.sensor",
+  "variant": {
+    "fictional_demo": true
+  },
+  "DEMO_SENSOR_CONFIG": {
+    "description": "Fictional sensor configuration",
+    "access": "RW",
+    "width": "32",
+    "offset": "0x0000",
+    "hdl_path": "demo.sensor.config",
+    "fields": {
+      "enable": {
+        "bit_range": "[0]",
+        "reset": "0x0",
+        "description": "Enable fictional sampling"
+      },
+      "sample_period": {
+        "bit_range": "[15..8]",
+        "reset": "0x10",
+        "description": "Demo sample interval in arbitrary ticks"
+      }
+    }
+  },
+  "DEMO_SENSOR_STATUS": {
+    "description": "Fictional sensor readiness",
+    "access": "RO",
+    "width": "32",
+    "offset": "0x0004",
+    "hdl_path": "demo.sensor.status",
+    "fields": {
+      "ready": {
+        "bit_range": "[0]",
+        "reset": "0x0",
+        "description": "The fictional sensor is ready"
+      },
+      "sample_count": {
+        "bit_range": "[15..8]",
+        "reset": "0x0",
+        "description": "Number of fictional samples"
+      }
+    }
+  }
+}

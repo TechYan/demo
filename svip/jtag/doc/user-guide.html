@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="syan"><title>SVIP JTAG 使用指导</title><style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--fg:#182739;--muted:#536579;--line:#dce4ed;--accent:#1459ad;--code:#f0f4f8}
+@media(prefers-color-scheme:dark){:root{--bg:#111a25;--panel:#172332;--fg:#e6edf5;--muted:#adbdce;--line:#35485b;--accent:#89baff;--code:#0f1b29}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+header{padding:22px max(24px,calc((100vw - 1440px)/2));background:var(--panel);border-bottom:1px solid var(--line)}
+header strong{font-size:20px}header p{margin:5px 0;color:var(--muted)}nav{display:flex;gap:22px;margin-top:12px}
+.layout{max-width:1488px;margin:28px auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;padding:0 24px}
+aside{align-self:start;position:sticky;top:20px;max-height:92vh;overflow:auto;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;line-height:1.6}
+aside ul{padding-left:20px}aside>div>ul{padding-left:14px}aside li{margin:8px 0}
+main{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:28px 34px}
+h1{font-size:29px;line-height:1.45;margin-top:0}h2{font-size:23px;margin-top:2.5em;border-bottom:1px solid var(--line);padding-bottom:8px}h3{font-size:19px;margin-top:2em}h1,h2,h3{scroll-margin-top:20px}
+a{color:var(--accent);text-underline-offset:3px}p{margin:1em 0}li{margin:.5em 0}
+table{display:block;overflow-x:auto;border-collapse:collapse;width:100%;font-size:14px;margin:20px 0}th,td{border:1px solid var(--line);padding:12px 14px;min-width:130px;vertical-align:top}th{background:var(--code);font-weight:600;text-align:left}
+code{font:0.9em/1.6 Consolas,'Cascadia Mono',monospace;background:var(--code);border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{padding:18px;overflow-x:auto;background:var(--code);border:1px solid var(--line);border-radius:8px;line-height:1.55}pre code{padding:0;white-space:pre;overflow-wrap:normal}
+footer{padding:20px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--line);margin-top:32px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;padding:0 12px}aside{position:static;max-height:none}main{padding:22px 18px}h1{font-size:25px}}
+@media print{aside,nav{display:none}.layout{display:block;padding:0;margin:0}main{border:0;padding:0}body{background:white;color:black}table{display:table;font-size:10px}pre{white-space:pre-wrap}a{color:inherit}}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}aside a{overflow-wrap:anywhere}
+</style></head>
+<body><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><strong>SVIP · JTAG 0.2.0</strong><p>syan · master / passive / device · chain helper · VCS / UVM1.2</p><nav><a href="user-guide.html">使用指导</a><a href="architecture.html">架构</a><a href="../../scope.html#verification">验收记录</a><a href="user-guide.html">文档页</a></nav></header>
+<div class="layout"><aside aria-label="目录"><div class="toc">
+<ul>
+<li><a href="#svip-jtag">SVIP JTAG 使用指导</a><ul>
+<li><a href="#1">1. 支持范围</a></li>
+<li><a href="#2">2. 编译与引脚接入</a></li>
+<li><a href="#3-agent">3. 创建agent</a></li>
+<li><a href="#4-scan">4. 发送scan与获得结果</a></li>
+<li><a href="#5-raw">5. 复位、时序与raw控制</a><ul>
+<li><a href="#51-scanpause">5.1 分段scan、Pause和运行时停钟</a></li>
+<li><a href="#52-tdomask">5.2 TDO比较与mask</a></li>
+<li><a href="#53-tap-chain">5.3 多TAP chain</a></li>
+<li><a href="#54-tap-device">5.4 可选TAP device与外挂寄存器</a></li>
+</ul>
+</li>
+<li><a href="#6-callbacktracker">6. 观察、callback和tracker</a></li>
+<li><a href="#7-coverage">7. 检查与coverage</a></li>
+<li><a href="#8">8. 自测与排查</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside><main><h1 id="svip-jtag">SVIP JTAG 使用指导</h1>
+<p>Author: syan</p>
+<h2 id="1">1. 支持范围</h2>
+<p>当前提供 master、passive 与可选 TAP device 响应组件，目标 VCS/UVM1.2，采用 IEEE1149.1 的16态、IR/DR移位与Update语义。master自行生成TCK；passive可观察外部master。多 TAP 链使用可选 sequence helper 拼接，底层仍是一个串行 bit stream。</p>
+<p>支持动态scan数组；默认 <code>max_scan_bits=65536</code> 是资源策略。高层scan默认从RTI开始、至少1bit，经Update返回RTI；可显式分段停在对应 Shift/Pause，再 resume。raw可表达Capture-only等路径。未知状态需先TMS5或TRST恢复；不会通过隐式导航提交用户未完成的scan。</p>
+<p>当前不含BSDL/SVF/STAPL、IJTAG或DMI/JTAG2AXI业务层。自测夹具的IR长度、寄存器、IDCODE/opcode只属于fixture，不是产品限制；device 的默认配置只启用BYPASS，用户显式配置自己的指令和寄存器。</p>
+<h2 id="2">2. 编译与引脚接入</h2>
+<p>从仓库根编译，先加载模拟器的UVM1.2：</p>
+<pre><code class="language-bash">vcs -full64 -sverilog -ntb_opts uvm-1.2 -timescale=1ps/1ps \
+  -f jtag/files.f -f jtag/sequence_lib/files.f \
+  -f jtag/checker/files.f YOUR_DUT_AND_TEST_FILES -top YOUR_TOP
+</code></pre>
+<p><code>files.f</code>包含common coverage service、interface和core package；sequence package与SVA是显式的后续输入。现有工程已编译common包时，按同样顺序只编译一次。</p>
+<p>使用VCS三步流程时，先单独执行 <code>vlogan -full64 -sverilog -ntb_opts uvm-1.2</code> 分析UVM，再分别用vlogan加载上述filelist，最后vcs链接top。仅在含用户文件的vlogan命令上写 <code>-ntb_opts</code>，不能假设uvm_pkg已经分析；本版已原生验证分开分析的接入流程。</p>
+<p>顶层创建 <code>svip_jtag_if bus(tap_external_reset_n)</code>，连接DUT的TCK/TMS/TDI到对应interface变量，DUT的TDO回接 <code>bus.tdo</code>。有TRST引脚时DUT连接 <code>bus.tap_reset_n</code>，它是外部有效TAP reset与VIP生成TRST的组合。无TRST引脚时设置 <code>cfg.has_trst=0</code>，用TMS5恢复。</p>
+<p><code>reset_n</code>表示<strong>确实让目标TAP复位的外部源</strong>，不要连接一个不影响TAP的SoC reset。若没有这种源，tie high。<code>trst_n</code>由active VIP拥有，外部复位源通过 <code>reset_n</code> 接入，不与VIP争驱 <code>trst_n</code>。master拥有TCK，禁止再接另一个时钟发生器。</p>
+<h2 id="3-agent">3. 创建agent</h2>
+<p>在已有UVM env/test的build_phase中：</p>
+<pre><code class="language-systemverilog">svip_jtag_agent jtag;
+svip_jtag_cfg cfg;
+virtual svip_jtag_if vif;
+
+// vif由顶层通过config_db发布，检查get()返回值。
+cfg=svip_jtag_cfg::type_id::create(&quot;cfg&quot;);
+cfg.vif=vif;
+cfg.t_low=5ns;
+cfg.t_high=5ns;
+cfg.coverage_en=1;
+cfg.tracker_filename=&quot;jtag.tracker.log&quot;;
+jtag=svip_jtag_agent::type_id::create(&quot;jtag&quot;,this);
+jtag.cfg=cfg;
+</code></pre>
+<p>顶层发布vif须在 <code>run_test()</code> 前完成；UVM run phase必须从仿真时间0启动。完整可执行示例在 <code>testbench/tb.sv</code>、<code>svip_jtag_test_pkg.sv</code> 和 <code>testsuite/examples/</code>，正式runner会编译并运行它们。</p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>默认</th>
+<th>使用规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>is_active</code></td>
+<td>UVM_ACTIVE</td>
+<td>passive只创建观察链，无driver/sqr；build期设置</td>
+</tr>
+<tr>
+<td><code>t_low/t_high</code></td>
+<td>各50ns</td>
+<td>package/interface均1ps单位与精度，必须可表示且&gt;=1ps；build期设置</td>
+</tr>
+<tr>
+<td><code>t_low_max/t_high_max</code></td>
+<td>0</td>
+<td>0使用固定时长；非零为每bit均匀随机区间的上界，须&gt;=对应最小值且&lt;=4294967295ps</td>
+</tr>
+<tr>
+<td><code>drive_delay</code></td>
+<td>0</td>
+<td>低相开始到TMS/TDI驱动的偏移，须&lt;t_low；零保持原有NBA驱动方式</td>
+</tr>
+<tr>
+<td><code>sample_delay</code></td>
+<td>0</td>
+<td>0在上升沿前采TDO；正值在上升沿后该偏移采样，须&lt;t_high；TDO须在整个高相保持当前位</td>
+</tr>
+<tr>
+<td><code>trst_low</code></td>
+<td>150ns</td>
+<td>TRST命令的低脉冲时长，必须&gt;=1ps；不依赖TCK运行</td>
+</tr>
+<tr>
+<td><code>has_trst</code></td>
+<td>1</td>
+<td>无引脚时置0，TRST命令被拒绝</td>
+</tr>
+<tr>
+<td><code>max_scan_bits</code></td>
+<td>65536</td>
+<td>配置范围1..2147483647（SV数组size容器），active长度上限、passive保留前缀上限；超限被拒绝/报告截断；首版实测上限65536</td>
+</tr>
+<tr>
+<td><code>checks_en</code></td>
+<td>1</td>
+<td>使用 <code>agent.set_checks(bit)</code> 同时切换monitor与interface上的SVA enable</td>
+</tr>
+<tr>
+<td><code>tracker_en</code></td>
+<td>1</td>
+<td>build期设置；空文件名使用agent实例全名</td>
+</tr>
+<tr>
+<td><code>coverage_en</code></td>
+<td>0</td>
+<td>build期设置，创建native covergroup与公共FC采样；JSON另需plusarg</td>
+</tr>
+<tr>
+<td><code>clock_hold</code></td>
+<td>0</td>
+<td>使用 <code>agent.set_clock_hold(bit)</code>；当前高相完成后停低，释放后继续同一命令</td>
+</tr>
+</tbody>
+</table>
+<p>时序在每个命令开始时冻结，命令中途修改不会改变该命令；下一命令重新验证。结构配置在build期设置。运行时即时控制只有 <code>set_checks</code> 与 <code>set_clock_hold</code>；用户扩展通过sequence、callback或device寄存器hook表达。</p>
+<h2 id="4-scan">4. 发送scan与获得结果</h2>
+<p>便利sequence继承 <code>svip_jtag_seq</code> 并在 <code>body()</code> 中使用：</p>
+<pre><code class="language-systemverilog">svip_jtag_txn r;
+bit payload[];
+reset_tms(r);                 // 五个TMS=1，结束于TLR
+goto_state(SVIP_JTAG_RTI,r);
+scan_word(1,64'hf,4,r);        // 示例设备4bit IR的BYPASS指令
+payload=new[132];
+foreach(payload[i])payload[i]=i%2;
+dr_scan(payload,r);
+if(r.status!=SVIP_JTAG_DONE)
+  `uvm_error(&quot;MY_JTAG&quot;,r.convert2string())
+foreach(r.rx_bits[i])begin
+  // 示例BYPASS期望：第0位是Capture的0，后续位是前一个TDI。
+  if(r.rx_bits[i] !== (i==0?1'b0:payload[i-1]))
+    `uvm_error(&quot;MY_JTAG&quot;,&quot;BYPASS mismatch&quot;)
+end
+</code></pre>
+<p>在test中 <code>seq.start(jtag.sqr)</code>。不要调用 <code>svip_jtag_seq.body()</code>直接驱动；标准start_item/finish_item负责仲裁和完成。</p>
+<p><code>ir_scan/dr_scan</code>以数组为权威长度，数组下标0最先移入。<code>scan_word(is_ir,value,n,r)</code>是最多64bit的便利转换，长数据使用数组。<code>raw(tms[],tdi[],r)</code>要求数组长度相等；空raw允许作为无操作，空高层scan拒绝。</p>
+<p><code>finish_item()</code>返回时命令已经完成或明确中止/拒绝，响应已回写原transaction。<code>tx_bits</code>可randomize，例如约束 <code>op==SVIP_JTAG_DR_SCAN</code> 和payload长度；无条件随机op可能产生不满足状态前置条件的控制命令，不能将其等同于合法场景生成器。</p>
+<table>
+<thead>
+<tr>
+<th>status</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SVIP_JTAG_DONE</code></td>
+<td>命令完成，声明的结束状态已达到</td>
+</tr>
+<tr>
+<td><code>SVIP_JTAG_RESET_ABORTED</code></td>
+<td>外部reset中止或提交时仍在reset；不自动重试</td>
+</tr>
+<tr>
+<td><code>SVIP_JTAG_BAD_REQUEST</code></td>
+<td>状态/长度/资源/opcode不支持，报告 <code>SVIP_JTAG_REQUEST</code>，驱动前拒绝</td>
+</tr>
+<tr>
+<td><code>SVIP_JTAG_X_RESPONSE</code></td>
+<td>有效Shift样本含X/Z，原值保留在四态rx数组</td>
+</tr>
+<tr>
+<td><code>SVIP_JTAG_COMPARE_ERROR</code></td>
+<td>已完成采样，但显式TDO比较失败；<code>n_mismatches</code>给出不匹配位数</td>
+</tr>
+</tbody>
+</table>
+<p>中止时rx数组可以包含未采样的尾部，<strong>只有前 <code>n_sampled</code> 位有效</strong>。中途取消时已经采到的位仍保留。<code>start_state/end_state</code>是执行器的协议预测状态，不是DUT内部状态的直接证明。</p>
+<p>IR→DR之类组合在多个sequence间需要原子性时，使用标准sequencer lock/grab；单命令串行不阻止其他sequence在两笔命令之间插入。transaction支持深拷贝和严格字段比较；派生transaction应扩展自己的do_copy/do_compare。</p>
+<h2 id="5-raw">5. 复位、时序与raw控制</h2>
+<p>TMS5复位、可选TRST、外部有效TAP reset是不同入口。异步effective reset使旧epoch失效，外部reset让在飞命令完成一次RESET_ABORTED；已发生的Update副作用不会回滚。外部reset后driver在下一笔命令前同步到TLR，用户通常再goto RTI。</p>
+<p>TMS5是实际TMS路径，不强制更换引脚reset epoch；从Pause/Shift出发可能先经过Update再到TLR，因此不能用它保证半笔操作从未提交。TLR选择目标的默认指令；用户寄存器是否复位由设备语义决定。<code>tms_reset_default</code>专门检查这一区别。</p>
+<p>master在低相设置TMS/TDI，等待t_low后读取前一个下降沿准备的TDO，再拉高TCK，等待t_high后拉低。该采样契约避免读取DUT同一上升沿移位后的下一位。低/高时间必须满足具体DUT的setup/hold和TDO clock-to-output，VIP不提供模拟电气时序认证。</p>
+<p>没有READY式反压。命令结束后TCK保持低电平；停TCK不改变TAP状态，进入Pause需要真实TMS路径。RTI clocks可能触发设备行为，不能当作无副作用延迟。</p>
+<h3 id="51-scanpause">5.1 分段scan、Pause和运行时停钟</h3>
+<pre><code class="language-systemverilog">dr_scan(first_bits,r,SVIP_JTAG_PAUSE_DR);  // 采样完成，尚未Update
+dwell(8,r);                              // Pause内产生8个TCK，保持移位内容
+dr_scan(rest_bits,r,SVIP_JTAG_RTI,1);      // resume=1；继续移位，最终Update
+</code></pre>
+<p><code>finish_state</code>只允许RTI、与操作匹配的Shift或Pause；<code>resume=1</code>只允许从同种Shift/Pause继续。默认fresh scan从RTI开始。每段结果只含本段位；monitor在最终Update发布一条累计scan。Pause不加位直接提交用 <code>goto_state(SVIP_JTAG_RTI,r)</code>；从Shift退出会再移一位，不能用goto声称无额外位提交。<code>dwell(cycles,r)</code>只接受TLR/RTI/Pause与1..max_scan_bits时钟数，拒绝在Shift填充隐式数据。</p>
+<p>多个sequence并行时，在完整的分段scan或IR/DR组合外使用标准sequencer <code>lock()/unlock()</code>；driver串行执行单条命令，组合的原子性由调用sequence持有。</p>
+<p><code>agent.set_clock_hold(1)</code>完成当前高相，并在下一上升沿前等待；命令可能仍在 <code>finish_item()</code> 中。需由另一并行控制线程释放，或由外部reset中止。TRST命令不依赖TCK；TMS5仍需要时钟。hold不是进入Pause，也不会中止或重发事务。每个bit的随机时长独立取样；默认固定时序不增加RNG调用，指定seed可以重放。</p>
+<h3 id="52-tdomask">5.2 TDO比较与mask</h3>
+<pre><code class="language-systemverilog">svip_jtag_txn t=new(&quot;read_check&quot;);
+t.op=SVIP_JTAG_DR_SCAN;
+t.tx_bits=payload;
+t.check_tdo=1;
+t.expected_bits=expected;  // logic[]，长度与payload相同
+t.compare_mask=mask;       // bit[]，1比较、0忽略；空数组表示全比较
+send(t);
+</code></pre>
+<p>长度不匹配在驱动前拒绝。比较使用四态精确比较，失败每命令报告一条 <code>SVIP_JTAG_COMPARE</code>。reset中止不比较未采样尾部。有效Shift的X检查独立于业务mask；mask全零也不会掩盖X_RESPONSE。X_RESPONSE优先于COMPARE_ERROR，仍保留mismatch计数。复杂比较通过transaction表达，不给scan helper增加一组重复参数。</p>
+<h3 id="53-tap-chain">5.3 多TAP chain</h3>
+<pre><code class="language-text">TDI -&gt; TAP[0] -&gt; TAP[1] -&gt; TAP[2] -&gt; TDO
+发送顺序：TAP[2]的LSB-first字 -&gt; TAP[1] -&gt; TAP[0]
+</code></pre>
+<p>在sequence中导入 <code>svip_jtag_seq_pkg</code>，创建 <code>svip_jtag_chain chain</code>。设置 <code>ir_lengths</code> 与当前指令所选的 <code>dr_lengths</code>，两者均按TDI到TDO的物理节点顺序。<code>svip_jtag_words_t</code> 是动态bit数组的数组；每个节点的字长必须精确匹配。调用 <code>ir_scan(chain.pack_ir(ir_words),r)</code>、<code>dr_scan(chain.pack_dr(dr_words),r)</code>，用 <code>svip_jtag_logic_words_t received=chain.unpack_dr(r.rx_bits)</code> 得到相同物理节点顺序的四态结果。</p>
+<p>其他TAP选BYPASS时，其IR全1、DR长度1。helper不猜测设备指令或实际DR长度，不把高位静默截断。IR至少2bit，DR至少1bit，合计受 <code>chain.max_bits</code> 限制。IR与DR组合需要原子性时仍用标准sequencer lock。<code>example_chain</code> 使用3/5/7-bit IR和不同寄存器值；<code>chain_target</code> 演示只选中中间TAP。</p>
+<h3 id="54-tap-device">5.4 可选TAP device与外挂寄存器</h3>
+<p>在env的build_phase创建一个独立响应组件：</p>
+<pre><code class="language-systemverilog">svip_jtag_device device;
+svip_jtag_register reg0=new(&quot;control&quot;);
+device=svip_jtag_device::type_id::create(&quot;device&quot;,this);
+device.cfg=new(&quot;device_cfg&quot;);
+device.cfg.vif=vif;
+device.cfg.ir_length=4;
+reg0.opcode='{0,1,0,0};       // LSB-first opcode 2
+reg0.reset_bits=new[65];     // 任意动态寄存器长度
+foreach(reg0.reset_bits[i])reg0.reset_bits[i]=0;
+device.cfg.registers.push_back(reg0);
+</code></pre>
+<p>device只驱动TDO；同一interface不能再有DUT或另一个device争驱TDO。需要日志、coverage或checker时，在同一interface接passive agent与显式SVA；不要创建第二个active master。</p>
+<table>
+<thead>
+<tr>
+<th>配置/扩展</th>
+<th>规则</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ir_length/max_bits</code></td>
+<td>默认4/65536；IR&gt;=2，寄存器非空，大小受max_bits限制</td>
+</tr>
+<tr>
+<td>BYPASS</td>
+<td>IR全1，DR固定1bit，Capture为0；已知未映射指令也进入BYPASS</td>
+</tr>
+<tr>
+<td><code>has_idcode/idcode/idcode_opcode</code></td>
+<td>默认不启用；启用时显式给出等长opcode与32bit、bit0=1的IDCODE；不能占用BYPASS</td>
+</tr>
+<tr>
+<td><code>registers</code></td>
+<td>每个opcode等于IR长度、唯一、不与IDCODE/BYPASS冲突；reset_bits声明宽度和物理reset值</td>
+</tr>
+<tr>
+<td><code>read_only</code></td>
+<td>基础register忽略Update；派生类覆盖update时自行负责业务权限</td>
+</tr>
+<tr>
+<td><code>capture()/update(logic bits[])/reset()</code></td>
+<td>可派生register外挂存储，不要求调用super；均为零时间function，不能阻塞TCK</td>
+</tr>
+<tr>
+<td><code>tco</code></td>
+<td>默认0；相对下降沿的TDO延迟，必须满足实际master的采样窗口，延迟输出带reset代际检查</td>
+</tr>
+</tbody>
+</table>
+<p>结构与opcode在build时冻结，register对象是有意保留的业务扩展句柄；不要运行中更改宽度、opcode或reset_bits定义。Capture必须返回声明的宽度。Shift用环形存储，每bit常数开销，Update时再物化位序。TLR/TMS5只选择默认指令，不清除用户存储；effective pin reset同时复位TAP和register。未知IR保留不确定性，不能二态转换为已知指令。</p>
+<p>device在posedge先保存TMS/TDI与epoch，经同槽reset/NBA检查后调用Capture/执行Shift；Update hook在有效下降沿调用。外挂存储的capture函数读取该调用时刻的业务模型值。</p>
+<p><code>example_device</code> 是产品自环示例；<code>device_manual</code>、<code>device_wide_ir</code>、<code>device_long</code> 使用独立手工master检查，<code>device_hooks</code> 展示外部存储及软件/物理reset的区别。device不是DMI或CPU调试模型，业务协议应独立实现。</p>
+<h2 id="6-callbacktracker">6. 观察、callback和tracker</h2>
+<ul>
+<li><code>agent.done_ap</code>：active命令终结，类型svip_jtag_txn；passive无此producer。</li>
+<li><code>agent.event_ap</code>：实际上升沿四态采样与异步reset事件，类型svip_jtag_event。<code>sample_time</code>为采样时刻，未延迟到下一下降沿。</li>
+<li><code>agent.scan_ap</code>：类型svip_jtag_scan；Update下降沿提交一次，reset则发布未完成scan的abort。Pause不重复发布累计scan。<code>committed</code>、<code>epoch</code>、<code>n_shifted</code>、<code>truncated</code>区分提交、真实位数与资源截断。</li>
+</ul>
+<p>analysis对象按只读使用，producer不会重用其动态payload。callback的pre_command接收staging，可改pattern；driver随后深拷贝为运行快照。post_command用于通知，修改通知不会改变用户结果。不要在callback里驱引脚或添加阻塞时序。</p>
+<p>注册方式：<code>uvm_callbacks#(svip_jtag_driver,svip_jtag_callback)::add(jtag.drv,callback_handle)</code>。参考 <code>copy_callback</code> 的快照隔离测试和 <code>example_callback</code>。</p>
+<p>tracker默认输出CMD、SCAN、RESET，时间为ps；包含epoch、状态、请求/实采位数、提交/中止和四态数据摘要。数据摘要明确标注低64bit与truncated，长数据的完整内容由transaction/AP消费；没有默认逐bit打印开销。</p>
+<h2 id="7-coverage">7. 检查与coverage</h2>
+<p>monitor提供采样窗口X、状态未知传播和资源限制检查；SVA需在顶层显式实例化，见checker/README。SVA和monitor独立报告，各有rule ID，负例预算分别核对。<code>set_checks(0)</code>只关闭可选协议诊断，不解除资源限制或参数验证。</p>
+<p>coverage采样实际命令终结、真实scan和TAP事件。包括op/status/长度、resume/请求结束态/比较开关、IR/DR/提交、实际TDI pattern分类（empty/zero/one/alternating/mixed/unknown/truncated）、32条状态出边、未知和reset。默认分母包括未命中能力，不以非零覆盖率声称完整认证。</p>
+<p>开启 <code>cfg.coverage_en=1</code> 并传 <code>+svip_fc_json=path.json</code>，agent在final_phase导出。runner使用common的FC格式检查器验证产物、实际样本数和身份，regress只合并通过运行。覆盖文件和native covergroup是不同证据，本版发布以经过审计的FC JSON bin计数为覆盖结论，不宣称原生VDB合并闭环。</p>
+<h2 id="8">8. 自测与排查</h2>
+<p>先执行examples，再full suite。<code>--waves</code>默认直接生成FSDB（VCS/Verdi环境，使用 <code>-debug_access+all -kdb</code> 和dump宏），<code>--waves vcd</code>可回退；未请求波形时不dump。建议观察TCK/TMS/TDI/TDO、tap_reset_n、reset_epoch、DUT state和Update计数。唯一run目录内有run.log、result.json、tracker.log、fc.json及请求的waves.fsdb/vcd，格式与哈希写入result.json。</p>
+<pre><code class="language-bash">python3 jtag/scripts/run.py --case example_chain --case example_segmented --waves
+python3 jtag/scripts/run.py --case example_device --waves vcd
+</code></pre>
+<p>源文件、catalog、运行器或公共FC消费者变化会使缓存身份变化；编译后检测输入变化则拒绝沿用结果。不要手动编辑已冻结结果或将失败run的coverage并入发布。当前实测点与未验收范围见verification.md。</p><footer>支持与实测范围分别声明；不代表完整IEEE认证。</footer></main></div></body></html>

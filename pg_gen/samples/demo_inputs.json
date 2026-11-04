@@ -1,0 +1,150 @@
+{
+  "rdfBlocks": [
+    {
+      "name": "demo_control_rdf.json",
+      "json": {
+        "registers": "demo_control_reg",
+        "reg_field_out": true,
+        "reg_addr_width": 32,
+        "reg_data_width": "32",
+        "map_to": "demoDecoder",
+        "hdl_path": "demo.control",
+        "variant": {
+          "fictional_demo": true
+        },
+        "DEMO_CONTROL": {
+          "description": "Fictional controller configuration",
+          "access": "RW",
+          "width": "32",
+          "offset": "0x0000",
+          "hdl_path": "demo.control.config",
+          "fields": {
+            "enable": {
+              "bit_range": "[0]",
+              "reset": "0x0",
+              "description": "Enable the fictional controller"
+            },
+            "mode": {
+              "bit_range": "[3..1]",
+              "reset": "0x0",
+              "description": "Select a demo operating mode"
+            },
+            "irq_enable": {
+              "bit_range": "[8]",
+              "reset": "0x1",
+              "description": "Enable demo completion interrupts"
+            }
+          }
+        },
+        "DEMO_IRQ_STATUS": {
+          "description": "Fictional interrupt status",
+          "access": "RW1C",
+          "width": "32",
+          "offset": "0x0004",
+          "hdl_path": "demo.control.irq_status",
+          "fields": {
+            "done": {
+              "bit_range": "[0]",
+              "reset": "0x0",
+              "description": "A demo operation completed"
+            },
+            "error": {
+              "bit_range": "[1]",
+              "reset": "0x0",
+              "description": "A demo operation reported an error"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "demo_sensor_rdf.json",
+      "json": {
+        "registers": "demo_sensor_reg",
+        "reg_field_out": true,
+        "reg_addr_width": 32,
+        "reg_data_width": "32",
+        "map_to": "demoDecoder",
+        "hdl_path": "demo.sensor",
+        "variant": {
+          "fictional_demo": true
+        },
+        "DEMO_SENSOR_CONFIG": {
+          "description": "Fictional sensor configuration",
+          "access": "RW",
+          "width": "32",
+          "offset": "0x0000",
+          "hdl_path": "demo.sensor.config",
+          "fields": {
+            "enable": {
+              "bit_range": "[0]",
+              "reset": "0x0",
+              "description": "Enable fictional sampling"
+            },
+            "sample_period": {
+              "bit_range": "[15..8]",
+              "reset": "0x10",
+              "description": "Demo sample interval in arbitrary ticks"
+            }
+          }
+        },
+        "DEMO_SENSOR_STATUS": {
+          "description": "Fictional sensor readiness",
+          "access": "RO",
+          "width": "32",
+          "offset": "0x0004",
+          "hdl_path": "demo.sensor.status",
+          "fields": {
+            "ready": {
+              "bit_range": "[0]",
+              "reset": "0x0",
+              "description": "The fictional sensor is ready"
+            },
+            "sample_count": {
+              "bit_range": "[15..8]",
+              "reset": "0x0",
+              "description": "Number of fictional samples"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "addrMaps": [
+    {
+      "name": "demo_addr_map.json",
+      "json": {
+        "decodes": {
+          "demo_control_reg.demo_control_reg.demoDecoder": {
+            "offset": "0x00001000",
+            "size": "0x00001000",
+            "visibility": "all",
+            "comment": "Fictional demo controller window"
+          },
+          "demo_sensor_reg.demo_sensor_reg.demoDecoder": {
+            "offset": "0x00002000",
+            "size": "0x00001000",
+            "visibility": "all",
+            "comment": "Fictional demo sensor window"
+          }
+        }
+      }
+    }
+  ],
+  "rnocMaps": [
+    {
+      "name": "demo_bus_map.json",
+      "json": {
+        "version": "fictional-demo-1",
+        "decodes": {
+          "demo.demo_bus.demoDecoder": {
+            "offset": "0x40000000",
+            "size": "0x00010000",
+            "visibility": "all",
+            "comment": "Synthetic demo bus window; no hardware assignment"
+          }
+        }
+      }
+    }
+  ]
+}

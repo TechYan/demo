@@ -1,0 +1,54 @@
+{
+  "registers": "demo_control_reg",
+  "reg_field_out": true,
+  "reg_addr_width": 32,
+  "reg_data_width": "32",
+  "map_to": "demoDecoder",
+  "hdl_path": "demo.control",
+  "variant": {
+    "fictional_demo": true
+  },
+  "DEMO_CONTROL": {
+    "description": "Fictional controller configuration",
+    "access": "RW",
+    "width": "32",
+    "offset": "0x0000",
+    "hdl_path": "demo.control.config",
+    "fields": {
+      "enable": {
+        "bit_range": "[0]",
+        "reset": "0x0",
+        "description": "Enable the fictional controller"
+      },
+      "mode": {
+        "bit_range": "[3..1]",
+        "reset": "0x0",
+        "description": "Select a demo operating mode"
+      },
+      "irq_enable": {
+        "bit_range": "[8]",
+        "reset": "0x1",
+        "description": "Enable demo completion interrupts"
+      }
+    }
+  },
+  "DEMO_IRQ_STATUS": {
+    "description": "Fictional interrupt status",
+    "access": "RW1C",
+    "width": "32",
+    "offset": "0x0004",
+    "hdl_path": "demo.control.irq_status",
+    "fields": {
+      "done": {
+        "bit_range": "[0]",
+        "reset": "0x0",
+        "description": "A demo operation completed"
+      },
+      "error": {
+        "bit_range": "[1]",
+        "reset": "0x0",
+        "description": "A demo operation reported an error"
+      }
+    }
+  }
+}

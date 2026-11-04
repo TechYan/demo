@@ -1,0 +1,11 @@
+{
+  "version": "fictional-demo-1",
+  "decodes": {
+    "demo.demo_bus.demoDecoder": {
+      "offset": "0x40000000",
+      "size": "0x00010000",
+      "visibility": "all",
+      "comment": "Synthetic demo bus window; no hardware assignment"
+    }
+  }
+}

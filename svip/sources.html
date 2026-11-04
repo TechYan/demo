@@ -1,0 +1,1107 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reusable SVIP examples</title><style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f4f6fa;color:#172033;font:16px/1.7 system-ui,-apple-system,'Segoe UI',sans-serif}main{max-width:1120px;margin:auto;padding:45px 28px 80px}a{color:#3159cc;text-underline-offset:4px}nav{display:flex;gap:20px;flex-wrap:wrap;font-size:14px}h1{font-size:clamp(36px,5vw,62px);letter-spacing:-2px;line-height:1.1;margin:34px 0 22px}h2{font-size:26px;letter-spacing:-.5px;margin:44px 0 18px}h3{margin:0 0 8px;font-size:20px}.eyebrow{color:#607089;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-top:40px}.lead{max-width:800px;font-size:20px;color:#536078}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:18px;margin:28px 0}.card{padding:24px;background:#fff;border:1px solid #dce2ec;border-radius:12px}.card p{color:#536078;margin-bottom:0}.card .number{font-size:34px;font-weight:700;color:#172033}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0}.button{display:inline-block;padding:12px 20px;background:#3159cc;color:#fff;border-radius:7px;text-decoration:none;font-weight:600}.button.secondary{background:#fff;color:#3159cc;border:1px solid #dce2ec}.note{padding:18px 22px;background:#eaf0ff;border-left:3px solid #5279e1;border-radius:0 8px 8px 0;color:#394c76}.muted{color:#607089;font-size:14px}code,pre{font-family:Consolas,'Courier New',monospace}code{font-size:.9em;overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#101b30;color:#dce8fc;padding:22px;border-radius:8px;font-size:13px;line-height:1.65}.source-section{scroll-margin-top:24px;border-top:1px solid #dce2ec;margin-top:32px;padding-top:20px}.source-section h2{font-size:20px;overflow-wrap:anywhere}table{width:100%;border-collapse:collapse;background:#fff;font-size:14px}td,th{text-align:left;border:1px solid #dce2ec;padding:12px}ul{padding-left:22px}li{margin:6px 0}.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;padding:4px 8px;border-radius:4px;background:#e9efff;color:#3159cc}footer{margin-top:50px;padding-top:22px;border-top:1px solid #dce2ec;color:#607089;font-size:13px}@media(max-width:600px){main{padding:24px 18px 55px}h1{letter-spacing:-1px}table{font-size:12px}td,th{padding:8px}.card{padding:19px}}
+</style></head><body><main><nav><a href="index.html">← Package index</a></nav><p class="eyebrow">Source browser</p><h1>Reusable SVIP examples</h1><p class="lead">Original SystemVerilog examples for AXI4, APB, JTAG, SPI, and Clock / Reset / Signal. They demonstrate the documented APIs. Running them requires the full SVIP runtime and VCS/UVM 1.2; the static snapshot contains their source, not simulation results.</p><ul><li><a href="#axi-testsuite-examples-svip-axi-callbacks-example-svh">axi/testsuite/examples/svip_axi_callbacks_example.svh</a></li><li><a href="#axi-testsuite-examples-svip-axi-controls-example-svh">axi/testsuite/examples/svip_axi_controls_example.svh</a></li><li><a href="#axi-testsuite-examples-svip-axi-observation-example-svh">axi/testsuite/examples/svip_axi_observation_example.svh</a></li><li><a href="#axi-testsuite-examples-svip-axi-patterns-example-svh">axi/testsuite/examples/svip_axi_patterns_example.svh</a></li><li><a href="#axi-testsuite-examples-svip-axi-reset-example-svh">axi/testsuite/examples/svip_axi_reset_example.svh</a></li><li><a href="#axi-testsuite-examples-svip-axi-slave-model-example-svh">axi/testsuite/examples/svip_axi_slave_model_example.svh</a></li><li><a href="#axi-testsuite-examples-svip-axi-timing-example-svh">axi/testsuite/examples/svip_axi_timing_example.svh</a></li><li><a href="#apb-testsuite-examples-svip-apb-control-examples-svh">apb/testsuite/examples/svip_apb_control_examples.svh</a></li><li><a href="#apb-testsuite-examples-svip-apb-examples-svh">apb/testsuite/examples/svip_apb_examples.svh</a></li><li><a href="#jtag-testsuite-examples-svip-jtag-examples-svh">jtag/testsuite/examples/svip_jtag_examples.svh</a></li><li><a href="#spi-testsuite-examples-svip-spi-examples-svh">spi/testsuite/examples/svip_spi_examples.svh</a></li><li><a href="#control-clock-examples-svip-clock-example-sv">control/clock/examples/svip_clock_example.sv</a></li><li><a href="#control-reset-examples-svip-reset-example-sv">control/reset/examples/svip_reset_example.sv</a></li><li><a href="#control-signal-examples-svip-signal-example-sv">control/signal/examples/svip_signal_example.sv</a></li><li><a href="#control-coordinator-examples-svip-clock-signal-example-sv">control/coordinator/examples/svip_clock_signal_example.sv</a></li><li><a href="#control-testsuite-examples-svip-control-examples-svh">control/testsuite/examples/svip_control_examples.svh</a></li><li><a href="#control-testbench-svip-control-quickstart-sv">control/testbench/svip_control_quickstart.sv</a></li></ul><section class="source-section" id="axi-testsuite-examples-svip-axi-callbacks-example-svh"><h2>axi/testsuite/examples/svip_axi_callbacks_example.svh</h2><p><a href="axi/testsuite/examples/svip_axi_callbacks_example.svh" download>Download original source</a> · 32 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Recipe: hooks are nonblocking functions; request fields change on the private snapshot.
+class svip_axi_recipe_callbacks extends svip_axi_callbacks;
+  function new(string name=&quot;svip_axi_recipe_callbacks&quot;); super.new(name); endfunction
+  virtual function void request(svip_axi_txn req); req.region=4&#x27;hc; endfunction
+  virtual function void write_response(svip_axi_txn req); req.buser=svip_axi_user_t&#x27;(&#x27;h1_01234567_89abcdef); endfunction
+  virtual function void read_response(svip_axi_txn req,ref bit [1:0] rresp[],ref svip_axi_user_t ruser[]);
+    foreach(ruser[i]) ruser[i]=svip_axi_user_t&#x27;(&#x27;h2_fedcba98_76543210) ^ i;
+  endfunction
+endclass
+class svip_axi_callbacks_recipe_seq extends svip_axi_contract_seq;
+  `uvm_object_utils(svip_axi_callbacks_recipe_seq)
+  function new(string name=&quot;svip_axi_callbacks_recipe_seq&quot;); super.new(name); endfunction
+  virtual task body();
+    svip_axi_txn t,r;
+    wait(ctrl.resetn===1); repeat(5) @(negedge ctrl.clk);
+    t=request(0,&#x27;h1000,4); completed(t,r);
+    if(r.buser!=svip_axi_user_t&#x27;(&#x27;h1_01234567_89abcdef)) `uvm_error(&quot;RECIPE_CALLBACK&quot;,&quot;write response hook effect missing&quot;)
+    t=request(1,&#x27;h1000,4); completed(t,r);
+    foreach(r.ruser[i]) if(r.ruser[i]!=(svip_axi_user_t&#x27;(&#x27;h2_fedcba98_76543210)^i)) `uvm_error(&quot;RECIPE_CALLBACK&quot;,&quot;read response hook effect missing&quot;)
+  endtask
+endclass
+class svip_axi_callbacks_example extends svip_axi_test;
+  `uvm_component_utils(svip_axi_callbacks_example)
+  svip_axi_recipe_callbacks hooks;
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase); hooks=new(&quot;hooks&quot;);
+    mgr.add_callback(hooks); sub.add_callback(hooks);
+  endfunction
+  virtual function svip_axi_contract_seq create_sequence(); return svip_axi_callbacks_recipe_seq::type_id::create(&quot;callbacks_recipe&quot;); endfunction
+endclass
+</code></pre></section><section class="source-section" id="axi-testsuite-examples-svip-axi-controls-example-svh"><h2>axi/testsuite/examples/svip_axi_controls_example.svh</h2><p><a href="axi/testsuite/examples/svip_axi_controls_example.svh" download>Download original source</a> · 26 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Recipe: force only a READY channel owned by that agent; always release explicit controls.
+class svip_axi_controls_recipe_seq extends svip_axi_contract_seq;
+  `uvm_object_utils(svip_axi_controls_recipe_seq)
+  function new(string name=&quot;svip_axi_controls_recipe_seq&quot;); super.new(name); endfunction
+  virtual task body();
+    svip_axi_txn t;
+    wait(ctrl.resetn===1); repeat(5) @(negedge ctrl.clk);
+    write_check(&#x27;h1000,4);
+    sub.force_ready(SVIP_AXI_AR,1,0);
+    t=request(1,&#x27;h1000,4); send(t); repeat(8) @(negedge ctrl.clk);
+    if(mgr.cfg.vif.arvalid!==1 || mgr.cfg.vif.arready!==0) `uvm_error(&quot;CONTROL_AR&quot;,&quot;AR READY override did not stall&quot;)
+    sub.force_ready(SVIP_AXI_AR,0,0); wait_all();
+    sub.hold_responses(1,1); // Pauses new responses, not an already presented VALID.
+    t=request(0,&#x27;h1100,4); send(t); t=request(1,&#x27;h1000,4); send(t);
+    repeat(20) @(negedge ctrl.clk);
+    if(mgr.cfg.vif.bvalid!==0 || mgr.cfg.vif.rvalid!==0) `uvm_error(&quot;CONTROL_HOLD&quot;,&quot;hold started a response&quot;)
+    sub.hold_responses(0,0); wait_all();
+    read_check(&#x27;h1100,4);
+  endtask
+endclass
+class svip_axi_controls_example extends svip_axi_test;
+  `uvm_component_utils(svip_axi_controls_example)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  virtual function svip_axi_contract_seq create_sequence(); return svip_axi_controls_recipe_seq::type_id::create(&quot;controls_recipe&quot;); endfunction
+endclass
+</code></pre></section><section class="source-section" id="axi-testsuite-examples-svip-axi-observation-example-svh"><h2>axi/testsuite/examples/svip_axi_observation_example.svh</h2><p><a href="axi/testsuite/examples/svip_axi_observation_example.svh" download>Download original source</a> · 36 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Recipe: analysis subscribers observe; they never participate in bus scheduling.
+class svip_axi_recipe_listener extends uvm_subscriber #(svip_axi_txn);
+  `uvm_component_utils(svip_axi_recipe_listener)
+  int seen;
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  virtual function void write(svip_axi_txn item);
+    seen++; `uvm_info(&quot;OBSERVED_TRANSACTION&quot;,item.convert2string(),UVM_LOW)
+  endfunction
+endclass
+class svip_axi_observation_recipe_seq extends svip_axi_contract_seq;
+  `uvm_object_utils(svip_axi_observation_recipe_seq)
+  function new(string name=&quot;svip_axi_observation_recipe_seq&quot;); super.new(name); endfunction
+  virtual task body();
+    wait(ctrl.resetn===1); repeat(5) @(negedge ctrl.clk);
+    write_check(&#x27;h1000,4); read_check(&#x27;h1000,4); repeat(5) @(negedge ctrl.clk);
+  endtask
+endclass
+class svip_axi_observation_example extends svip_axi_test;
+  `uvm_component_utils(svip_axi_observation_example)
+  svip_axi_recipe_listener listener;
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  virtual function void configure_test();
+    listener=svip_axi_recipe_listener::type_id::create(&quot;listener&quot;,this);
+    mc.tracker_mode=SVIP_AXI_TRACKER_CHANNEL; mc.tracker_filename=&quot;example_mgr.tracker.log&quot;;
+    sc.tracker_mode=SVIP_AXI_TRACKER_TXN; sc.tracker_filename=&quot;example_sub.tracker.log&quot;;
+  endfunction
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase); mgr.ap.connect(listener.analysis_export);
+  endfunction
+  function void check_phase(uvm_phase phase);
+    super.check_phase(phase);
+    if(listener.seen!=2) `uvm_error(&quot;OBSERVATION_RECIPE&quot;,&quot;expected one complete write and one complete read&quot;)
+  endfunction
+  virtual function svip_axi_contract_seq create_sequence(); return svip_axi_observation_recipe_seq::type_id::create(&quot;observation_recipe&quot;); endfunction
+endclass
+</code></pre></section><section class="source-section" id="axi-testsuite-examples-svip-axi-patterns-example-svh"><h2>axi/testsuite/examples/svip_axi_patterns_example.svh</h2><p><a href="axi/testsuite/examples/svip_axi_patterns_example.svh" download>Download original source</a> · 38 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Recipe: write AA/55 data with alternating byte enables; untouched bytes stay initialized.
+class svip_axi_patterns_recipe_seq extends svip_axi_generation_seq;
+  `uvm_object_utils(svip_axi_patterns_recipe_seq)
+  function new(string name=&quot;svip_axi_patterns_recipe_seq&quot;); super.new(name); endfunction
+  virtual task body();
+    svip_axi_addr_t address=64&#x27;h1234567800001000;
+    byte unsigned old_bytes[svip_axi_addr_t];
+    svip_axi_txn t,r;
+    svip_axi_generation_goal_t goal;
+    svip_axi_strb_e modes[3]=&#x27;{SVIP_AXI_STRB_FULL,SVIP_AXI_STRB_RANDOM,SVIP_AXI_STRB_MIXED};
+    int bytes=p_sequencer.cfg.data_bytes;
+    wait(ctrl.resetn===1); repeat(5) @(negedge ctrl.clk);
+    write_check(address,1,$clog2(bytes));
+    old_bytes=oracle; t=request(0,address,1,$clog2(bytes)); oracle=old_bytes;
+    for(int lane=0;lane&lt;bytes;lane++) begin
+      t.data[0][lane*8+:8]=lane%2 ? 8&#x27;h55 : 8&#x27;haa;
+      t.strb[0][lane]=(lane%2)==0;
+      if((lane%2)==0) oracle[address+lane]=8&#x27;haa;
+    end
+    completed(t,r); read_check(address,1,$clog2(bytes));
+    // Public helper modes: initialize untouched bytes, send the filled object, check readback.
+    foreach(modes[m]) begin
+      goal=make_goal(SVIP_AXI_WR,address+&#x27;h1000,2,$clog2(bytes),SVIP_AXI_INCR,&#x27;h710+m);
+      write_check(goal.addr,goal.beats,goal.size,goal.burst,91);
+      t=randomized_request(goal);
+      t.fill_wdata(modes[m]);
+      send_generated(t,goal,modes[m]);
+    end
+  endtask
+endclass
+class svip_axi_patterns_example extends svip_axi_test;
+  `uvm_component_utils(svip_axi_patterns_example)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  virtual function svip_axi_contract_seq create_sequence();
+    return svip_axi_patterns_recipe_seq::type_id::create(&quot;patterns_recipe&quot;);
+  endfunction
+endclass
+</code></pre></section><section class="source-section" id="axi-testsuite-examples-svip-axi-reset-example-svh"><h2>axi/testsuite/examples/svip_axi_reset_example.svh</h2><p><a href="axi/testsuite/examples/svip_axi_reset_example.svh" download>Download original source</a> · 26 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Recipe: reset outstanding traffic without calling the driver&#x27;s software flush.
+class svip_axi_reset_recipe_seq extends svip_axi_contract_seq;
+  `uvm_object_utils(svip_axi_reset_recipe_seq)
+  function new(string name=&quot;svip_axi_reset_recipe_seq&quot;); super.new(name); endfunction
+  virtual task body();
+    svip_axi_txn t;
+    wait(ctrl.resetn===1); repeat(5) @(negedge ctrl.clk);
+    write_check(&#x27;h1000,4);
+    mgr.force_ready(SVIP_AXI_B,1,0); mgr.force_ready(SVIP_AXI_R,1,0);
+    repeat(3) @(negedge ctrl.clk);
+    t=request(0,&#x27;h1000,4); expect_abort[t.get_transaction_id()]=1; send(t);
+    t=request(1,&#x27;h1000,4); expect_abort[t.get_transaction_id()]=1; send(t);
+    wait(mgr.cfg.vif.bvalid===1 &amp;&amp; mgr.cfg.vif.rvalid===1);
+    ctrl.pulse_reset(); wait_all();
+    mgr.force_ready(SVIP_AXI_B,0,0); mgr.force_ready(SVIP_AXI_R,0,0);
+    read_check(&#x27;h1000,4); write_check(&#x27;h1200,4); read_check(&#x27;h1200,4);
+  endtask
+endclass
+class svip_axi_reset_example extends svip_axi_test;
+  `uvm_component_utils(svip_axi_reset_example)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  virtual function svip_axi_contract_seq create_sequence();
+    return svip_axi_reset_recipe_seq::type_id::create(&quot;reset_recipe&quot;);
+  endfunction
+endclass
+</code></pre></section><section class="source-section" id="axi-testsuite-examples-svip-axi-slave-model-example-svh"><h2>axi/testsuite/examples/svip_axi_slave_model_example.svh</h2><p><a href="axi/testsuite/examples/svip_axi_slave_model_example.svh" download>Download original source</a> · 50 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+// Recipe: a sequence chooses when the subordinate processes and replies to requests.
+class svip_axi_slave_model_recipe_seq extends svip_axi_contract_seq;
+  `uvm_object_utils(svip_axi_slave_model_recipe_seq)
+  function new(string name=&quot;svip_axi_slave_model_recipe_seq&quot;); super.new(name); endfunction
+  virtual task body();
+    int size,reply_count;
+    wait(ctrl.resetn===1); repeat(5) @(negedge ctrl.clk);
+    size=p_sequencer.cfg.max_size()&lt;3 ? p_sequencer.cfg.max_size() : 3;
+    if(sub.cfg.memory_mode!=SVIP_AXI_MEMORY || sub.cfg.mem==null)
+      `uvm_fatal(&quot;SLAVE_RECIPE_MEMORY&quot;,&quot;default internal memory was not installed&quot;)
+    fork
+      begin
+        svip_axi_txn t,r;
+        t=request(0,&#x27;h1000,2,size,SVIP_AXI_INCR,1,37); completed(t,r);
+        if(r.buser!=svip_axi_user_t&#x27;(&#x27;h31)) `uvm_error(&quot;SLAVE_RECIPE_BUSER&quot;,&quot;sequence-selected BUSER was lost&quot;)
+        t=request(1,&#x27;h1000,2,size,SVIP_AXI_INCR,1); completed(t,r);
+        if(r.rresp.size()!=2 || r.ruser.size()!=2) `uvm_fatal(&quot;SLAVE_RECIPE_READ&quot;,&quot;read response omitted beats&quot;)
+        foreach(r.rresp[i])
+          if(r.rresp[i]!=SVIP_AXI_OKAY || r.ruser[i]!=svip_axi_user_t&#x27;(&#x27;h51+i))
+            `uvm_error(&quot;SLAVE_RECIPE_RUSER&quot;,&quot;sequence-selected read status/USER was lost&quot;)
+      end
+      begin
+        svip_axi_txn req,rsp;
+        repeat(2) begin
+          sub.get_request(req);
+          repeat(3) @(negedge ctrl.clk);
+          // This explicit call commits a write or snapshots a read exactly once.
+          rsp=sub.default_response(req);
+          if(rsp==null) `uvm_fatal(&quot;SLAVE_RECIPE_DEFAULT&quot;,&quot;default processing rejected a live request&quot;)
+          if(req.dir==SVIP_AXI_WR) rsp.buser=svip_axi_user_t&#x27;(&#x27;h31);
+          else foreach(rsp.ruser[i]) rsp.ruser[i]=svip_axi_user_t&#x27;(&#x27;h51+i);
+          if(!sub.send_response(req,rsp)) `uvm_fatal(&quot;SLAVE_RECIPE_SEND&quot;,&quot;live response was rejected&quot;)
+          reply_count++;
+        end
+      end
+    join
+    wait_all(); repeat(8) @(negedge ctrl.clk);
+    if(n_sent!=2 || n_done!=2 || reply_count!=2)
+      `uvm_error(&quot;SLAVE_RECIPE_COMPLETIONS&quot;,&quot;manager and responder did not complete exactly two requests&quot;)
+  endtask
+endclass
+
+class svip_axi_slave_model_example extends svip_axi_test;
+  `uvm_component_utils(svip_axi_slave_model_example)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  virtual function void configure_test(); sc.sub_response_mode=SVIP_AXI_SUB_USER; endfunction
+  virtual function svip_axi_contract_seq create_sequence(); return svip_axi_slave_model_recipe_seq::type_id::create(&quot;slave_model_recipe&quot;); endfunction
+endclass
+</code></pre></section><section class="source-section" id="axi-testsuite-examples-svip-axi-timing-example-svh"><h2>axi/testsuite/examples/svip_axi_timing_example.svh</h2><p><a href="axi/testsuite/examples/svip_axi_timing_example.svh" download>Download original source</a> · 30 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Recipe: timing policies are runtime objects; no driver subclass or pin force is needed.
+class svip_axi_timing_recipe_seq extends svip_axi_contract_seq;
+  `uvm_object_utils(svip_axi_timing_recipe_seq)
+  function new(string name=&quot;svip_axi_timing_recipe_seq&quot;); super.new(name); endfunction
+  virtual task body();
+    longint unsigned predecessor;
+    wait(ctrl.resetn===1); repeat(5) @(negedge ctrl.clk);
+    mgr.cfg.timing.apply(SVIP_AXI_TIMING_ZERO);
+    mgr.cfg.timing.aw_valid.set_fixed(1);
+    mgr.cfg.timing.w_valid.set_range(0,2);
+    sub.cfg.timing.aw_ready.set_bursty(0,1,100,3,3);
+    sub.cfg.timing.b_lat.set_fixed(3);
+    sub.cfg.timing.r_lat.set_fixed(1);
+    sub.cfg.timing.r_beat.set_fixed(2);
+    write_check(&#x27;h1000,4);
+    predecessor=ctrl.last_aw_cycle&gt;ctrl.last_wlast_cycle ? ctrl.last_aw_cycle : ctrl.last_wlast_cycle;
+    if(ctrl.last_b_cycle-predecessor!=4) `uvm_error(&quot;TIMING_RECIPE_B&quot;,&quot;fixed B latency3 must handshake4 physical cycles later&quot;)
+    read_check(&#x27;h1000);
+    if(ctrl.last_r_cycle-ctrl.last_ar_cycle!=2) `uvm_error(&quot;TIMING_RECIPE_R&quot;,&quot;fixed R latency1 must handshake2 physical cycles later&quot;)
+    read_check(&#x27;h1000,4);
+    // Restore a simple profile before this sequence yields the shared timing objects.
+    mgr.cfg.timing.apply(SVIP_AXI_TIMING_ZERO); sub.cfg.timing.apply(SVIP_AXI_TIMING_ZERO);
+  endtask
+endclass
+class svip_axi_timing_example extends svip_axi_test;
+  `uvm_component_utils(svip_axi_timing_example)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  virtual function svip_axi_contract_seq create_sequence(); return svip_axi_timing_recipe_seq::type_id::create(&quot;timing_recipe&quot;); endfunction
+endclass
+</code></pre></section><section class="source-section" id="apb-testsuite-examples-svip-apb-control-examples-svh"><h2>apb/testsuite/examples/svip_apb_control_examples.svh</h2><p><a href="apb/testsuite/examples/svip_apb_control_examples.svh" download>Download original source</a> · 137 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+// Independent response fixture owns PREADY; requester controls remain unchanged.
+class svip_apb_backpressure_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_backpressure_test)
+  function new(string name,uvm_component parent);super.new(name,parent);endfunction
+  task stalled(svip_apb_data_t expected,int cycles);
+    svip_apb_strb_t expected_strb=0;
+    if(cfg.apb4)for(int lane=0;lane&lt;cfg.data_width/8;lane++)expected_strb[lane]=1;
+    do @(vif.mon_cb);while(vif.mon_cb.psel!==1 || vif.mon_cb.penable!==1);
+    for(int i=0;i&lt;cycles;i++)begin
+      if(vif.mon_cb.pready!==0 || vif.mon_cb.psel!==1 || vif.mon_cb.penable!==1 ||
+         vif.mon_cb.paddr!==&#x27;h80 || vif.mon_cb.pwrite!==1 || vif.mon_cb.pwdata!==expected ||
+         vif.mon_cb.pprot!==0 || vif.mon_cb.pstrb!==expected_strb)
+        `uvm_fatal(&quot;TEST_BACKPRESSURE&quot;,&quot;selected write changed while response was withheld&quot;)
+      #1ps;
+      if(ctrl.bus_completions!=1 || terminal.items.size()!=1)
+        `uvm_fatal(&quot;TEST_BACKPRESSURE&quot;,&quot;request completed before PREADY was released&quot;)
+      if(i+1&lt;cycles)@(vif.mon_cb);
+    end
+  endtask
+  task run_case();
+    svip_apb_txn t=cfg.create_txn(&quot;blocked_write&quot;);
+    svip_apb_data_t next_data=data_pattern(&#x27;h2468ace0);
+    bit abort_write=(case_name==&quot;backpressure_reset_write&quot;);
+    checked_write(&#x27;h80,&#x27;h13579bdf);
+    t.write=1;t.addr=&#x27;h80;t.data=next_data;t.strb=&#x27;1;
+    ctrl.manual_response=1;ctrl.manual_ready=0;ctrl.manual_error=0;
+    fork
+      submit(t);
+      begin
+        stalled(next_data,16);
+        if(abort_write)begin
+          @(negedge ctrl.clk);ctrl.resetn=0;
+          #1ps;
+          if(vif.psel!==0 || vif.penable!==0) `uvm_fatal(&quot;TEST_BACKPRESSURE&quot;,&quot;reset did not idle pins&quot;)
+          @(negedge ctrl.clk);ctrl.resetn=1;
+        end else ctrl.manual_ready=1;
+      end
+    join
+    if(t.status!==(abort_write?SVIP_APB_RESET_ABORTED:SVIP_APB_OK) || t.wait_cycles!=16)
+      `uvm_fatal(&quot;TEST_BACKPRESSURE&quot;,&quot;held request lost its result or exact wait count&quot;)
+    ctrl.manual_response=0;ctrl.manual_ready=1;
+    if(!abort_write)for(int lane=0;lane&lt;cfg.data_width/8;lane++)gold[&#x27;h80+lane]=next_data[lane*8+:8];
+    // This fixture commits memory on the actual bus handshake, never on a stall.
+    checked_read(&#x27;h80);
+    if(ctrl.bus_completions!=(abort_write?2:3) || observed.items.size()!=(abort_write?2:3) || terminal.items.size()!=3)
+      `uvm_fatal(&quot;TEST_BACKPRESSURE&quot;,&quot;false completion or lost recovery&quot;)
+  endtask
+endclass
+
+// The convenience sequence expresses an exact, reproducible address/data list.
+class svip_apb_directed_pattern_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_directed_pattern_test)
+  function new(string name,uvm_component parent);super.new(name,parent);endfunction
+  task run_case();
+    svip_apb_rw_seq seq=svip_apb_rw_seq::type_id::create(&quot;directed&quot;);
+    svip_apb_data_t words[6]=&#x27;{&#x27;0,&#x27;1,32&#x27;haa55aa55,32&#x27;h55aa55aa,32&#x27;h01234567,32&#x27;h89abcdef};
+    svip_apb_addr_t addresses[6]=&#x27;{&#x27;h40,&#x27;h44,&#x27;h48,&#x27;h4c,&#x27;h50,&#x27;h54};
+    seq.cfg=cfg;
+    foreach(words[i])begin
+      svip_apb_data_t expected=data_pattern(words[i]);
+      logic [2:0] protection=cfg.apb4?3&#x27;(i):3&#x27;b000;
+      seq.addr=addresses[i];seq.write=1;seq.data=expected;seq.strb=&#x27;1;seq.prot=protection;
+      sent++;seq.start(agent.sqr);#1ps;
+      if(seq.result.status!==SVIP_APB_OK || observed.items[$].addr!==addresses[i] ||
+         observed.items[$].data!==expected || observed.items[$].prot!==protection)
+        `uvm_fatal(&quot;TEST_DIRECTED_PATTERN&quot;,&quot;write pins did not match the requested literal/protection&quot;)
+      seq.write=0;sent++;seq.start(agent.sqr);#1ps;
+      if(seq.result.status!==SVIP_APB_OK || seq.data!==expected ||
+         observed.items[$].data!==expected || observed.items[$].prot!==protection)
+        `uvm_fatal(&quot;TEST_DIRECTED_PATTERN&quot;,&quot;readback or read protection differed from the literal&quot;)
+    end
+    if(ctrl.bus_completions!=12 || observed.items.size()!=12)
+      `uvm_fatal(&quot;TEST_DIRECTED_PATTERN&quot;,&quot;a directed transfer was lost or duplicated&quot;)
+  endtask
+endclass
+
+// Fixed bits and random bits coexist: low-byte high nibble A, low nibble random.
+class svip_apb_constrained_pattern_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_constrained_pattern_test)
+  function new(string name,uvm_component parent);super.new(name,parent);endfunction
+  task run_case();
+    bit [15:0] low_values=0;
+    svip_apb_addr_t first_address;
+    bit varied_address=0;
+    svip_apb_strb_t full_strb=0;
+    logic [2:0] protection=cfg.apb4?3&#x27;b101:3&#x27;b000;
+    for(int lane=0;lane&lt;cfg.data_width/8;lane++)full_strb[lane]=1;
+    for(int i=0;i&lt;40;i++)begin
+      svip_apb_txn t=cfg.create_txn(&quot;constrained_pattern&quot;);
+      svip_apb_addr_t address;
+      svip_apb_data_t expected;
+      if(!t.randomize() with {write==1;addr inside {[&#x27;h40:&#x27;h7f]};data[7:4]==4&#x27;ha;
+                             strb==local::full_strb;prot==local::protection;})
+        `uvm_fatal(&quot;TEST_CONSTRAINED_PATTERN&quot;,&quot;randomize failed&quot;)
+      address=t.addr;expected=t.data;
+      if(i==0)first_address=address;else if(address!=first_address)varied_address=1;
+      submit(t);
+      if(t.status!==SVIP_APB_OK || observed.items[$].addr!==address ||
+         observed.items[$].data!==expected || observed.items[$].data[7:4]!==4&#x27;ha ||
+         observed.items[$].prot!==protection || observed.items[$].strb!==full_strb)
+        `uvm_fatal(&quot;TEST_CONSTRAINED_PATTERN&quot;,&quot;actual pattern did not satisfy the requested constraints&quot;)
+      low_values[observed.items[$].data[3:0]]=1;
+      for(int lane=0;lane&lt;cfg.data_width/8;lane++)gold[longint&#x27;(address)+lane]=expected[lane*8+:8];
+      checked_read(address,protection);
+    end
+    if($countones(low_values)&lt;2 || !varied_address || ctrl.bus_completions!=80)
+      `uvm_fatal(&quot;TEST_CONSTRAINED_PATTERN&quot;,&quot;sent traffic did not vary or lost a transfer&quot;)
+  endtask
+endclass
+
+class svip_apb_byte_lane_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_byte_lane_test)
+  function new(string name,uvm_component parent);super.new(name,parent);endfunction
+  task run_case();
+    svip_apb_rw_seq seq=svip_apb_rw_seq::type_id::create(&quot;byte_lane&quot;);
+    checked_write(&#x27;h80,0);
+    seq.cfg=cfg;seq.addr=&#x27;h80;seq.write=1;seq.prot=3&#x27;b101;
+    for(int lane=0;lane&lt;cfg.data_width/8;lane++)begin
+      bit [7:0] literal=8&#x27;(&#x27;h5a+lane*&#x27;h11);
+      svip_apb_data_t expected=0;
+      svip_apb_strb_t strobe=0;
+      expected[lane*8+:8]=literal;strobe[lane]=1;
+      seq.data=expected;seq.strb=strobe;sent++;seq.start(agent.sqr);#1ps;
+      if(seq.result.status!==SVIP_APB_OK || observed.items[$].data!==expected ||
+         observed.items[$].strb!==strobe || observed.items[$].prot!==3&#x27;b101)
+        `uvm_fatal(&quot;TEST_BYTE_LANE&quot;,&quot;byte data was not placed in the selected lane&quot;)
+      gold[&#x27;h80+lane]=literal;checked_read(&#x27;h80);
+    end
+    // Zero strobe is a legal completed transfer with no byte update in this fixture.
+    seq.data=data_pattern(&#x27;1);seq.strb=0;sent++;seq.start(agent.sqr);#1ps;
+    if(seq.result.status!==SVIP_APB_OK || observed.items[$].strb!==0)
+      `uvm_fatal(&quot;TEST_BYTE_LANE&quot;,&quot;zero-strobe transfer did not complete&quot;)
+    checked_read(&#x27;h80);
+  endtask
+endclass
+</code></pre></section><section class="source-section" id="apb-testsuite-examples-svip-apb-examples-svh"><h2>apb/testsuite/examples/svip_apb_examples.svh</h2><p><a href="apb/testsuite/examples/svip_apb_examples.svh" download>Download original source</a> · 241 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+class svip_apb_smoke_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_smoke_test)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  task run_case();
+    checked_write(&#x27;h80,&#x27;h12345678);
+    checked_read(&#x27;h80);
+    if (ctrl.bus_completions!=2 || observed.items.size()!=2)
+      `uvm_fatal(&quot;TEST_COUNT&quot;,&quot;smoke requires exactly two pin/monitor completions&quot;)
+  endtask
+endclass
+
+class svip_apb_sequence_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_sequence_test)
+  function new(string name,uvm_component parent);super.new(name,parent);endfunction
+  task run_case();
+    svip_apb_rw_seq seq=svip_apb_rw_seq::type_id::create(&quot;user_sequence&quot;);
+    seq.cfg=cfg;seq.addr=&#x27;h80;seq.write=1;seq.data=data_pattern(&#x27;h59a63cc3);
+    sent=2;
+    seq.start(agent.sqr);
+    if(seq.result.status!==SVIP_APB_OK) `uvm_fatal(&quot;TEST_SEQUENCE&quot;,&quot;write sequence failed&quot;)
+    seq.write=0;seq.start(agent.sqr);#1ps;
+    if(seq.result.status!==SVIP_APB_OK || seq.data!==data_pattern(&#x27;h59a63cc3))
+      `uvm_fatal(&quot;TEST_SEQUENCE&quot;,&quot;read sequence lost response&quot;)
+  endtask
+endclass
+
+class svip_apb_random_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_random_test)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  task run_case();
+    bit saw_read=0,saw_write=0;
+    bit [7:0] prot_seen=0;
+    svip_apb_data_t data_or=0,data_and=&#x27;1;
+    repeat(120) begin
+      svip_apb_txn t=cfg.create_txn(&quot;random_pattern&quot;);
+      if (!t.randomize() with {addr inside {[&#x27;h40:&#x27;h7f]};}) `uvm_fatal(&quot;TEST_RAND&quot;,&quot;randomize failed&quot;)
+      ctrl.wait_cycles=$urandom_range(0,5);
+      if(t.write) begin
+        checked_write(t.addr,t.data,t.strb,t.prot); saw_write=1;
+        data_or |= t.data; data_and &amp;= t.data;
+      end else begin checked_read(t.addr,t.prot); saw_read=1; end
+      prot_seen[observed.items[$].prot]=1;
+    end
+    if (!saw_read || !saw_write || data_pattern(data_or)!==data_pattern(&#x27;1) || data_pattern(data_and)!==0)
+      `uvm_fatal(&quot;TEST_PATTERN&quot;,&quot;actual random traffic missed direction/data variation&quot;)
+    if(cfg.apb4 &amp;&amp; $countones(prot_seen)&lt;2) `uvm_fatal(&quot;TEST_PATTERN&quot;,&quot;actual PROT never varied&quot;)
+  endtask
+endclass
+
+class svip_apb_stream_seq extends uvm_sequence #(svip_apb_txn);
+  `uvm_object_utils(svip_apb_stream_seq)
+  svip_apb_cfg cfg;
+  virtual svip_apb_test_ctrl_if ctrl;
+  function new(string name=&quot;stream&quot;);super.new(name);endfunction
+  task body();
+    realtime previous_end=0,period_ns=2.0*ctrl.clock_half_ps*0.001;
+    realtime first_gap=-1;
+    bit varied_gap=0;
+    bit next_write=1;
+    svip_apb_data_t literal=&#x27;h3c965aa5;
+    repeat(16)begin
+      svip_apb_txn t=cfg.create_txn(&quot;stream_request&quot;);
+      svip_apb_data_t expected=0;
+      realtime gap;
+      for(int i=0;i&lt;cfg.data_width;i++)expected[i]=literal[i];
+      start_item(t);
+      t.write=next_write;next_write=!next_write;
+      t.addr=&#x27;h80;t.data=expected;t.strb=t.write?&#x27;1:&#x27;0;
+      finish_item(t);
+      if(t.status!==SVIP_APB_OK || t.data!==expected) `uvm_fatal(&quot;TEST_STREAM&quot;,&quot;stream payload/status failed&quot;)
+      if(previous_end!=0)begin
+        gap=t.t_start-previous_end;
+        if(cfg.back_to_back &amp;&amp; (gap&lt; -0.0001 || gap&gt;0.0001))
+          `uvm_fatal(&quot;TEST_B2B&quot;,&quot;back-to-back inserted a bubble&quot;)
+        if(!cfg.back_to_back &amp;&amp; (gap&lt;cfg.min_idle_cycles*period_ns-0.0001 || gap&gt;cfg.max_idle_cycles*period_ns+0.0001))
+          `uvm_fatal(&quot;TEST_IDLE_GAP&quot;,&quot;actual idle latency outside configured bounds&quot;)
+        if(first_gap&lt;0)first_gap=gap;
+        else if(gap&lt;first_gap-0.0001 || gap&gt;first_gap+0.0001)varied_gap=1;
+      end
+      previous_end=t.t_end;
+    end
+    if(!cfg.back_to_back &amp;&amp; cfg.max_idle_cycles&gt;cfg.min_idle_cycles &amp;&amp; !varied_gap)
+      `uvm_fatal(&quot;TEST_IDLE_GAP&quot;,&quot;random idle latency never varied on pins&quot;)
+  endtask
+endclass
+
+class svip_apb_timing_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_timing_test)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  task run_case();
+    svip_apb_stream_seq stream=svip_apb_stream_seq::type_id::create(&quot;stream&quot;);
+    if(case_name==&quot;example_timing&quot;)begin
+      cfg.back_to_back=0;cfg.min_idle_cycles=2;cfg.max_idle_cycles=2;ctrl.wait_cycles=3;
+    end
+    stream.cfg=cfg;stream.ctrl=ctrl;sent=16;stream.start(agent.sqr);#1ps;
+    if(case_name==&quot;example_timing&quot;)begin
+      cfg.max_idle_cycles=5;sent+=16;stream.start(agent.sqr);#1ps;
+    end
+    if(ctrl.bus_completions!=sent || observed.items.size()!=sent) `uvm_fatal(&quot;TEST_STREAM&quot;,&quot;stream lost completions&quot;)
+  endtask
+endclass
+
+class svip_apb_hold_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_hold_test)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  task run_case();
+    svip_apb_txn t=cfg.create_txn(&quot;held&quot;);
+    t.write=0; t.addr=&#x27;h80; t.strb=0; cfg.hold=1;
+    fork
+      submit(t);
+      begin
+        repeat(4) @(vif.mon_cb);
+        if(vif.psel!==0 || terminal.items.size()!=0 || ctrl.bus_completions!=0)
+          `uvm_fatal(&quot;TEST_HOLD&quot;,&quot;held request reached pins or completed&quot;)
+        cfg.hold=0;
+      end
+    join
+    if(t.status!==SVIP_APB_OK) `uvm_fatal(&quot;TEST_HOLD&quot;,&quot;request did not resume&quot;)
+    ctrl.wait_cycles=4;t=cfg.create_txn(&quot;already_presented&quot;);t.addr=&#x27;h80;t.strb=0;
+    fork
+      submit(t);
+      begin wait(vif.psel===1 &amp;&amp; vif.penable===1);cfg.hold=1;end
+    join
+    if(t.status!==SVIP_APB_OK || t.wait_cycles!=4)
+      `uvm_fatal(&quot;TEST_HOLD&quot;,&quot;hold cancelled an already presented transfer&quot;)
+    repeat(2)@(vif.mon_cb);#1ps;
+    if(vif.psel!==0 || vif.penable!==0 || ctrl.bus_completions!=2)
+      `uvm_fatal(&quot;TEST_HOLD&quot;,&quot;requester did not idle after draining the transfer&quot;)
+    cfg.hold=0;ctrl.wait_cycles=0;
+    checked_write(&#x27;h80,&#x27;ha55aa55a); checked_read(&#x27;h80);
+  endtask
+endclass
+
+class svip_apb_error_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_error_test)
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  task run_case();
+    svip_apb_txn t=cfg.create_txn(&quot;error_read&quot;);
+    ctrl.response_error=1; ctrl.error_data_x=1; ctrl.wait_cycles=2;
+    t.write=0;t.addr=&#x27;h80;t.strb=0;submit(t);
+    if(t.status!==SVIP_APB_SLVERR || t.slverr!==1 || t.wait_cycles!=2)
+      `uvm_fatal(&quot;TEST_ERROR&quot;,&quot;PSLVERR result lost&quot;)
+    t=cfg.create_txn(&quot;error_write&quot;);t.write=1;t.addr=&#x27;h80;
+    t.data=data_pattern(&#x27;hbadc0ffe);t.strb=&#x27;1;submit(t);
+    if(t.status!==SVIP_APB_SLVERR || observed.items[$].status!==SVIP_APB_SLVERR || t.wait_cycles!=2)
+      `uvm_fatal(&quot;TEST_ERROR&quot;,&quot;write PSLVERR result / monitor lost&quot;)
+    ctrl.response_error=0;ctrl.error_data_x=0;ctrl.wait_cycles=0;
+    checked_write(&#x27;h80,&#x27;h76543210);checked_read(&#x27;h80);
+  endtask
+endclass
+
+class svip_apb_test_reg extends uvm_reg;
+  `uvm_object_utils(svip_apb_test_reg)
+  uvm_reg_field value;
+  uvm_reg_field upper;
+  function new(string name=&quot;csr&quot;,int bits=32); super.new(name,bits,UVM_NO_COVERAGE); endfunction
+  function void build(int bits);
+    value=uvm_reg_field::type_id::create(&quot;value&quot;);
+    value.configure(this,8,0,&quot;RW&quot;,0,0,1,1,1);
+    if(bits&gt;8)begin
+      upper=uvm_reg_field::type_id::create(&quot;upper&quot;);
+      upper.configure(this,bits-8,8,&quot;RW&quot;,0,0,1,1,0);
+    end
+  endfunction
+endclass
+
+class svip_apb_test_block extends uvm_reg_block;
+  function new(string name);super.new(name,UVM_NO_COVERAGE);endfunction
+endclass
+
+class svip_apb_ral_test extends svip_apb_base_test;
+  `uvm_component_utils(svip_apb_ral_test)
+  svip_apb_test_block block;
+  uvm_reg_map map;
+  svip_apb_test_reg csr;
+  uvm_reg_predictor #(svip_apb_txn) predictor;
+  function new(string name,uvm_component parent); super.new(name,parent); endfunction
+  function void build_phase(uvm_phase phase);
+    super.build_phase(phase);
+    block=new(&quot;registers&quot;);
+    block.configure(null,&quot;&quot;);
+    map=block.create_map(&quot;map&quot;,0,cfg.data_width/8,UVM_LITTLE_ENDIAN,1);
+    csr=new(&quot;csr&quot;,cfg.data_width);csr.configure(block);csr.build(cfg.data_width);
+    map.add_reg(csr,&#x27;h80,&quot;RW&quot;);block.lock_model();
+    predictor=uvm_reg_predictor#(svip_apb_txn)::type_id::create(&quot;predictor&quot;,this);
+  endfunction
+  function void connect_phase(uvm_phase phase);
+    super.connect_phase(phase);
+    agent.connect_reg_map(map);agent.connect_predictor(predictor,map);
+  endfunction
+  task run_case();
+    uvm_status_e status;
+    uvm_reg_data_t value;
+    svip_apb_data_t expected=data_pattern(&#x27;h96a53cc3);
+    // RAL owns submissions here; count actual requested frontdoor operations.
+    sent=1;
+    csr.write(status,expected,UVM_FRONTDOOR,map);
+    #1ps;
+    if(status!==UVM_IS_OK || csr.get_mirrored_value()!==expected)
+      `uvm_fatal(&quot;TEST_RAL&quot;,&quot;frontdoor write / explicit prediction failed&quot;)
+    if(case_name==&quot;ral_byte_enable&quot;)begin
+      sent++;
+      csr.value.write(status,&#x27;h5a,UVM_FRONTDOOR,map);#1ps;
+      expected[7:0]=&#x27;h5a;
+      if(status!==UVM_IS_OK || observed.items[$].strb!==1 || csr.get_mirrored_value()!==expected)
+        `uvm_fatal(&quot;TEST_RAL_BYTE&quot;,&quot;field write lost byte enable / mirror&quot;)
+    end
+    if(case_name==&quot;ral_reset&quot;)begin
+      ctrl.wait_cycles=100;sent++;
+      fork
+        csr.read(status,value,UVM_FRONTDOOR,map);
+        begin
+          wait(vif.psel===1 &amp;&amp; vif.penable===1);@(negedge ctrl.clk);ctrl.resetn=0;
+          #1ps;if(vif.psel!==0 || vif.penable!==0) `uvm_fatal(&quot;TEST_RAL_RESET&quot;,&quot;pins not idle&quot;)
+          @(negedge ctrl.clk);ctrl.resetn=1;
+        end
+      join
+      #1ps;
+      if(status!==UVM_NOT_OK || csr.get_mirrored_value()!==expected)
+        `uvm_fatal(&quot;TEST_RAL_RESET&quot;,&quot;abort returned success or changed mirror&quot;)
+      ctrl.wait_cycles=0;
+    end
+    if(case_name==&quot;ral_error&quot;)begin
+      ctrl.response_error=1;ctrl.error_data_x=1;sent++;
+      csr.read(status,value,UVM_FRONTDOOR,map);#1ps;
+      if(status!==UVM_NOT_OK || csr.get_mirrored_value()!==expected)
+        `uvm_fatal(&quot;TEST_RAL_ERROR&quot;,$sformatf(&quot;status=%s mirror=%h expected=%h&quot;,status.name(),csr.get_mirrored_value(),expected))
+      sent++;csr.write(status,data_pattern(&#x27;h57ca83b6),UVM_FRONTDOOR,map);#1ps;
+      if(status!==UVM_NOT_OK || csr.get_mirrored_value()!==expected)
+        `uvm_fatal(&quot;TEST_RAL_ERROR&quot;,&quot;error write returned success / changed mirror&quot;)
+      ctrl.response_error=0;ctrl.error_data_x=0;
+    end
+    sent++;
+    csr.read(status,value,UVM_FRONTDOOR,map);
+    #1ps;
+    if(status!==UVM_IS_OK || value!==expected || ctrl.bus_completions!=(case_name==&quot;ral_reset&quot;?2:sent))
+      `uvm_fatal(&quot;TEST_RAL&quot;,&quot;frontdoor read differs from fixed value&quot;)
+  endtask
+endclass
+</code></pre></section><section class="source-section" id="jtag-testsuite-examples-svip-jtag-examples-svh"><h2>jtag/testsuite/examples/svip_jtag_examples.svh</h2><p><a href="jtag/testsuite/examples/svip_jtag_examples.svh" download>Download original source</a> · 40 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+task examples();
+  svip_jtag_txn r;
+  case(scenario)
+    &quot;example_basic&quot;:begin
+      reset_tms(r);goto_state(SVIP_JTAG_RTI,r);
+      scan_word(0,0,32,r);
+      insist(r.status==SVIP_JTAG_DONE,&quot;IDCODE scan&quot;);
+      foreach(r.rx_bits[i])insist(r.rx_bits[i]===((32&#x27;h149511c3&gt;&gt;i)&amp;1),&quot;IDCODE&quot;);
+    end
+    &quot;example_patterns&quot;:begin setup_bypass();for(int p=0;p&lt;5;p++)bypass_check(132,p);end
+    &quot;example_long&quot;:begin setup_bypass();bypass_check(4097);end
+    &quot;example_callback&quot;:begin cb.change=1;setup_bypass();bypass_check(1,1);cb.change=0;end
+    &quot;example_passive&quot;:begin
+      // External master: passive agent receives no sequence items or driver flags.
+      repeat(5)manual_cycle(1);manual_cycle(0);
+      manual_cycle(1);manual_cycle(1);manual_cycle(0);manual_cycle(0);
+      repeat(3)manual_cycle(0,1);manual_cycle(1,1);manual_cycle(1);manual_cycle(0);
+      insist(agent.mon.n_scans==1,&quot;passive IR commit&quot;);
+    end
+    &quot;example_raw_pause&quot;:begin
+      bit tms[],tdi[];
+      setup_bypass();goto_state(SVIP_JTAG_SHIFT_DR,r);
+      tms=new[4];tdi=new[4];tms=&#x27;{0,0,1,0};tdi=&#x27;{1,0,1,0};raw(tms,tdi,r);
+      insist(ctrl.state==6,&quot;Pause-DR&quot;);
+      #123ps; // TCK stopped low; this does not itself move the TAP.
+      insist(ctrl.state==6,&quot;stopped clock holds Pause&quot;);
+      tms=&#x27;{1,0,0,1,1,0};tdi=new[6];raw(tms,tdi,r);
+      insist(ctrl.state==1 &amp;&amp; agent.mon.last_scan.tdo_bits.size()==5,&quot;one cumulative committed scan&quot;);
+    end
+    &quot;example_register&quot;:begin
+      setup_bypass();scan_word(1,2,4,r);scan_word(0,32&#x27;h89abcdef,32,r);
+      insist(ctrl.value==32&#x27;h89abcdef &amp;&amp; ctrl.updates==1,&quot;Update side effect&quot;);
+      scan_word(0,0,32,r);
+      foreach(r.rx_bits[i])insist(r.rx_bits[i]===((32&#x27;h89abcdef&gt;&gt;i)&amp;1),&quot;register readback&quot;);
+    end
+    default:p1();
+  endcase
+endtask
+</code></pre></section><section class="source-section" id="spi-testsuite-examples-svip-spi-examples-svh"><h2>spi/testsuite/examples/svip_spi_examples.svh</h2><p><a href="spi/testsuite/examples/svip_spi_examples.svh" download>Download original source</a> · 53 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+// Each example checks results; the same public API is usable outside this TB.
+// ctrl/manual below are independent peer fixtures, replaced by the DUT in a project.
+task example_basic_api();
+  svip_spi_transfer_seq seq=svip_spi_transfer_seq::type_id::create(&quot;example&quot;);
+  profile(0,8,0);ctrl.reply=&#x27;{&#x27;h3d,&#x27;ha7};ctrl.seen.delete();
+  seq.cs=0;seq.tx_words=&#x27;{&#x27;h96,&#x27;h23};
+  seq.check_rx=1;seq.expected_words=&#x27;{&#x27;h3d,&#x27;ha7};
+  seq.start(spi.sequencer);
+  if(seq.result.status!=SVIP_SPI_OK || seq.result.n_received!=2 || seq.result.n_sampled!=16 ||
+     ctrl.seen.size()!=2 || ctrl.seen[0]!==&#x27;h96 || ctrl.seen[1]!==&#x27;h23)
+    `uvm_fatal(&quot;SPI_ORACLE&quot;,&quot;public transfer sequence did not complete expected exchange&quot;)
+endtask
+
+task example_slave_api();
+  svip_spi_txn response=svip_spi_txn::type_id::create(&quot;response&quot;);
+  svip_spi_word_t command[]=&#x27;{&#x27;h96,&#x27;h23};svip_spi_sample_t returned[];
+  profile(0,8,0);response.tx_words=&#x27;{&#x27;h3d,&#x27;ha7};
+  if(!spi.enqueue_response(response))`uvm_fatal(&quot;SPI_TEST&quot;,&quot;response rejected&quot;)
+  manual(command,returned);
+  if(returned.size()!=2 || returned[0]!==&#x27;h3d || returned[1]!==&#x27;ha7 ||
+     spi.pending_responses()!=0 || completed.items.size()!=1 || completed.items[0].status!=SVIP_SPI_OK ||
+     completed.items[0].rx_words[0]!==&#x27;h96 || completed.items[0].rx_words[1]!==&#x27;h23)
+    `uvm_fatal(&quot;SPI_ORACLE&quot;,&quot;queued response or received command incorrect&quot;)
+endtask
+
+task run_example(string which,output bit handled);
+  handled=1;
+  case(which)
+    &quot;example_basic&quot;:example_basic_api();
+    &quot;example_modes&quot;:begin simple_master(0);simple_master(1);simple_master(2);simple_master(3);end
+    &quot;example_nonbyte&quot;:simple_master(2,9,1);
+    &quot;example_multi_cs&quot;:begin simple_master(0,8,0,0);simple_master(3,8,1,`SVIP_SPI_MAX_CS-1);end
+    &quot;example_patterns&quot;:patterns();
+    &quot;example_random&quot;:patterns(1);
+    &quot;example_slave_queue&quot;:example_slave_api();
+    &quot;example_callback&quot;:slave_generated(0,1);
+    &quot;example_passive&quot;:passive_modes();
+    &quot;example_clock_hold&quot;:clock_hold();
+    &quot;example_reset&quot;:reset_master();
+    &quot;example_compare&quot;:masked_compare();
+    &quot;example_timing&quot;:begin
+      cfg.t_low_max=cfg.t_low+half_ps*1ps;cfg.t_high_max=cfg.t_high+half_ps*1ps;
+      cfg.word_gap=half_ps*1ps;cfg.word_gap_max=half_ps*3ps;
+      cfg.frame_delay=0;cfg.frame_delay_max=half_ps*2ps;
+      simple_master(0,9,0);simple_master(3,9,1);
+      if(observe.frames[$].min_half_period==observe.frames[$].max_half_period)
+        `uvm_fatal(&quot;SPI_ORACLE&quot;,&quot;timing variation did not reach pins&quot;)
+    end
+    default:handled=0;
+  endcase
+endtask
+</code></pre></section><section class="source-section" id="control-clock-examples-svip-clock-example-sv"><h2>control/clock/examples/svip_clock_example.sv</h2><p><a href="control/clock/examples/svip_clock_example.sv" download>Download original source</a> · 44 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+// Only common + clock are compiled. No reset/signal/coordinator package.
+module svip_clock_example;
+  timeunit 1ps; timeprecision 1ps;
+  import svip_control_common_pkg::*;
+  import svip_clock_pkg::*;
+  wire clk;
+  svip_control_pin_if pin(clk,clk);
+  assign clk=pin.drive_value;
+  initial begin
+    svip_control_registry resources;
+    svip_control_sv_binding#(1) binding;
+    svip_control_endpoint endpoint;
+    svip_clock_controller clock;
+    svip_control_result r;
+    svip_control_tick_t accepted,first,edges;
+    string reason;
+    #1;resources=new;binding=new(pin);
+    if(!resources.register_pin(&quot;clock&quot;,binding,&quot;dut.clk&quot;,0,&quot;tb&quot;,0,SVIP_CONTROL_CLOCK,
+      SVIP_CONTROL_DIRECT_PIN,endpoint,reason))$fatal(1,&quot;%s&quot;,reason);
+    clock=new(endpoint,20,30);
+    fork clock.run();clock.monitor();join_none
+    accepted=svip_control_now();clock.start(accepted+500,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED)$fatal(1,&quot;start&quot;);
+    clock.wait_edges(1,svip_control_now()+500,r);first=binding.last_rise();
+    if(r.status!=SVIP_CONTROL_COMPLETED || first-accepted!=30)$fatal(1,&quot;full first low&quot;);
+    #3;clock.stop_low(svip_control_now()+500,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED || clk!==0 || binding.last_fall()-first!=20)$fatal(1,&quot;complete high/stop low&quot;);
+    edges=binding.rises();#47;
+    if(binding.rises()!=edges)$fatal(1,&quot;unexpected stopped edge&quot;);
+    accepted=svip_control_now();clock.start(accepted+500,r);
+    clock.wait_edges(1,svip_control_now()+500,r);
+    if(binding.last_rise()-accepted!=30)$fatal(1,&quot;restart full low&quot;);
+    clock.set_period_at_boundary(12,18,svip_control_now()+500,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED || clock.period()!=30)$fatal(1,&quot;boundary timing&quot;);
+    clock.wait_edges(1,svip_control_now()+500,r);
+    if(binding.last_rise()-clock.boundary_edge()!=30)$fatal(1,&quot;actual new period&quot;);
+    clock.stop_low(svip_control_now()+500,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED || clock.unexpected_edges!=0)$fatal(1,&quot;final stop&quot;);
+    $display(&quot;SVIP_COMPONENT_PASS component=clock&quot;);$finish;
+  end
+  initial begin #2000;$fatal(1,&quot;clock example deadline&quot;);end
+endmodule
+</code></pre></section><section class="source-section" id="control-reset-examples-svip-reset-example-sv"><h2>control/reset/examples/svip_reset_example.sv</h2><p><a href="control/reset/examples/svip_reset_example.sv" download>Download original source</a> · 63 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+// Project-owned HDL clock; no clock generator UVC or signal package is needed.
+module svip_reset_example;
+  timeunit 1ps; timeprecision 1ps;
+  import svip_control_common_pkg::*;
+  import svip_reset_pkg::*;
+  bit clk=0;
+  always #25 clk=~clk;
+  wire rst_n;
+  logic received=1;
+  svip_control_pin_if#(1,1&#x27;b1) pin(rst_n,clk);
+  svip_control_pin_if clock_pin(clk,clk);
+  assign rst_n=pin.drive_value;
+  always @(posedge clk or negedge rst_n)if(!rst_n)received&lt;=0;else received&lt;=1;
+
+  class project_clock_ref extends svip_control_clock_ref;
+    function new(svip_control_endpoint endpoint);super.new(endpoint);endfunction
+    virtual function bit is_running();return 1;endfunction
+    // This reset example only uses actual edge IDs, not period prediction.
+    virtual function bit predicts_rise(svip_control_tick_t at_tick);return 0;endfunction
+  endclass
+  initial begin
+    svip_control_registry resources;
+    svip_control_sv_binding#(1,1&#x27;b1) binding;
+    svip_control_sv_binding#(1) clock_binding;
+    svip_control_endpoint endpoint,clock_endpoint;
+    svip_reset_controller reset;
+    project_clock_ref reference_clock;
+    svip_control_result r,old_release;
+    svip_control_tick_t epoch;
+    string reason;bit ok;
+    #1;resources=new;binding=new(pin);clock_binding=new(clock_pin,&quot;&quot;,0);
+    if(!resources.register_pin(&quot;reset&quot;,binding,&quot;dut.rst_n&quot;,0,&quot;tb&quot;,0,SVIP_CONTROL_RESET,
+      SVIP_CONTROL_DIRECT_PIN,endpoint,reason))$fatal(1,&quot;%s&quot;,reason);
+    if(!resources.register_pin(&quot;external_clock&quot;,clock_binding,&quot;dut.clk&quot;,0,&quot;project&quot;,1,SVIP_CONTROL_CLOCK,
+      SVIP_CONTROL_DIRECT_PIN,clock_endpoint,reason))$fatal(1,&quot;%s&quot;,reason);
+    reset=new(endpoint,1);reference_clock=new(clock_endpoint);
+    fork reset.monitor();join_none
+    reset.set_source(&quot;software&quot;,1,svip_control_now()+300,r);epoch=reset.watch.epoch();
+    if(r.status!=SVIP_CONTROL_COMPLETED || rst_n!==0 || received!==0 || epoch!=1)$fatal(1,&quot;actual async reset&quot;);
+    reset.set_source(&quot;software&quot;,1,svip_control_now()+300,r);
+    if(reset.watch.epoch()!=epoch)$fatal(1,&quot;repeated assertion epoch&quot;);
+    reset.set_source(&quot;watchdog&quot;,1,svip_control_now()+300,r);
+    reset.set_source(&quot;software&quot;,0,svip_control_now()+300,r);
+    if(rst_n!==0)$fatal(1,&quot;other source lost&quot;);
+    reset.set_source(&quot;watchdog&quot;,0,svip_control_now()+300,r);
+    if(rst_n!==1)$fatal(1,&quot;physical release&quot;);
+    reset.source_after_edge(&quot;scheduled&quot;,1,reference_clock,clock_binding.rises()+1,svip_control_now()+300,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED || r.applied_tick!=clock_binding.last_rise() || received!==0)$fatal(1,&quot;external-clock assertion&quot;);
+    reset.source_after_edge(&quot;scheduled&quot;,0,reference_clock,clock_binding.rises()+1,svip_control_now()+300,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED || rst_n!==1 || received!==0)$fatal(1,&quot;release is not receiver ready&quot;);
+    clock_binding.wait_rises(clock_binding.rises()+1,svip_control_now()+300,ok);#1;
+    if(!ok || received!==1)$fatal(1,&quot;receiver did not recover&quot;);
+    fork
+      reset.source_at(&quot;software&quot;,0,svip_control_now()+20,svip_control_now()+300,old_release);
+      begin #3;reset.set_source(&quot;software&quot;,1,svip_control_now()+300,r);end
+    join
+    if(old_release.status!=SVIP_CONTROL_CANCELLED || rst_n!==0)$fatal(1,&quot;stale source release&quot;);
+    $display(&quot;SVIP_COMPONENT_PASS component=reset&quot;);$finish;
+  end
+  initial begin #2000;$fatal(1,&quot;reset example deadline&quot;);end
+endmodule
+</code></pre></section><section class="source-section" id="control-signal-examples-svip-signal-example-sv"><h2>control/signal/examples/svip_signal_example.sv</h2><p><a href="control/signal/examples/svip_signal_example.sv" download>Download original source</a> · 54 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+// Existing HDL clock plus a narrow reference: no clock/reset UVC is compiled.
+module svip_signal_example;
+  timeunit 1ps; timeprecision 1ps;
+  import svip_control_common_pkg::*;
+  import svip_signal_pkg::*;
+  bit clk=0;
+  always #25 clk=~clk;
+  wire [64:0] cfg;
+  logic [64:0] received=&#x27;0;
+  svip_control_pin_if#(65) pin(cfg,clk);
+  svip_control_pin_if clock_pin(clk,clk);
+  assign cfg=pin.drive_value;
+  always @(posedge clk)received&lt;=cfg;
+  class project_clock_ref extends svip_control_clock_ref;
+    function new(svip_control_endpoint endpoint);super.new(endpoint);endfunction
+    virtual function bit is_running();return 1;endfunction
+    virtual function bit predicts_rise(svip_control_tick_t at_tick);
+      return at_tick&gt;=25 &amp;&amp; (at_tick-25)%50==0;
+    endfunction
+  endclass
+  initial begin
+    svip_control_registry resources;
+    svip_control_sv_binding#(65) binding;
+    svip_control_sv_binding#(1) clock_binding;
+    svip_control_endpoint endpoint,clock_endpoint;
+    svip_signal_controller signal_bank;
+    project_clock_ref reference_clock;
+    svip_control_when when_at;
+    svip_control_result r;
+    string reason;
+    #1;resources=new;binding=new(pin);clock_binding=new(clock_pin,&quot;&quot;,0);
+    if(!resources.register_pin(&quot;cfg&quot;,binding,&quot;dut.cfg&quot;,0,&quot;tb&quot;,0,SVIP_CONTROL_SIGNAL,
+      SVIP_CONTROL_DIRECT_PIN,endpoint,reason))$fatal(1,&quot;%s&quot;,reason);
+    if(!resources.register_pin(&quot;external_clock&quot;,clock_binding,&quot;dut.clk&quot;,0,&quot;project&quot;,1,SVIP_CONTROL_CLOCK,
+      SVIP_CONTROL_DIRECT_PIN,clock_endpoint,reason))$fatal(1,&quot;%s&quot;,reason);
+    reference_clock=new(clock_endpoint);signal_bank=new(endpoint,reference_clock);
+    when_at=new(SVIP_CONTROL_ASYNC_AT,svip_control_now()+3);
+    signal_bank.set(65&#x27;h10000000000000001,svip_control_mask(65),when_at,svip_control_now()+300,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED || r.actual!==65&#x27;h10000000000000001)$fatal(1,&quot;65-bit actual data&quot;);
+    when_at=new(SVIP_CONTROL_BEFORE_CAPTURE,75);when_at.setup_ticks=3;
+    signal_bank.set(65&#x27;h10000000000000008,svip_control_mask(65),when_at,svip_control_now()+300,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED || r.applied_tick!=72 || r.observed_tick!=75 || received!==65&#x27;h10000000000000008)$fatal(1,&quot;external-clock capture&quot;);
+    when_at=new(SVIP_CONTROL_AFTER_SOURCE_EDGE,0,clock_binding.rises()+1);
+    signal_bank.set(&#x27;h55,&#x27;hff,when_at,svip_control_now()+300,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED || r.applied_tick!=clock_binding.last_rise() ||
+      cfg!==65&#x27;h10000000000000055 || received!==65&#x27;h10000000000000008)$fatal(1,&quot;masked after-edge old/new views&quot;);
+    signal_bank.expect_value(65&#x27;h10000000000000055,svip_control_mask(65),svip_control_now()+100,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED)$fatal(1,&quot;actual observation&quot;);
+    $display(&quot;SVIP_COMPONENT_PASS component=signal&quot;);$finish;
+  end
+  initial begin #2000;$fatal(1,&quot;signal example deadline&quot;);end
+endmodule
+</code></pre></section><section class="source-section" id="control-coordinator-examples-svip-clock-signal-example-sv"><h2>control/coordinator/examples/svip_clock_signal_example.sv</h2><p><a href="control/coordinator/examples/svip_clock_signal_example.sv" download>Download original source</a> · 40 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+// A selected pair shares ownership/backend once; reset/coordinator are absent.
+module svip_clock_signal_example;
+  timeunit 1ps;timeprecision 1ps;
+  import svip_control_common_pkg::*;
+  import svip_clock_pkg::*;
+  import svip_signal_pkg::*;
+  wire clk;
+  wire [31:0] cfg;
+  logic [31:0] received=0;
+  svip_control_pin_if clock_pin(clk,clk);
+  svip_control_pin_if#(32) data_pin(cfg,clk);
+  assign clk=clock_pin.drive_value;assign cfg=data_pin.drive_value;
+  always @(posedge clk)received&lt;=cfg;
+  initial begin
+    svip_control_registry resources;
+    svip_control_sv_binding#(1) clock_binding;
+    svip_control_sv_binding#(32) data_binding;
+    svip_control_endpoint clock_endpoint,data_endpoint;
+    svip_clock_controller clock;
+    svip_signal_controller signal_bank;
+    svip_control_when when_at;
+    svip_control_result r;
+    string reason;
+    #1;resources=new;clock_binding=new(clock_pin);data_binding=new(data_pin);
+    if(!resources.register_pin(&quot;clock&quot;,clock_binding,&quot;clk&quot;,0,&quot;tb&quot;,0,SVIP_CONTROL_CLOCK,SVIP_CONTROL_DIRECT_PIN,clock_endpoint,reason))$fatal(1,&quot;%s&quot;,reason);
+    if(!resources.register_pin(&quot;data&quot;,data_binding,&quot;cfg&quot;,0,&quot;tb&quot;,0,SVIP_CONTROL_SIGNAL,SVIP_CONTROL_DIRECT_PIN,data_endpoint,reason))$fatal(1,&quot;%s&quot;,reason);
+    clock=new(clock_endpoint,20,30);signal_bank=new(data_endpoint,clock);
+    fork clock.run();clock.monitor();join_none
+    clock.start(svip_control_now()+500,r);
+    when_at=new(SVIP_CONTROL_BEFORE_CAPTURE,clock.next_rise_tick());when_at.setup_ticks=3;
+    signal_bank.set(32&#x27;h80402001,svip_control_mask(32),when_at,svip_control_now()+500,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED || received!==32&#x27;h80402001)$fatal(1,&quot;pair capture&quot;);
+    clock.stop_low(svip_control_now()+500,r);
+    if(r.status!=SVIP_CONTROL_COMPLETED)$fatal(1,&quot;pair stop&quot;);
+    $display(&quot;SVIP_COMPONENT_PASS component=clock_signal&quot;);$finish;
+  end
+  initial begin #2000;$fatal(1,&quot;pair example deadline&quot;);end
+endmodule
+</code></pre></section><section class="source-section" id="control-testsuite-examples-svip-control-examples-svh"><h2>control/testsuite/examples/svip_control_examples.svh</h2><p><a href="control/testsuite/examples/svip_control_examples.svh" download>Download original source</a> · 142 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+// Checked examples using the same public API as customer test sequences.
+
+  task automatic example_basic();
+    svip_control_when at_tick;
+    svip_control_result r;
+    svip_control_value_t value=&#x27;0;
+    value[256]=1;value[64]=1;value[0]=1;
+    check(!core_domain.ready(),&quot;A29 accepting start is not actual clock availability&quot;);
+    control.domains.wait_ready(&quot;core&quot;,$time+3,r);check(r.status==SVIP_CONTROL_TIMEOUT,&quot;A29 ready cannot precede first actual edge&quot;);
+    at_tick=new(SVIP_CONTROL_BEFORE_CAPTURE,core_clock.next_rise_tick());at_tick.setup_ticks=100;
+    wide_signal.set(value,svip_control_mask(257),at_tick,$time+20000,r);
+    check(r.status==SVIP_CONTROL_COMPLETED,&quot;before capture complete&quot;);
+    check(wide_q[256]===1 &amp;&amp; wide_q[64]===1 &amp;&amp; wide_q[0]===1,&quot;receiver actual high bits&quot;);
+    check(r.observed &amp;&amp; !r.effective,&quot;pin observed is distinct from destination effect&quot;);
+    control.domains.wait_ready(&quot;core&quot;,$time+100,r);check(r.status==SVIP_CONTROL_COMPLETED,&quot;domain clock/reset availability observed&quot;);
+  endtask
+  
+
+task automatic test_profile_policies();
+  svip_control_profile profile;
+  svip_control_result r;
+  svip_control_transition_plan plan;
+  svip_control_when at_tick;
+  svip_control_value_t old_a,old_b;
+  svip_control_value_t a=&#x27;0;
+  a[64]=1;a[0]=1;
+  profile=new(&quot;tuple&quot;);profile.add(cfg_a_signal,a,svip_control_mask(65));profile.add(cfg_b_signal,32&#x27;h83579bdf,svip_control_mask(32));
+  control.capture_coherent(profile,core_clock,core_clock.next_rise_tick(),100,$time+20000,r);
+  check(r.status==SVIP_CONTROL_COMPLETED,&quot;B01 profile coherent&quot;);
+  check(tuple_q=={65&#x27;h10000000000000001,32&#x27;h83579bdf},&quot;B01 real RTL tuple complete&quot;);
+  control.capture_coherent(profile,core_clock,core_clock.next_rise_tick(),100,$time+20000,r);
+  check(r.status==SVIP_CONTROL_COMPLETED,&quot;B05 same value no value-change dependency&quot;);
+  old_a=cfg_a;old_b=cfg_b;profile.values[0]=0;profile.values[1]=&#x27;0;profile.values[1][32]=1;
+  control.capture_coherent(profile,core_clock,core_clock.next_rise_tick(),100,$time+20000,r);
+  check(r.status==SVIP_CONTROL_REJECTED &amp;&amp; cfg_a==old_a &amp;&amp; cfg_b==old_b,&quot;B02 invalid second field no partial first write&quot;);
+  profile=new(&quot;cross_domain&quot;);profile.add(cfg_a_signal,1,1);profile.add(data64_signal,1,1);
+  control.capture_coherent(profile,core_clock,core_clock.next_rise_tick(),100,$time+20000,r);
+  check(r.status==SVIP_CONTROL_REJECTED,&quot;B02 cross-domain capture coherence rejected&quot;);
+  plan=new(profile);at_tick=new(SVIP_CONTROL_ASYNC_AT,$time+10);plan.steps.push_back(at_tick);
+  at_tick=new(SVIP_CONTROL_ASYNC_AT,$time+20);plan.steps.push_back(at_tick);
+  plan.request_global_atomic=1;control.transition(plan,$time+20000,r);check(r.status==SVIP_CONTROL_REJECTED,&quot;B02 unsupported global atomic rejected&quot;);
+  plan.request_global_atomic=0;control.transition(plan,$time+20000,r);
+  check(r.status==SVIP_CONTROL_COMPLETED &amp;&amp; plan.progress.size()==2,&quot;B03 per-domain barrier reports each step&quot;);
+  check(plan.progress[0].applied_tick&lt;plan.progress[1].applied_tick,&quot;B03 barrier does not imply simultaneous effects&quot;);
+endtask
+
+
+
+task automatic test_lifecycle_policies();
+  svip_control_result r;
+  svip_control_when at_tick;
+  svip_control_value_t image=&#x27;0;
+  tieoff_control.configure(1,$time+1000,r);check(r.status==SVIP_CONTROL_COMPLETED,&quot;B06 tieoff bootstrap&quot;);
+  check(tieoff_control.lock(),&quot;B06 tieoff lock&quot;);
+  at_tick=new(SVIP_CONTROL_ASYNC_AT,$time);
+  tieoff_signal.set(0,1,at_tick,$time+1000,r);
+  check(r.status==SVIP_CONTROL_REJECTED &amp;&amp; tieoff===1,&quot;B06 low-level signal path cannot bypass lock&quot;);
+  tieoff_signal.expect_stable(1,$time+101,$time+200,r);
+  check(r.status==SVIP_CONTROL_COMPLETED,&quot;B06 independent actual-pin stability window&quot;);
+  image[64]=1;image[5]=1;
+  fuse_control.load_image(image,$time+1000,r);check(r.status==SVIP_CONTROL_REJECTED,&quot;B08 no POR window&quot;);
+  reset_high.set_source(&quot;por&quot;,1,$time+1000,r);
+  fuse_control.load_image(image,$time+1000,r);
+  check(r.status==SVIP_CONTROL_COMPLETED &amp;&amp; fuse_image==65&#x27;h10000000000000020,&quot;B07 image loaded with high bit&quot;);
+  fuse_control.load_image(1,$time+1000,r);check(r.status==SVIP_CONTROL_REJECTED,&quot;B08 consumed POR epoch locked&quot;);
+  check(!ep_fuse.open_load(&quot;FUNCTIONAL_RESET&quot;),&quot;B08 wrong load event rejected&quot;);
+  reset.set_source(&quot;functional&quot;,1,$time+1000,r);reset.set_source(&quot;functional&quot;,0,$time+1000,r);
+  check(fuse_image==65&#x27;h10000000000000020 &amp;&amp; tieoff===1,&quot;B07 functional reset retained image/tieoff&quot;);
+  reset_high.set_source(&quot;por&quot;,0,$time+1000,r);reset_high.set_source(&quot;por&quot;,1,$time+1000,r);
+  fuse_control.load_image(65&#x27;h10000000000000001,$time+1000,r);
+  check(r.status==SVIP_CONTROL_COMPLETED &amp;&amp; fuse_image==65&#x27;h10000000000000001,&quot;B07 new observed POR epoch can reload&quot;);
+  reset_high.set_source(&quot;por&quot;,0,$time+1000,r);
+  at_tick=new(SVIP_CONTROL_ASYNC_AT,$time);
+  fuse_signal.set(0,svip_control_mask(65),at_tick,$time+1000,r);
+  check(r.status==SVIP_CONTROL_REJECTED &amp;&amp; fuse_image[64]===1,&quot;B08 no ordinary write after window&quot;);
+endtask
+
+
+
+task automatic test_irq();
+  svip_control_result r,pulse_result,observation_result;
+  svip_control_when at_tick;
+  svip_control_tick_t measured,first_tick;
+  at_tick=new(SVIP_CONTROL_ASYNC_AT,$time+7);
+  fork
+    short_irq_observer.measure_pulse($time+1000,measured,observation_result);
+    irq_source.pulse_time(1,0,1,23,at_tick,$time+1000,pulse_result);
+  join
+  check(pulse_result.status==SVIP_CONTROL_COMPLETED &amp;&amp; observation_result.status==SVIP_CONTROL_COMPLETED &amp;&amp; measured==23,&quot;B10 exact short 23ps pulse, no stretch&quot;);
+  check(irq_q===0,&quot;B10 sub-cycle pulse can be missed by RTL; no hidden synchronizer&quot;);
+  #1; // Visible idle separates the two examples even in settled-only FSDB.
+  first_tick=$time;irq_source.pulse_cycles(1,0,1,2,$time+20000,pulse_result);
+  check(pulse_result.status==SVIP_CONTROL_COMPLETED &amp;&amp; irq===0 &amp;&amp; irq_q===1,&quot;B10 N future captures, release after last capture&quot;);
+  check(pulse_result.applied_tick==first_tick,&quot;B10 cycle pulse starts at accepted source tick&quot;);
+  at_tick=new(SVIP_CONTROL_ASYNC_AT,$time+17);
+  irq_inputs_source.level(4&#x27;b1010,at_tick,$time+1000,r);
+  check(irq_inputs===4&#x27;b1010,&quot;B09 multiple IRQ lines together&quot;);
+  reference_clock.wait_edges(1,$time+20000,r);
+  irq_observer.expect_level(1,$time+1000,r);check(r.status==SVIP_CONTROL_COMPLETED,&quot;B11 DUT output observed&quot;);
+  at_tick=new(SVIP_CONTROL_ASYNC_AT,$time);irq_inputs_source.level(0,at_tick,$time+1000,r);
+  check(dut_irq===1,&quot;B11 clearing source does not silently drive sticky DUT output&quot;);
+  csr.write(&quot;pending&quot;,4&#x27;b1010,$time+50000,r);check(r.status==SVIP_CONTROL_COMPLETED,&quot;B11 clear via real W1C&quot;);
+  irq_observer.expect_level(0,$time+1000,r);check(r.status==SVIP_CONTROL_COMPLETED,&quot;B11 output clears after CSR&quot;);
+endtask
+
+
+
+task automatic test_csr();
+  svip_control_result bus_result,r;
+  svip_control_value_t value;
+  svip_control_when at_tick;
+  svip_control_endpoint bad;
+  svip_control_sv_binding#(32) active_binding;
+  int before_reads;
+  string why;
+  csr.write(&quot;control&quot;,32&#x27;h80402001,$time+80000,bus_result);
+  check(bus_result.status==SVIP_CONTROL_COMPLETED &amp;&amp; bus_result.applied_kind==&quot;CSR_TRANSACTION_COMPLETED&quot;,&quot;B12 typed bus completion&quot;);
+  check(!bus_result.observed &amp;&amp; !bus_result.effective &amp;&amp; csr_output==0,&quot;B12 APB done precedes destination output effect&quot;);
+  csr_observer.expect_value(32&#x27;h80402001,svip_control_mask(32),$time+80000,r,1,SVIP_CONTROL_CAPTURE_VALUE,b_csr_output.capture_id());
+  check(r.status==SVIP_CONTROL_COMPLETED &amp;&amp; r.observed_tick&gt;bus_result.applied_tick,&quot;B12 actual delayed target-domain observation&quot;);
+  $display(&quot;SVIP_CONTROL_CSR_EFFECT bus_tick=%0d actual_capture_tick=%0d value=%0h&quot;,bus_result.applied_tick,r.observed_tick,r.actual);
+  csr.read(&quot;control&quot;,$time+80000,r,value);check(value==32&#x27;h80402001,&quot;real CSR readback&quot;);
+  csr.write(&quot;control_byte&quot;,8&#x27;ha5,$time+80000,r);check(r.status==SVIP_CONTROL_COMPLETED,&quot;native byte strobe write&quot;);
+  csr.read(&quot;control&quot;,$time+80000,r,value);check(value==32&#x27;h8040a501,&quot;byte update preserved other bytes without RMW&quot;);
+  at_tick=new(SVIP_CONTROL_ASYNC_AT,$time);irq_inputs_source.level(4&#x27;b1010,at_tick,$time+1000,r);
+  reference_clock.wait_edges(1,$time+20000,r);
+  at_tick=new(SVIP_CONTROL_ASYNC_AT,$time);irq_inputs_source.level(0,at_tick,$time+1000,r);
+  before_reads=csr_reads;csr.write(&quot;pending&quot;,2,$time+80000,r);
+  check(r.status==SVIP_CONTROL_COMPLETED &amp;&amp; pending==8 &amp;&amp; csr_reads==before_reads,&quot;B14 W1C preserves unrelated pending, no blind read-modify-write&quot;);
+  csr.write(&quot;pending&quot;,8,$time+80000,r);check(dut_irq===0,&quot;B14 real pending clear&quot;);
+  csr.read(&quot;read_clear&quot;,$time+80000,r,value);check(value==32&#x27;h80000001,&quot;B14 explicit side-effect read&quot;);
+  csr.read(&quot;read_clear&quot;,$time+80000,r,value);check(value==0,&quot;B14 read-clear hardware effect&quot;);
+  csr.write(&quot;read_clear&quot;,1,$time+80000,r);check(r.status==SVIP_CONTROL_REJECTED,&quot;B14 read-clear cannot be RMW-written&quot;);
+  active_binding=new(csr_output_pin,&quot;svip_control_tb.csr_output_pin.observed&quot;,1);
+  check(!registry.register_pin(&quot;direct_fallback&quot;,active_binding,&quot;csr_output&quot;,0,&quot;bad&quot;,0,SVIP_CONTROL_SIGNAL,SVIP_CONTROL_DIRECT_PIN,bad,why),&quot;B18 CSR canonical output rejects DirectPin owner&quot;);
+  at_tick=new(SVIP_CONTROL_ASYNC_AT,$time);csr_observer.set(0,svip_control_mask(32),at_tick,$time+1000,r);
+  check(r.status==SVIP_CONTROL_REJECTED,&quot;B18 CSR observer cannot drive through low API&quot;);
+endtask
+
+
+</code></pre></section><section class="source-section" id="control-testbench-svip-control-quickstart-sv"><h2>control/testbench/svip_control_quickstart.sv</h2><p><a href="control/testbench/svip_control_quickstart.sv" download>Download original source</a> · 52 lines</p><pre><code>// SPDX-License-Identifier: Apache-2.0
+// Author: syan
+// Standalone customer-style integration: core filelist, no APB dependency.
+module svip_control_quickstart;
+  timeunit 1ps;timeprecision 1ps;
+  import svip_control_pkg::*;
+  wire clk,rst_n;
+  wire [31:0] cfg;
+  logic [31:0] received=&#x27;0;
+  svip_control_pin_if clock_pin(clk,clk);
+  svip_control_pin_if#(1,1&#x27;b1) reset_pin(rst_n,clk);
+  svip_control_pin_if#(32) cfg_pin(cfg,clk);
+  assign clk=clock_pin.drive_value;
+  assign rst_n=reset_pin.drive_value;
+  assign cfg=cfg_pin.drive_value;
+  always @(posedge clk or negedge rst_n)if(!rst_n)received&lt;=0;else received&lt;=cfg;
+  initial begin
+    svip_control_registry resources;
+    svip_control_sv_binding#(1) clock_binding;
+    svip_control_sv_binding#(1,1&#x27;b1) reset_binding;
+    svip_control_sv_binding#(32) cfg_binding;
+    svip_control_endpoint clock_ep,reset_ep,cfg_ep;
+    svip_clock_controller clock;
+    svip_reset_controller reset;
+    svip_signal_controller signal_bank;
+    svip_control_when before_capture;
+    svip_control_result result;
+    string reason;
+    #1; // All physical startup pins are known before model initialization.
+    resources=new;
+    clock_binding=new(clock_pin);reset_binding=new(reset_pin);cfg_binding=new(cfg_pin);
+    if(!resources.register_pin(&quot;core_clock&quot;,clock_binding,&quot;dut.clk&quot;,0,&quot;tb&quot;,0,
+      SVIP_CONTROL_CLOCK,SVIP_CONTROL_DIRECT_PIN,clock_ep,reason))$fatal(1,&quot;%s&quot;,reason);
+    if(!resources.register_pin(&quot;core_reset&quot;,reset_binding,&quot;dut.rst_n&quot;,0,&quot;tb&quot;,0,
+      SVIP_CONTROL_RESET,SVIP_CONTROL_DIRECT_PIN,reset_ep,reason))$fatal(1,&quot;%s&quot;,reason);
+    if(!resources.register_pin(&quot;cfg&quot;,cfg_binding,&quot;dut.cfg&quot;,0,&quot;tb&quot;,0,
+      SVIP_CONTROL_SIGNAL,SVIP_CONTROL_DIRECT_PIN,cfg_ep,reason))$fatal(1,&quot;%s&quot;,reason);
+    clock=new(clock_ep,2000,3000);reset=new(reset_ep,1);
+    reset.attach(cfg_ep);signal_bank=new(cfg_ep,clock);
+    fork clock.run();clock.monitor();reset.monitor();join_none
+    clock.start($time+20000,result);
+    if(result.status!=SVIP_CONTROL_COMPLETED)$fatal(1,&quot;start: %s&quot;,result.reason);
+    before_capture=new(SVIP_CONTROL_BEFORE_CAPTURE,clock.next_rise_tick());
+    before_capture.setup_ticks=100;
+    signal_bank.set(32&#x27;h80402001,svip_control_mask(32),before_capture,$time+20000,result);
+    if(result.status!=SVIP_CONTROL_COMPLETED || received!==32&#x27;h80402001)$fatal(1,&quot;actual capture failed&quot;);
+    clock.stop_low($time+20000,result);
+    if(result.status!=SVIP_CONTROL_COMPLETED || clk!==0)$fatal(1,&quot;stop failed&quot;);
+    $display(&quot;SVIP_CONTROL_QUICKSTART_PASS received=%h&quot;,received);$finish;
+  end
+  initial begin #100000;$fatal(1,&quot;quickstart deadline&quot;);end
+endmodule
+</code></pre></section><footer>TechYan / Demo · Portable documentation and source examples · <a href="provenance.json">Source provenance</a></footer></main></body></html>

@@ -1,0 +1,93 @@
+{
+  "schema": "demo.bus-protocol-lab.v1",
+  "entry": "index.html",
+  "tools": [
+    {
+      "id": "packet-studio",
+      "entry": "axi-pcie-packet-studio.html",
+      "presets": [
+        {
+          "id": "rcb64",
+          "name": "RCB 64 split"
+        },
+        {
+          "id": "rcb128",
+          "name": "RCB 128 split"
+        },
+        {
+          "id": "boundary4k",
+          "name": "4 KB crossing"
+        },
+        {
+          "id": "mrrs",
+          "name": "MRRS read split"
+        },
+        {
+          "id": "mpswrite",
+          "name": "MPS write split"
+        },
+        {
+          "id": "unaligned",
+          "name": "Unaligned byte enables"
+        },
+        {
+          "id": "axi1024",
+          "name": "1024-bit AXI"
+        },
+        {
+          "id": "combined",
+          "name": "4 KB + MRRS + RCB"
+        },
+        {
+          "id": "largewrite",
+          "name": "Large write"
+        }
+      ]
+    },
+    {
+      "id": "tlp-split",
+      "entry": "pcie-tlp-split-demo.html",
+      "presets": [
+        {
+          "id": "presetA",
+          "name": "Unaligned 512B"
+        },
+        {
+          "id": "presetB",
+          "name": "3 x 512B"
+        },
+        {
+          "id": "presetC",
+          "name": "Cross 4KB"
+        }
+      ]
+    },
+    {
+      "id": "atomic",
+      "entry": "axi4-atomic-format-table.html",
+      "parameters": {
+        "operand_bits": [
+          16,
+          32,
+          64
+        ],
+        "atomic_type": [
+          "scalar",
+          "vector"
+        ],
+        "bus_bits": [
+          128,
+          256,
+          512,
+          1024
+        ]
+      },
+      "parameter_combinations": 24,
+      "auto_demo": true
+    }
+  ],
+  "runtime": {
+    "external_dependencies": [],
+    "standalone_html": true
+  }
+}

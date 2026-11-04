@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="syan"><title>SPI 架构与时序契约</title><style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--fg:#182739;--muted:#536579;--line:#dce4ed;--accent:#1459ad;--code:#f0f4f8}
+@media(prefers-color-scheme:dark){:root{--bg:#111a25;--panel:#172332;--fg:#e6edf5;--muted:#adbdce;--line:#35485b;--accent:#89baff;--code:#0f1b29}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.85 'Segoe UI','Microsoft YaHei',sans-serif}
+header{padding:22px max(24px,calc((100vw - 1440px)/2));background:var(--panel);border-bottom:1px solid var(--line)}
+header strong{font-size:20px}header p{margin:5px 0;color:var(--muted)}nav{display:flex;gap:22px;margin-top:12px}
+.layout{max-width:1488px;margin:28px auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;padding:0 24px}
+aside{align-self:start;position:sticky;top:20px;max-height:92vh;overflow:auto;padding:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:14px;line-height:1.6}
+aside ul{padding-left:20px}aside>div>ul{padding-left:14px}aside li{margin:8px 0}
+main{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:28px 34px}
+h1{font-size:29px;line-height:1.45;margin-top:0}h2{font-size:23px;margin-top:2.5em;border-bottom:1px solid var(--line);padding-bottom:8px}h3{font-size:19px;margin-top:2em}h1,h2,h3{scroll-margin-top:20px}
+a{color:var(--accent);text-underline-offset:3px}p{margin:1em 0}li{margin:.5em 0}
+table{display:block;overflow-x:auto;border-collapse:collapse;width:100%;font-size:14px;margin:20px 0}th,td{border:1px solid var(--line);padding:12px 14px;min-width:130px;vertical-align:top}th{background:var(--code);font-weight:600;text-align:left}
+code{font:0.9em/1.6 Consolas,'Cascadia Mono',monospace;background:var(--code);border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{padding:18px;overflow-x:auto;background:var(--code);border:1px solid var(--line);border-radius:8px;line-height:1.55}pre code{padding:0;white-space:pre;overflow-wrap:normal}
+footer{padding:20px 0;color:var(--muted);font-size:13px;border-top:1px solid var(--line);margin-top:32px}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;padding:0 12px}aside{position:static;max-height:none}main{padding:22px 18px}h1{font-size:25px}}
+@media print{aside,nav{display:none}.layout{display:block;padding:0;margin:0}main{border:0;padding:0}body{background:white;color:black}table{display:table;font-size:10px}pre{white-space:pre-wrap}a{color:inherit}}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}
+
+nav{flex-wrap:wrap}pre{max-width:100%;overflow-x:auto}aside a{overflow-wrap:anywhere}
+</style></head>
+<body><div style="padding:10px 18px;background:#eaf0ff;color:#283f74;font:13px/1.6 system-ui;border-bottom:1px solid #bdccef"><a style="color:#244ab3" href="../../index.html">← SVIP demo</a> · 文档与示例快照 · 运行库、历史验收记录及仿真日志未打包 · <a style="color:#244ab3" href="../../scope.html">阅读范围说明</a></div><header><strong>SVIP · SPI</strong><p>syan · four-wire · Mode 0–3 · master / slave / passive · VCS / UVM1.2</p><nav><a href="user-guide.html">使用指导</a><a href="architecture.html">架构</a><a href="../../scope.html#verification">验收记录</a><a href="architecture.html">文档页</a></nav></header>
+<div class="layout"><aside aria-label="目录"><div class="toc">
+<ul>
+<li><a href="#spi">SPI 架构与时序契约</a><ul>
+<li><a href="#_1">组件与数据流</a></li>
+<li><a href="#profile">支持 profile 与参数</a></li>
+<li><a href="#_2">对象、完成与所有权</a></li>
+<li><a href="#_3">边沿、首末位与事件区域</a></li>
+<li><a href="#_4">响应与回调</a></li>
+<li><a href="#reset">reset、异常和恢复</a></li>
+<li><a href="#_5">观察、覆盖与性能边界</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</aside><main><h1 id="spi">SPI 架构与时序契约</h1>
+<p>Author: syan</p>
+<p>产品实现为 SystemVerilog/UVM1.2，目录内核心不依赖商业框架或 Python BFM。设计采用逐位执行的 master、事件驱动的 slave，以及读取最终解析引脚的独立 monitor。目标是让验证工程师用少量配置完成激励、响应和观察。</p>
+<h2 id="_1">组件与数据流</h2>
+<pre><code class="language-text">master sequence -&gt; standard sequencer -&gt; master_driver --+
+                                                        | independent pin
+slave.enqueue_response -&gt; copied queue -&gt; slave_driver --+ endpoint -&gt; SPI wires
+                                                                    |
+                  monitor &lt;------------------------------------------+
+                    +-&gt; frame_ap / word_ap -&gt; tracker / coverage / user scoreboard
+                  checker/SVA &lt;--------------------------------------+
+
+completion_ap: local accepted transaction -&gt; exactly one terminal result
+</code></pre>
+<p><code>svip_spi_agent</code> 依据 cfg 的 MASTER/SLAVE 与 UVM_ACTIVE/UVM_PASSIVE 创建相应 driver。master 有标准 sequencer；slave 使用有界预装队列。passive 不创建 driver。monitor 始终存在；tracker、coverage 可关闭，sequence_lib 和 checker 有独立编译入口。</p>
+<p>每个 active agent 必须绑定独立 <code>svip_spi_if</code> endpoint；多个 endpoint 连接同一组 tri/wire。master 只驱动 SCLK/CS/MOSI，slave 只驱动自己的 MISO/OE。不要把两个 active agent 绑定到同一组输出寄存器。全局协议 checker 每总线绑定一次，本地 OE 由相应 endpoint 检查。</p>
+<h2 id="profile">支持 profile 与参数</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>物理信号</td>
+<td>SCLK、MOSI、MISO、active-low CS；单 master、多 slave、4-wire全双工</td>
+</tr>
+<tr>
+<td>模式/位序</td>
+<td>Mode0..3，MSB 或 LSB；一个 CS 窗口内统一</td>
+</tr>
+<tr>
+<td>编译容器</td>
+<td><code>SVIP_SPI_MAX_WORD_BITS</code> 默认64；<code>SVIP_SPI_MAX_CS</code> 默认8，集中于 defs.svh</td>
+</tr>
+<tr>
+<td>有效配置</td>
+<td><code>word_bits=1..MAX_WORD_BITS</code> 默认8；<code>num_cs=1..MAX_CS</code> 默认1；低 word_bits 位有效</td>
+</tr>
+<tr>
+<td>资源</td>
+<td><code>max_frame_words=4096</code>、<code>response_queue_depth=16</code>，可配置；属于资源限制</td>
+</tr>
+<tr>
+<td>时间</td>
+<td>精度1ps，高低周期和 CS setup/hold/idle 为正；额外 latency、gap、drive_delay 可为0</td>
+</tr>
+<tr>
+<td>并发</td>
+<td>一条总线一个活动 CS 窗口；队列不代表并行线上传输</td>
+</tr>
+<tr>
+<td>reset</td>
+<td><code>reset_n</code> 为验证环境边带，可绑1，不是 SPI 四条物理线之一</td>
+</tr>
+<tr>
+<td>排除</td>
+<td>多lane、3-wire、TI/NS、DDR、多master仲裁、跨item keep_cs、Flash业务协议</td>
+</tr>
+</tbody>
+</table>
+<p>未使用的 CS 容器位不参与解码和协议判断，可悬空；有效 CS 必须为已知值。容器和实际有效范围分别配置，驱动和 checker 都按有效范围检查。</p>
+<h2 id="_2">对象、完成与所有权</h2>
+<p>master 接纳标准 sequence item 后建立私有快照；payload、有效 profile 与时序在当前事务中固定。<code>clock_hold</code> 与 abort 是明确的运行期控制，按实际边界消费。正常完成、reset、abort、timeout 或参数拒绝均只对应一次 item_done，finish_item 返回时结果已回写。</p>
+<p>slave 在 enqueue 返回成功时复制对象，分配局部 serial；实际 CS 选中才消耗响应。局部 serial 仅用于调试，不是 SPI bus ID。活动/排队响应被 reset 取消时都有对应终态。修改原提交对象不会改变已接纳数据。</p>
+<p><code>do_copy/clone</code> 保留派生类型、用户字段与四态数组。AP 发布独立快照；订阅者将它们视为只读，修改前自行 clone。<code>frame_ap</code> 是实际物理帧，<code>completion_ap</code> 是本地工作终态，不能相互替代。被动部署也能检查原始引脚和导出 tracker/coverage。</p>
+<h2 id="_3">边沿、首末位与事件区域</h2>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>CPOL/CPHA</th>
+<th>leading edge</th>
+<th>trailing edge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0/0</td>
+<td>上升采样</td>
+<td>下降 launch</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0/1</td>
+<td>上升 launch</td>
+<td>下降采样</td>
+</tr>
+<tr>
+<td>2</td>
+<td>1/0</td>
+<td>下降采样</td>
+<td>上升 launch</td>
+</tr>
+<tr>
+<td>3</td>
+<td>1/1</td>
+<td>下降 launch</td>
+<td>上升采样</td>
+</tr>
+</tbody>
+</table>
+<p>CPHA0 首 bit 在首采样沿之前预装；CPHA1 在首 launch 呈现。每 bit 的完整周期包括返回 CPOL，最后周期也不能省略或多采一位。CS hold 从最终时钟收尾计算，随后释放 CS。</p>
+<p>双边沿 clocking 输入 <code>#1step</code> 保存沿前值；输出使用 NBA。SCLK idle 时改变 CPOL 的 clocking 事件可能晚于同 tick 的 CS 更新到达，slave 根据事件采样到的 CS/reset 判断归属，不能仅看当前 raw CS。配置的正物理时间形成实际建立窗口；不依赖任意 #0/#1ps 来掩盖 driver 竞争。</p>
+<p>clock-to-out 延迟从 CS 首位预装或后续 launch 计时；延迟线程带 epoch/launch token，并随响应窗口结束取消。reset 取消 worker 后，再经过 NBA 对 idle/OE 压制，避免旧调度残留。</p>
+<p>checker 的 setup/hold 围绕 sample edge，而非要求整个某一高相都稳定；允许合法的 launch 后传播延迟。数值窗口由 DUT/profile 决定，默认数据与高低脉宽有一个1ps精度量子的数字检查，可设0关闭窗口。CS 数值窗口默认0，接入时按 DUT 手册设置。</p>
+<h2 id="_4">响应与回调</h2>
+<p>FIXED 持续发送 fill_word 的有效位；RANDOM 按未来 word 生成已知随机值；QUEUED 每个 CS 窗口消耗一个响应。QUEUED 耗尽后发送 fill，实际被采样时每帧报告一次 UNDERRUN，不阻塞 SCLK。短帧未使用的响应尾部丢弃并计数，不回流下一帧。中途 enqueue 归下一次选中。</p>
+<p><code>prepare_word(prefix,index,value)</code> 是 function，输入只有已经采样完成的 MOSI 前缀与待准备 word。CPHA0 最后一个 trailing edge 可能预备一个最终未使用的下一 word，因此回调可被推测调用；不要在其中提交不可撤销的业务副作用。依据实际 <code>word_ap</code>/<code>frame_ap</code> 完成存储提交。业务响应可以不调用 super。</p>
+<p>用户可在此边界实现寄存器/存储语义，核心没有 address/WEL/page 等假设。收到整个请求后再等待上层 sequence 返回，无法回填同一 CS 窗口过去的响应。</p>
+<h2 id="reset">reset、异常和恢复</h2>
+<p>reset 优先于同 tick 采样；driver 取消活动输出、释放 CS/OE，返回 RESET_ABORTED，队列清空。SPI 不承诺回滚外部 DUT 已接收的位或业务副作用。恢复后需要新的完整 CS 边界；若仅复位 VIP、外部 master 仍保持 CS，driver 与 monitor 均等待实际 idle-CS，丢弃无法重建的帧尾。</p>
+<p>主动 abort 返回 ABORTED，可产生 partial 物理帧；实际协议诊断仍保留。watchdog 默认关闭，启用时从本地工作开始计时，包含配置 latency/hold；返回 TIMEOUT。slave timeout 后释放 OE，等待当前 CS 撤销再接受新帧。</p>
+<p>非完整 word 保留 partial 值与实际 bit 数；required 数据 X/Z 保留四态并诊断。被动组件在已选中的帧中启动时标识 resync 并等待下一个干净边界，不伪造帧头。</p>
+<h2 id="_5">观察、覆盖与性能边界</h2>
+<p>frame记录包含 mode/order/有效字长/CS、完整双向 word、partial、实际采样数、状态、时间与观察到的半周期跨度。<code>word_ap</code> 在每个实际完整 word 发出累计前缀；无订阅时不复制前缀。</p>
+<p>coverage 的 native covergroup 和 common/cov 共享 bin 定义，按实际帧与局部完成分别采样，final hook 负责 JSON 导出。多实例 service 按组聚合计数，native covergroup 可分实例查看；详细字段见使用指导。</p>
+<p>普通移位路径与 bit 数线性增长。用户若订阅每 word 的累计快照，或回调要求长前缀快照，会增加复制成本；长事务优先订阅 frame_ap，并让业务模型保持自己的增量状态。默认 tracker 有界预览，完整原始数组仍从 AP 提供。</p><footer>标准四线SPI profile；实际支持和实测范围见验收记录。</footer></main></div></body></html>

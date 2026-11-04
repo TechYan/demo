@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="用 xDCT 的真实合成示例，比较 SystemVerilog 顶层接口清单、破坏性变化和仅声明顺序变化。">
+  <title>xDCT · Top interface change detector</title>
+  <link rel="stylesheet" href="styles.css"><script src="data.js" defer></script><script src="app.js" defer></script>
+</head>
+<body>
+<nav class="nav"><a class="brand" href="../index.html">TECHYAN <span>/ DEMO</span></a><a href="README.md">说明与复现 ↗</a></nav>
+<main>
+  <header class="hero">
+    <div class="eyebrow"><span class="signal"></span> XDCT / TOP INTERFACE CHANGE DETECTOR</div>
+    <h1>接口变化，<br><span>逐项看清。</span></h1>
+    <p class="lead">把生成的 SystemVerilog 顶层展开为稳定清单，再比较类型、位宽、方向和接口语义。让真正影响接入的变化浮到眼前。</p>
+    <div class="hero-actions"><a class="primary" href="#changes">检查接口差异 <span>↓</span></a><span class="prototype">v0.1.0 · prototype</span></div>
+    <div class="comparison-strip"><div><span class="micro">BASELINE</span><strong>CL 123450</strong><span>9 ports · DATA_W = 16</span></div><span class="compare-arrow" aria-hidden="true">→</span><div><span class="micro">CURRENT</span><strong>CL 123456</strong><span>9 ports · DATA_W = 32</span></div><div class="result"><span class="micro">RESULT</span><strong>BREAKING_CHANGE</strong><span>chip_top · schema v1</span></div></div>
+  </header>
+  <div class="metrics"><div class="danger"><strong>6</strong><span>破坏性变化</span></div><div><strong>5</strong><span>已修改</span></div><div><strong>1</strong><span>新增</span></div><div><strong>1</strong><span>移除</span></div><div><strong>3</strong><span>仅声明顺序</span></div></div>
+
+  <section id="changes" aria-labelledby="changes-title">
+    <div class="section-head"><div><div class="eyebrow">01 / SEMANTIC COMPARISON</div><h2 id="changes-title">从端口，看清变化</h2></div><span class="pill">chip_top</span></div>
+    <p class="section-intro">直接浏览仓库现有的清单与差异结果。每项显示前后声明、发生变化的属性和原始端口记录；所有分类及 breaking 标志均来自原型输出。</p>
+    <div class="filters"><div id="filter-buttons" class="segmented" role="group" aria-label="变化类型"><button class="selected" data-filter="all" aria-pressed="true">全部 <span>10</span></button><button data-filter="breaking" aria-pressed="false">破坏性 <span>6</span></button><button data-filter="nonbreaking" aria-pressed="false">非破坏性 <span>4</span></button><button data-filter="order" aria-pressed="false">仅顺序 <span>3</span></button></div><label class="search"><span>搜索端口或分类</span><input id="search" type="search" placeholder="rx_data / WIDTH_CHANGED" autocomplete="off"></label></div>
+    <div class="list-heading"><p id="visible-count" role="status" aria-live="polite">显示 10 / 10 个变化项</p><span>声明顺序从 0 开始</span></div>
+    <div id="change-list" class="change-list"></div>
+    <p id="empty-state" class="empty" hidden>没有符合条件的变化。尝试其他端口名或筛选条件。</p>
+    <aside class="note"><strong>如何读这些数字</strong><p>6 处破坏性变化包含 1 个移除和 5 个修改；4 个非破坏性变化包含 1 个新增和 3 个仅顺序变化。<code>ctrl</code> 同时有 modport 和顺序变化，因此各分类标签的计数可以重叠。新增端口与仅顺序变化的非破坏性判定采用当前原型的策略。</p></aside>
+  </section>
+
+  <section id="evidence" aria-labelledby="evidence-title">
+    <div class="section-head"><div><div class="eyebrow">02 / TRACEABLE EVIDENCE</div><h2 id="evidence-title">回到原始证据</h2></div><a class="text-link" href="provenance.json">固定提交与 SHA-256 ↗</a></div>
+    <p class="section-intro">两份 SV、两份 manifest、diff JSON 和文本报告均逐字节保留。生成本演示时，也通过原项目重新提取并核对了全部结果。</p>
+    <div class="segmented evidence-tabs" role="group" aria-label="证据视图"><button class="selected" data-evidence="report" aria-pressed="true">原始报告</button><button data-evidence="source" aria-pressed="false">SystemVerilog 前后</button><button data-evidence="manifests" aria-pressed="false">Manifest 前后</button><button data-evidence="diff" aria-pressed="false">Diff JSON</button></div>
+    <div id="evidence-report" class="evidence-view"><div class="code-heading"><span>report_cl123450_to_cl123456.txt</span><a href="demo/report_cl123450_to_cl123456.txt" download>下载报告 ↓</a></div><pre id="report-code" class="code-panel" tabindex="0" aria-label="xDCT 原始文本报告"></pre></div>
+    <div id="evidence-source" class="evidence-view code-grid" hidden><div><div class="code-heading"><span>BEFORE / top_v1.sv</span><a href="examples/top_v1.sv" download>下载 ↓</a></div><pre id="source-before" class="code-panel" tabindex="0" aria-label="旧版本 SystemVerilog 源码"></pre></div><div><div class="code-heading"><span>AFTER / top_v2.sv</span><a href="examples/top_v2.sv" download>下载 ↓</a></div><pre id="source-after" class="code-panel" tabindex="0" aria-label="新版本 SystemVerilog 源码"></pre></div></div>
+    <div id="evidence-manifests" class="evidence-view code-grid" hidden><div><div class="code-heading"><span>BASELINE / CL 123450</span><a href="demo/baseline_cl123450.json" download>下载 ↓</a></div><pre id="manifest-before" class="code-panel" tabindex="0" aria-label="旧版本接口清单"></pre></div><div><div class="code-heading"><span>CURRENT / CL 123456</span><a href="demo/current_cl123456.json" download>下载 ↓</a></div><pre id="manifest-after" class="code-panel" tabindex="0" aria-label="新版本接口清单"></pre></div></div>
+    <div id="evidence-diff" class="evidence-view" hidden><div class="code-heading"><span>diff_cl123450_to_cl123456.json</span><a href="demo/diff_cl123450_to_cl123456.json" download>下载 diff ↓</a></div><pre id="diff-code" class="code-panel" tabindex="0" aria-label="原始接口差异 JSON"></pre></div>
+  </section>
+
+  <section class="scope" aria-labelledby="scope-title"><div><div class="eyebrow">03 / PROTOTYPE BOUNDARY</div><h2 id="scope-title">语义提取在本地，<br>证据比较在浏览器。</h2><p>原型通过 <code>pyslang</code> elaboration 处理 ANSI 风格顶层端口、interface / modport、参数展开后的位宽与数组类型。这里展示固定的合成示例，浏览器只做筛选和呈现。</p><a class="text-link" href="README.md">查看本地提取命令与退出码 ↗</a></div><div class="scope-card"><h3>接入前需要补齐</h3><p>生产环境的项目配置、诊断格式、baseline 更新策略与真实生成顶层的回归样本。</p><div class="exit-code"><code>0</code><span>没有破坏性变化</span><code>2</code><span>发现破坏性变化</span><code>1</code><span>解析或配置失败</span></div></div></section>
+  <div class="resource-links"><a href="examples/top_v1.sv" download>旧版 SV ↓</a><a href="examples/top_v2.sv" download>新版 SV ↓</a><a href="demo/baseline_cl123450.json" download>Baseline JSON ↓</a><a href="demo/current_cl123456.json" download>Current JSON ↓</a><a href="demo/diff_cl123450_to_cl123456.json" download>Diff JSON ↓</a><a href="demo/report_cl123450_to_cl123456.txt" download>文本报告 ↓</a></div>
+  <noscript><p class="note">启用 JavaScript 可筛选和展开差异。原始 SV、清单、diff 与报告始终可以通过链接直接打开。</p></noscript>
+  <footer><span>xDCT · Source <code>c19ed68</code></span><span>合成示例 · 固定证据 · 浏览器无需解析器</span></footer>
+</main>
+</body>
+</html>

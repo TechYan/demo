@@ -1,0 +1,45 @@
+{
+  "repository": "TechYan/pg_gen",
+  "visibility": "private",
+  "ref": "7d2641fcbf930a98eb8c363273bab0f239c73b77",
+  "copied_files": [
+    {
+      "source_path": "index.html",
+      "source_sha256": "83f12eaca6606b86c58cfc2649e83c94b0ff2649fcd6eaebe71d6e135ca33a6e",
+      "published_path": "index.html"
+    }
+  ],
+  "modifications": [
+    "Replaced the entire embedded SAMPLE with newly authored fictional controller/sensor register blocks and synthetic addresses.",
+    "Replaced the sample flow with read/write/rmw/poll steps referencing the fictional inputs.",
+    "Removed project-specific decode preferences, name-prefix aliases, and namespace fallbacks; retained generic token matching and explicit map selection.",
+    "Added scoped relative return navigation, fictional-sample note, and example download links.",
+    "Retained export schema labels for compatibility."
+  ],
+  "excluded": [
+    "All source register and address-map datasets",
+    "Legacy app.js/styles.css",
+    "CLI conversion script and other private repository files"
+  ],
+  "generated_files": [
+    "samples/*",
+    "examples/*",
+    "README.md",
+    "provenance.json"
+  ],
+  "sample": {
+    "origin": "New synthetic data authored for this demo",
+    "register_blocks": 2,
+    "registers": 4,
+    "fields": 9,
+    "block_maps": 2,
+    "bus_maps": 1,
+    "flow_steps": 4,
+    "operations": [
+      "read",
+      "write",
+      "rmw",
+      "poll"
+    ]
+  }
+}

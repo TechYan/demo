@@ -1,0 +1,357 @@
+{
+  "schema": "xpg.config.v0.1",
+  "generated_at": "2026-11-04T00:00:00.000Z",
+  "files": {
+    "rdf_blocks": [
+      {
+        "name": "demo_control_rdf.json",
+        "json": {
+          "registers": "demo_control_reg",
+          "reg_field_out": true,
+          "reg_addr_width": 32,
+          "reg_data_width": "32",
+          "map_to": "demoDecoder",
+          "hdl_path": "demo.control",
+          "variant": {
+            "fictional_demo": true
+          },
+          "DEMO_CONTROL": {
+            "description": "Fictional controller configuration",
+            "access": "RW",
+            "width": "32",
+            "offset": "0x0000",
+            "hdl_path": "demo.control.config",
+            "fields": {
+              "enable": {
+                "bit_range": "[0]",
+                "reset": "0x0",
+                "description": "Enable the fictional controller"
+              },
+              "mode": {
+                "bit_range": "[3..1]",
+                "reset": "0x0",
+                "description": "Select a demo operating mode"
+              },
+              "irq_enable": {
+                "bit_range": "[8]",
+                "reset": "0x1",
+                "description": "Enable demo completion interrupts"
+              }
+            }
+          },
+          "DEMO_IRQ_STATUS": {
+            "description": "Fictional interrupt status",
+            "access": "RW1C",
+            "width": "32",
+            "offset": "0x0004",
+            "hdl_path": "demo.control.irq_status",
+            "fields": {
+              "done": {
+                "bit_range": "[0]",
+                "reset": "0x0",
+                "description": "A demo operation completed"
+              },
+              "error": {
+                "bit_range": "[1]",
+                "reset": "0x0",
+                "description": "A demo operation reported an error"
+              }
+            }
+          }
+        }
+      },
+      {
+        "name": "demo_sensor_rdf.json",
+        "json": {
+          "registers": "demo_sensor_reg",
+          "reg_field_out": true,
+          "reg_addr_width": 32,
+          "reg_data_width": "32",
+          "map_to": "demoDecoder",
+          "hdl_path": "demo.sensor",
+          "variant": {
+            "fictional_demo": true
+          },
+          "DEMO_SENSOR_CONFIG": {
+            "description": "Fictional sensor configuration",
+            "access": "RW",
+            "width": "32",
+            "offset": "0x0000",
+            "hdl_path": "demo.sensor.config",
+            "fields": {
+              "enable": {
+                "bit_range": "[0]",
+                "reset": "0x0",
+                "description": "Enable fictional sampling"
+              },
+              "sample_period": {
+                "bit_range": "[15..8]",
+                "reset": "0x10",
+                "description": "Demo sample interval in arbitrary ticks"
+              }
+            }
+          },
+          "DEMO_SENSOR_STATUS": {
+            "description": "Fictional sensor readiness",
+            "access": "RO",
+            "width": "32",
+            "offset": "0x0004",
+            "hdl_path": "demo.sensor.status",
+            "fields": {
+              "ready": {
+                "bit_range": "[0]",
+                "reset": "0x0",
+                "description": "The fictional sensor is ready"
+              },
+              "sample_count": {
+                "bit_range": "[15..8]",
+                "reset": "0x0",
+                "description": "Number of fictional samples"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "addr_maps": [
+      {
+        "name": "demo_addr_map.json",
+        "json": {
+          "decodes": {
+            "demo_control_reg.demo_control_reg.demoDecoder": {
+              "offset": "0x00001000",
+              "size": "0x00001000",
+              "visibility": "all",
+              "comment": "Fictional demo controller window"
+            },
+            "demo_sensor_reg.demo_sensor_reg.demoDecoder": {
+              "offset": "0x00002000",
+              "size": "0x00001000",
+              "visibility": "all",
+              "comment": "Fictional demo sensor window"
+            }
+          }
+        }
+      }
+    ],
+    "rnoc_maps": [
+      {
+        "name": "demo_bus_map.json",
+        "json": {
+          "version": "fictional-demo-1",
+          "decodes": {
+            "demo.demo_bus.demoDecoder": {
+              "offset": "0x40000000",
+              "size": "0x00010000",
+              "visibility": "all",
+              "comment": "Synthetic demo bus window; no hardware assignment"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "block_settings": {
+    "demo_control_rdf.json:demo_control_reg": {
+      "addressMode": "map",
+      "manualOffset": "",
+      "addrId": "",
+      "rnocId": "",
+      "simNamespace": ""
+    },
+    "demo_sensor_rdf.json:demo_sensor_reg": {
+      "addressMode": "map",
+      "manualOffset": "",
+      "addrId": "",
+      "rnocId": "",
+      "simNamespace": ""
+    }
+  },
+  "ui": {
+    "selected_reg_id": "demo_control_rdf.json:DEMO_CONTROL",
+    "selected_field": "enable",
+    "selected_fields": [],
+    "field_values": {},
+    "active_phase": 0,
+    "preview_tab": "guide",
+    "register_search": "",
+    "block_filter": "all"
+  },
+  "recipe": {
+    "schema": "xpg.programming_guide.v0.2",
+    "register_input_format": "company_rdf_json",
+    "generated_at": "2026-11-04T00:00:00.000Z",
+    "files": {
+      "rdf_blocks": [
+        "demo_control_rdf.json",
+        "demo_sensor_rdf.json"
+      ],
+      "addr_maps": [
+        "demo_addr_map.json"
+      ],
+      "rnoc_maps": [
+        "demo_bus_map.json"
+      ]
+    },
+    "flow": {
+      "id": "demo.sensor_init",
+      "description": "Synthetic controller and sensor initialization; all names and addresses are fictional",
+      "scope": "fictional_soc",
+      "applies_to": {
+        "ip_sim": true,
+        "soc_sim": true,
+        "post_si": true,
+        "programming_guide": true
+      },
+      "phases": [
+        {
+          "id": "demo_init",
+          "title": "Demo initialization",
+          "owner": "demo_owner",
+          "steps": [
+            {
+              "op": "read",
+              "target": "register",
+              "reg": "DEMO_CONTROL",
+              "field": "",
+              "value": "",
+              "condition": "",
+              "timeout_us": "",
+              "interval_us": "",
+              "comment": "Inspect the fictional controller before configuration.",
+              "source": {
+                "block": "demo_control_reg",
+                "block_id": "demo_control_rdf.json:demo_control_reg",
+                "file": "demo_control_rdf.json",
+                "map_to": "demoDecoder",
+                "address": "0x40001000",
+                "local_offset": "0x00000000",
+                "block_offset": "0x00001000",
+                "addr_map": "demo_control_reg.demo_control_reg.demoDecoder",
+                "rnoc_map": "demo.demo_bus.demoDecoder",
+                "sv_macro_namespace": "DEMO_BUS",
+                "sv_macro_block": "DEMO_CONTROL_REG",
+                "hdl_path": "demo.control.config",
+                "access": "RW",
+                "bit_range": "[31:0]",
+                "width": 32,
+                "reset": "",
+                "description": "Fictional controller configuration"
+              }
+            },
+            {
+              "op": "write",
+              "target": "register",
+              "reg": "DEMO_SENSOR_CONFIG",
+              "field": "",
+              "value": "0x00001001",
+              "condition": "",
+              "timeout_us": "",
+              "interval_us": "",
+              "comment": "Enable fictional sampling with a 16-tick demo period.",
+              "source": {
+                "block": "demo_sensor_reg",
+                "block_id": "demo_sensor_rdf.json:demo_sensor_reg",
+                "file": "demo_sensor_rdf.json",
+                "map_to": "demoDecoder",
+                "address": "0x40002000",
+                "local_offset": "0x00000000",
+                "block_offset": "0x00002000",
+                "addr_map": "demo_sensor_reg.demo_sensor_reg.demoDecoder",
+                "rnoc_map": "demo.demo_bus.demoDecoder",
+                "sv_macro_namespace": "DEMO_BUS",
+                "sv_macro_block": "DEMO_SENSOR_REG",
+                "hdl_path": "demo.sensor.config",
+                "access": "RW",
+                "bit_range": "[31:0]",
+                "width": 32,
+                "reset": "",
+                "description": "Fictional sensor configuration"
+              }
+            },
+            {
+              "op": "rmw",
+              "target": "field",
+              "reg": "DEMO_CONTROL",
+              "field": "enable",
+              "value": "0x1",
+              "condition": "",
+              "timeout_us": "",
+              "interval_us": "",
+              "comment": "Enable the fictional controller while preserving other fields.",
+              "source": {
+                "block": "demo_control_reg",
+                "block_id": "demo_control_rdf.json:demo_control_reg",
+                "file": "demo_control_rdf.json",
+                "map_to": "demoDecoder",
+                "address": "0x40001000",
+                "local_offset": "0x00000000",
+                "block_offset": "0x00001000",
+                "addr_map": "demo_control_reg.demo_control_reg.demoDecoder",
+                "rnoc_map": "demo.demo_bus.demoDecoder",
+                "sv_macro_namespace": "DEMO_BUS",
+                "sv_macro_block": "DEMO_CONTROL_REG",
+                "hdl_path": "demo.control.config",
+                "access": "RW",
+                "bit_range": "[0]",
+                "width": 1,
+                "reset": "0x0",
+                "description": "Enable the fictional controller"
+              },
+              "fields": [
+                {
+                  "name": "enable",
+                  "value": "0x1",
+                  "bit_range": "[0]",
+                  "reset": "0x0",
+                  "width": 1,
+                  "description": "Enable the fictional controller"
+                }
+              ]
+            },
+            {
+              "op": "poll",
+              "target": "field",
+              "reg": "DEMO_SENSOR_STATUS",
+              "field": "ready",
+              "value": "0x1",
+              "condition": "eq",
+              "timeout_us": 1000,
+              "interval_us": 10,
+              "comment": "Wait for fictional sensor readiness with a bounded timeout.",
+              "source": {
+                "block": "demo_sensor_reg",
+                "block_id": "demo_sensor_rdf.json:demo_sensor_reg",
+                "file": "demo_sensor_rdf.json",
+                "map_to": "demoDecoder",
+                "address": "0x40002004",
+                "local_offset": "0x00000004",
+                "block_offset": "0x00002000",
+                "addr_map": "demo_sensor_reg.demo_sensor_reg.demoDecoder",
+                "rnoc_map": "demo.demo_bus.demoDecoder",
+                "sv_macro_namespace": "DEMO_BUS",
+                "sv_macro_block": "DEMO_SENSOR_REG",
+                "hdl_path": "demo.sensor.status",
+                "access": "RO",
+                "bit_range": "[0]",
+                "width": 1,
+                "reset": "0x0",
+                "description": "The fictional sensor is ready"
+              },
+              "fields": [
+                {
+                  "name": "ready",
+                  "value": "0x1",
+                  "bit_range": "[0]",
+                  "reset": "0x0",
+                  "width": 1,
+                  "description": "The fictional sensor is ready"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

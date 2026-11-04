@@ -1,0 +1,146 @@
+{
+  "project": "uvm_wiki",
+  "repository": "https://github.com/TechYan/uvm_wiki",
+  "source_revision": "82134333fab2a7a493cd5b13eac5709824c35202",
+  "generated_at": "2026-11-04T08:14:04.595624+00:00",
+  "generator": "uvm-wiki/scripts/uvm_wiki_core.py + uvm_wiki_filelist.py + uvm_wiki_web.py",
+  "parser": "pyslang",
+  "parser_fallback_files": 0,
+  "per_file_syntax_diagnostics": 49,
+  "publication_changes": [
+    "Relative metadata paths and no cache path",
+    "Link back to package index",
+    "Ensure embedded line-one source preview for every HDL file",
+    "Force embedded-source mode on static HTTP hosting",
+    "Default Wiki Graph to All relations; external UVM inheritance remains in Class Hierarchy"
+  ],
+  "stats": {
+    "files": 15,
+    "symbols": 41,
+    "classes": 11,
+    "relations": 56,
+    "ports": 2,
+    "connections": 3,
+    "components": 8,
+    "unresolved_components": 0,
+    "architecture_roots": 1,
+    "roles": {
+      "module": 2,
+      "interface": 1,
+      "package": 1,
+      "sequence_item": 1,
+      "function": 22,
+      "config": 1,
+      "sequence": 1,
+      "task": 4,
+      "sequencer": 1,
+      "driver": 1,
+      "monitor": 1,
+      "agent": 1,
+      "scoreboard": 1,
+      "coverage": 1,
+      "env": 1,
+      "test": 1
+    },
+    "relation_kinds": {
+      "import": 3,
+      "include": 12,
+      "config_db_set": 2,
+      "extends": 11,
+      "creates": 12,
+      "config_db_get": 3,
+      "declares_tlm_port": 2,
+      "seq_item_connect": 1,
+      "tlm_connect": 2,
+      "has_member": 8
+    }
+  },
+  "simulation_run": false,
+  "published_source_files": [
+    {
+      "path": "examples/demo_uvm/filelist.f",
+      "sha256": "d44ab38ec07080a234193f4c4acf3df20677ccf3b5a1459fc6e347c1bf031b3e",
+      "bytes": 125
+    },
+    {
+      "path": "examples/demo_uvm/filelists/rtl.f",
+      "sha256": "91f6f9a3d7677868eb9d19c3b90d64da93e29cf6cbcec40dce708e81ab591076",
+      "bytes": 20
+    },
+    {
+      "path": "examples/demo_uvm/rtl/demo_dut.sv",
+      "sha256": "45629b652bed87353099617209dfa635a09f357e15874006537b4027c05f0810",
+      "bytes": 519
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_agent.svh",
+      "sha256": "8182c4082077a5771c2d43d8836a27eee7a7b3a48b2737de66d9f65f765764d2",
+      "bytes": 828
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_coverage.svh",
+      "sha256": "986fd3b1b04ba80de401ea336a5f48a6f7d6abaa21e2eb4139e17139cf058156",
+      "bytes": 584
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_driver.svh",
+      "sha256": "88b3bc8e51676b2c21b50cbccf4d3309d2b14c952b8ca7b8bd4ef5e48ff7653c",
+      "bytes": 845
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_env.svh",
+      "sha256": "c6780262715ebae6d6cfc84c34fa230aea8a954f0d4bc90f8210a7cda6529597",
+      "bytes": 982
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_env_config.svh",
+      "sha256": "87b9fabb3c90c3e6ce3d39f03204164bb1516231f61f66a30b2f24a25676c9b8",
+      "bytes": 411
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_item.svh",
+      "sha256": "8cc5abc2dd00ac3ce3b7b1004e4f603edcb02a980eab090028fb51834e2a8183",
+      "bytes": 340
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_monitor.svh",
+      "sha256": "ba4c6b56eebc9415e8f63e0afa0d6d6023a1f2626b1180d918916bf7e76e7f8a",
+      "bytes": 884
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_scoreboard.svh",
+      "sha256": "391c6c4945717f986164e3bb11eb095412ea69ea85bb5585724d37affd47a53f",
+      "bytes": 776
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_sequence.svh",
+      "sha256": "25494eaddd436a05f452458ffff8441140575eb94c6fbd4a04a02a72aabd3506",
+      "bytes": 489
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_sequencer.svh",
+      "sha256": "ee36a5ccbd7c914b45eac29233df084a9e0b382426d1a8a02bdb03be37eafc4b",
+      "bytes": 233
+    },
+    {
+      "path": "examples/demo_uvm/tb/classes/demo_smoke_test.svh",
+      "sha256": "edd337c5928665e303683b4d6ee7b9e78f0a336edead1c74aa6a6917b3f65620",
+      "bytes": 862
+    },
+    {
+      "path": "examples/demo_uvm/tb/demo_if.sv",
+      "sha256": "376f9140cd640751d534136d02260d998d880c4bb063732d449d45f11e5af4c1",
+      "bytes": 505
+    },
+    {
+      "path": "examples/demo_uvm/tb/demo_pkg.sv",
+      "sha256": "f3470143de97ba06129de81e866a04e34c35dd16648c796b9789b329f0c69119",
+      "bytes": 428
+    },
+    {
+      "path": "examples/demo_uvm/tb/demo_top.sv",
+      "sha256": "159d15a60676da7de8e612f7ec376c1066bfe0765e6af7192df086ccfb07a52e",
+      "bytes": 603
+    }
+  ]
+}

@@ -1,0 +1,3627 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>XPG Programming Guide Builder</title>
+    <style>
+:root {
+  --bg: #f5f7f9;
+  --panel: #ffffff;
+  --panel-soft: #f0f4f6;
+  --line: #d8e0e6;
+  --line-strong: #b9c6d0;
+  --text: #18212b;
+  --muted: #657386;
+  --teal: #0d746e;
+  --teal-dark: #095a55;
+  --teal-soft: #e0f2ef;
+  --navy: #15213a;
+  --blue: #2458a7;
+  --blue-soft: #e4ecfa;
+  --amber: #8a6100;
+  --amber-soft: #fff3cc;
+  --red: #a43b2e;
+  --red-soft: #ffe5df;
+  --green: #276b3e;
+  --green-soft: #def2e5;
+  --mapping-bg: #fffaf0;
+  --mapping-head: #fff2cf;
+  --register-bg: #f3f8fb;
+  --register-head: #e7f0f7;
+  --builder-bg: #f7fbfa;
+  --builder-head: #e6f3f0;
+  --preview-bg: #f7f6fb;
+  --preview-head: #efedf7;
+  --shadow: 0 14px 32px rgba(24, 33, 43, 0.08);
+  --radius: 8px;
+  --mono: ui-monospace, "SFMono-Regular", "Cascadia Code", "Cascadia Mono", "Consolas", monospace;
+  --sans: "Segoe UI Variable", "Aptos", "Inter", "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei UI", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.48 var(--sans);
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+.button-like,
+.file-picker {
+  min-height: 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button:hover,
+.button-like:hover,
+.file-picker:hover {
+  border-color: var(--teal);
+  background: #fbfefe;
+}
+
+button.primary {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+  font-weight: 700;
+}
+
+button.primary:hover {
+  background: var(--teal-dark);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.file-picker input,
+.button-like input {
+  display: none;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 34px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text);
+  padding: 7px 9px;
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13, 116, 110, 0.15);
+}
+
+label span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(520px, 1fr) auto;
+}
+
+.topbar {
+  min-height: 64px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  background: #fbfcfd;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: var(--navy);
+  color: #f5b841;
+  font-family: var(--mono);
+  font-weight: 800;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.brand p {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.top-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.import-strip {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  display: grid;
+  grid-template-columns: auto auto auto auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.file-picker.secondary {
+  background: var(--panel-soft);
+  color: var(--muted);
+}
+
+.status-pill,
+.loaded-chip,
+.pill {
+  min-height: 26px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 9px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.loaded-files {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  overflow-x: auto;
+}
+
+.loaded-chip {
+  color: var(--text);
+  background: #fff;
+  flex: 0 0 auto;
+}
+
+.loaded-chip button {
+  min-height: 22px;
+  width: 22px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.mapping-panel {
+  margin: 10px 14px 0;
+  padding: 9px 12px 10px;
+  border: 1px solid #ead8a7;
+  border-top: 3px solid var(--amber);
+  border-radius: var(--radius);
+  background: var(--mapping-bg);
+}
+
+.mapping-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  margin: -9px -12px 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #ead8a7;
+  background: var(--mapping-head);
+  border-radius: 6px 6px 0 0;
+}
+
+.mapping-head strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.mapping-warnings {
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.warning,
+.ok {
+  border-radius: 6px;
+  padding: 7px 9px;
+  font-size: 12px;
+}
+
+.warning {
+  background: var(--amber-soft);
+  color: var(--amber);
+  border: 1px solid #e6c979;
+}
+
+.ok {
+  background: var(--green-soft);
+  color: var(--green);
+  border: 1px solid #b5ddc2;
+}
+
+.block-mappings {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  overflow: hidden;
+}
+
+.block-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.75fr) minmax(360px, 1.5fr) minmax(220px, 0.9fr);
+  gap: 10px;
+  align-items: end;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+
+.block-row > * {
+  min-width: 0;
+}
+
+.mapping-choice {
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fbfcfd;
+}
+
+.mapping-choice.disabled {
+  background: #f1f4f6;
+  color: var(--muted);
+}
+
+.mapping-choice.disabled input,
+.mapping-choice.disabled select {
+  opacity: 0.72;
+}
+
+.mapping-choice-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.mapping-choice-head input {
+  width: auto;
+  min-height: auto;
+}
+
+.mapping-choice-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.mapping-choice label {
+  min-width: 0;
+}
+
+.mapping-choice select,
+.mapping-choice input {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.block-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.block-meta {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.offset-note {
+  margin-top: 3px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.offset-note strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.workspace {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(320px, 370px) minmax(720px, 1fr);
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg);
+  align-items: start;
+}
+
+.pane {
+  min-width: 0;
+  min-height: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+}
+
+.workspace > .pane:last-child {
+  border-right: 1px solid var(--line);
+}
+
+.pane-head {
+  flex: 0 0 auto;
+  min-height: 52px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-radius: 6px 6px 0 0;
+}
+
+.pane-head h2 {
+  font-size: 14px;
+}
+
+.register-pane,
+.builder-pane,
+.output-pane {
+  overflow: hidden;
+}
+
+.register-pane > :not(.pane-head),
+.builder-pane > :not(.pane-head),
+.output-pane > :not(.pane-head) {
+  min-height: 0;
+}
+
+.preview-panel {
+  margin: 0 14px 14px;
+  min-height: 330px;
+  border-top: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+  background: var(--preview-bg);
+}
+
+.preview-panel .pane-head {
+  min-height: 48px;
+  border-top: 3px solid var(--navy);
+  background: var(--preview-head);
+}
+
+.register-pane {
+  background: var(--register-bg);
+  height: min(760px, calc(100vh - 240px));
+  min-height: 420px;
+}
+
+.register-pane .pane-head {
+  border-top: 3px solid var(--blue);
+  background: var(--register-head);
+}
+
+.builder-pane {
+  background: var(--builder-bg);
+}
+
+.builder-pane .pane-head {
+  border-top: 3px solid var(--teal);
+  background: var(--builder-head);
+}
+
+.search-grid {
+  flex: 0 0 auto;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.result-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  overflow: auto;
+  padding: 10px;
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  scrollbar-gutter: stable;
+}
+
+.result-list::-webkit-scrollbar,
+.selected-card::-webkit-scrollbar {
+  width: 10px;
+}
+
+.result-list::-webkit-scrollbar-thumb,
+.selected-card::-webkit-scrollbar-thumb {
+  background: #b9c6d0;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: content-box;
+}
+
+.result-list.empty,
+.steps.empty {
+  color: var(--muted);
+  place-content: center;
+  text-align: center;
+}
+
+.reg-card,
+.step-card {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 8px 9px;
+}
+
+.reg-card {
+  cursor: pointer;
+}
+
+.reg-card:hover,
+.reg-card.active {
+  border-color: var(--teal);
+  box-shadow: var(--shadow);
+}
+
+.reg-card.active {
+  background: var(--teal-soft);
+}
+
+.reg-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.reg-title strong,
+.field-name,
+.step-title,
+code,
+pre {
+  font-family: var(--mono);
+}
+
+.reg-title strong {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.reg-meta,
+.field-meta,
+.step-meta {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  min-height: 22px;
+  padding: 2px 8px;
+  font-size: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-soft);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.badge.rw,
+.badge.rw1c {
+  color: var(--green);
+  background: var(--green-soft);
+  border-color: #b5ddc2;
+}
+
+.badge.ro {
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-color: #b8caeb;
+}
+
+.badge.wo {
+  color: var(--amber);
+  background: var(--amber-soft);
+  border-color: #e6c979;
+}
+
+.phase-tabs,
+.preview-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  flex: 1;
+}
+
+.phase-tabs button,
+.preview-tabs button {
+  border-radius: 999px;
+  min-height: 30px;
+  padding: 0 10px;
+}
+
+.phase-tabs button.active,
+.preview-tabs button.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.icon-button {
+  width: 32px;
+  padding: 0;
+  font-weight: 700;
+}
+
+.flow-grid,
+.builder-grid,
+.advanced-grid {
+  flex: 0 0 auto;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.flow-grid {
+  grid-template-columns: minmax(150px, 1fr) 100px minmax(240px, 1.3fr) minmax(150px, 0.8fr) 110px;
+}
+
+.flow-grid .wide {
+  grid-column: auto;
+}
+
+.builder-grid {
+  grid-template-columns: 130px 100px minmax(200px, 1fr) minmax(180px, 0.9fr);
+}
+
+.advanced-grid {
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+}
+
+.selected-card {
+  flex: 0 0 auto;
+  margin: 8px 12px 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fbfcfd;
+  padding: 0;
+  color: var(--muted);
+  font-size: 12px;
+  max-height: min(680px, calc(100vh - 240px));
+  min-height: 300px;
+  overflow: auto;
+}
+
+.selected-card.has-selection {
+  color: var(--text);
+  background: #f8fdfc;
+  border-color: #b6dfda;
+}
+
+.reg-detail-head {
+  padding: 10px 12px;
+  border-bottom: 1px solid #b6dfda;
+  background: var(--teal-soft);
+}
+
+.reg-main {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.reg-main strong {
+  font-family: var(--mono);
+  font-size: 15px;
+}
+
+.reg-desc {
+  color: #344355;
+  font-size: 13px;
+}
+
+.reg-kv-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding: 9px 12px;
+  border-bottom: 1px solid #cce7e2;
+  background: #eef9f6;
+}
+
+.reg-kv {
+  min-width: 0;
+  padding: 6px 7px;
+  border: 1px solid #c8e3df;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.reg-kv span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.reg-kv code {
+  display: block;
+  color: var(--text);
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.field-toolbar {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  background: #fff;
+}
+
+.field-toolbar span {
+  color: var(--muted);
+}
+
+.field-list {
+  display: grid;
+  gap: 5px;
+  padding: 8px 9px 10px;
+  background: #f8fdfc;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 32px minmax(170px, 1.05fr) 70px 70px minmax(130px, 0.8fr) minmax(260px, 2.1fr);
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+  align-items: center;
+}
+
+.field-row.header {
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.field-row.selectable {
+  cursor: pointer;
+}
+
+.field-row.selectable:hover {
+  border-color: #92cac2;
+  background: #fbfffe;
+}
+
+.field-row.selected {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.field-row input[type="checkbox"] {
+  width: 16px;
+  min-height: 16px;
+  margin: 0;
+}
+
+.field-value-input {
+  min-height: 28px;
+  padding: 4px 7px;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.field-desc {
+  color: #344355;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.field-row > strong {
+  overflow-wrap: anywhere;
+}
+
+.field-bits,
+.field-reset {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.multi-field-summary {
+  flex: 0 0 auto;
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.value-row {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 8px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.38);
+}
+
+.value-hint {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.value-hint.error {
+  color: var(--red);
+}
+
+.comment-box {
+  flex: 0 0 auto;
+  display: block;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.comment-box textarea {
+  min-height: 58px;
+}
+
+.action-row,
+.step-headline {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.step-headline {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.step-headline strong {
+  color: var(--text);
+}
+
+.steps {
+  flex: 1 1 auto;
+  min-height: 180px;
+  overflow: auto;
+  padding: 10px 12px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.step-card {
+  display: grid;
+  gap: 7px;
+}
+
+.step-card.editing {
+  border-color: var(--teal);
+  background: var(--teal-soft);
+}
+
+.step-top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.step-op {
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-family: var(--mono);
+  font-size: 12px;
+  min-height: 24px;
+  padding: 3px 8px;
+}
+
+.step-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.step-actions button {
+  min-height: 28px;
+  min-width: 38px;
+  width: auto;
+  padding: 0 7px;
+  font-size: 12px;
+}
+
+.preview {
+  flex: 1 1 auto;
+  min-height: 260px;
+  overflow: auto;
+  padding: 12px;
+  background: var(--preview-bg);
+}
+
+.guide h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.guide h3 {
+  font-size: 14px;
+  margin: 18px 0 8px;
+}
+
+.guide table,
+.csv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.guide th,
+.guide td,
+.csv-table th,
+.csv-table td {
+  border: 1px solid var(--line);
+  padding: 7px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.guide th,
+.csv-table th {
+  background: var(--panel-soft);
+}
+
+pre {
+  min-height: 320px;
+  margin: 0;
+  padding: 14px;
+  border-radius: var(--radius);
+  background: #101827;
+  color: #d7f8e6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+mark {
+  background: #ffe58a;
+  color: inherit;
+  border-radius: 3px;
+  padding: 0 1px;
+}
+
+.toast {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  max-width: 360px;
+  border-radius: var(--radius);
+  background: var(--navy);
+  color: #fff;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(70px);
+  transition: 160ms ease;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 1220px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .pane {
+    min-height: 420px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .preview-panel {
+    min-height: 320px;
+  }
+
+  .import-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .loaded-files {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 1380px) {
+  .block-row {
+    grid-template-columns: minmax(150px, 0.8fr) minmax(360px, 1.6fr);
+  }
+
+  .block-row .mapping-choice:last-child {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar,
+  .mapping-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .import-strip,
+  .flow-grid,
+  .builder-grid,
+  .advanced-grid,
+  .mapping-choice-grid,
+  .block-row {
+    grid-template-columns: 1fr;
+  }
+
+  .block-row .mapping-choice:last-child {
+    grid-column: auto;
+  }
+}
+
+    </style>
+  
+<style>
+.demo-back-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;padding:10px 18px;background:#101823;border-bottom:1px solid #334155;color:#cbd5e1;font:13px/1.5 system-ui,sans-serif}
+.demo-back-nav a,.demo-package-note a{color:#b4d8ff;text-decoration:none}.demo-back-nav a:hover,.demo-package-note a:hover{text-decoration:underline}.demo-back-nav a:focus-visible,.demo-package-note a:focus-visible{outline:2px solid #93c5fd;outline-offset:3px}
+.demo-package-note{padding:9px 18px;background:#172230;color:#cbd5e1;font:12px/1.6 system-ui,sans-serif}.demo-package-note a{margin-left:12px}
+</style>
+</head>
+  <body>
+<nav class="demo-back-nav" aria-label="Project navigation"><a href="../">&larr; Project hub</a><a href="../projects/pg_gen/">PG Generator overview</a></nav>
+<div class="demo-package-note">Fictional controller + sensor demo &middot; Use <strong>Load Sample</strong> to try four register operations. Inputs and generation stay in your browser.
+<a href="examples/demo_init.config.json" download>Editable config</a><a href="examples/demo_init.pg.json" download>PG JSON</a><a href="examples/demo_init.csv" download>CSV</a><a href="examples/demo_init.sv" download>SV</a></div>
+
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">XPG</div>
+          <div>
+            <h1>Programming Guide Builder</h1>
+            <p>RDF-style register JSON programming flow editor</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="loadSample" type="button">Load Sample</button>
+          <label class="button-like">
+            <input id="configFile" type="file" accept=".json,application/json" />
+            Load Config
+          </label>
+          <button id="saveConfig" type="button" class="primary">Save Config</button>
+        </div>
+      </header>
+
+      <section class="import-strip">
+        <label class="file-picker">
+          <input id="rdfFiles" type="file" accept=".json,application/json" multiple />
+          Add RDF Blocks
+        </label>
+        <label class="file-picker secondary">
+          <input id="addrFiles" type="file" accept=".json,application/json" multiple />
+          Add Addr Maps
+        </label>
+        <label class="file-picker secondary">
+          <input id="rnocFiles" type="file" accept=".json,application/json" multiple />
+          Add RNOC Maps
+        </label>
+        <div class="status-pill" id="importStatus">0 registers - 0 maps</div>
+        <div id="loadedFiles" class="loaded-files"></div>
+      </section>
+
+      <section class="mapping-panel">
+        <div class="mapping-head">
+          <strong>Address Mapping</strong>
+          <span id="mappingSummary">Load RDF block files or sample data to begin.</span>
+        </div>
+        <div id="mappingWarnings" class="mapping-warnings"></div>
+        <div id="blockMappings" class="block-mappings"></div>
+      </section>
+
+      <section class="workspace">
+        <aside class="pane register-pane">
+          <div class="pane-head">
+            <h2>Registers</h2>
+            <span id="registerCount">0</span>
+          </div>
+          <div class="search-grid">
+            <label>
+              <span>Search register or field</span>
+              <input id="registerSearch" type="search" placeholder="DEMO_CONTROL, enable, 0x40001000" />
+            </label>
+            <label>
+              <span>Block</span>
+              <select id="blockFilter"></select>
+            </label>
+          </div>
+          <div id="registerList" class="result-list empty">No registers loaded.</div>
+        </aside>
+
+        <section class="pane builder-pane">
+          <div class="pane-head">
+            <h2>Step Builder</h2>
+            <div class="phase-tabs" id="phaseTabs"></div>
+            <button id="addPhase" type="button" class="icon-button" title="Add phase">+</button>
+          </div>
+
+          <div class="flow-grid">
+            <label>
+              <span>flow_id</span>
+              <input id="flowId" type="text" value="xpg.example_flow" />
+            </label>
+            <label>
+              <span>scope</span>
+              <input id="flowScope" type="text" value="soc" />
+            </label>
+            <label class="wide">
+              <span>description</span>
+              <input id="flowDesc" type="text" value="Generated programming guide flow" />
+            </label>
+            <label>
+              <span>step group name</span>
+              <input id="phaseTitle" type="text" value="phase_1" />
+            </label>
+            <label>
+              <span>owner</span>
+              <input id="phaseOwner" type="text" value="bootloader" />
+            </label>
+          </div>
+
+          <div class="selected-card" id="selectedRegister">Select a register to inspect fields.</div>
+
+          <div class="builder-grid">
+            <label>
+              <span>Operation</span>
+              <select id="operation"></select>
+            </label>
+            <label>
+              <span>Target</span>
+              <select id="targetKind">
+                <option value="field">field</option>
+                <option value="register">register</option>
+              </select>
+            </label>
+            <label>
+              <span>Active Field</span>
+              <select id="fieldSelect"></select>
+            </label>
+            <label>
+              <span>Active Value / Expect</span>
+              <input id="valueInput" type="text" placeholder="0x1 or $symbolic_value" />
+            </label>
+          </div>
+
+          <div id="fieldEditSummary" class="multi-field-summary">No field selected.</div>
+
+          <div class="value-row">
+            <div id="valueHint" class="value-hint">Select a register and operation.</div>
+            <button id="valueZero" type="button">0</button>
+            <button id="valueReset" type="button">Reset</button>
+            <button id="valueMax" type="button">Max</button>
+          </div>
+
+          <div id="advancedFields" class="advanced-grid"></div>
+
+          <label class="comment-box">
+            <span>Step comment</span>
+            <textarea id="stepComment" rows="3" placeholder="Describe why this step is needed"></textarea>
+          </label>
+
+          <div class="action-row">
+            <button id="addStep" type="button" class="primary">Add Step</button>
+            <button id="cancelEditStep" type="button" hidden>Cancel Edit</button>
+            <button id="clearSelection" type="button">Clear Selection</button>
+          </div>
+
+          <div class="step-headline">
+            <strong>Current Phase Steps</strong>
+            <span id="stepCount">0 steps</span>
+          </div>
+          <div id="stepList" class="steps empty">No steps yet.</div>
+        </section>
+      </section>
+
+      <section class="pane output-pane preview-panel">
+        <div class="pane-head">
+          <h2>Preview</h2>
+          <div class="preview-tabs">
+            <button type="button" data-tab="guide" class="active">Guide</button>
+            <button type="button" data-tab="json">PG JSON</button>
+            <button type="button" data-tab="yaml">YAML</button>
+            <button type="button" data-tab="csv">CSV</button>
+            <button type="button" data-tab="sv">SV</button>
+          </div>
+          <button id="downloadPreview" type="button" class="primary" title="Open Save As when supported; otherwise use browser download">Download</button>
+        </div>
+        <div id="preview" class="preview"></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast"></div>
+    <script>
+"use strict";
+
+const META_KEYS = new Set([
+  "registers",
+  "reg_field_out",
+  "reg_addr_width",
+  "reg_data_width",
+  "map_to",
+  "hdl_path",
+  "variant",
+  "version",
+  "history",
+  "decodes",
+  "nius",
+]);
+
+const OPERATIONS = [
+  { id: "read", label: "read", target: "register", value: false },
+  { id: "write", label: "write", target: "register", value: true },
+  { id: "rmw", label: "rmw", target: "field", value: true },
+  { id: "poll", label: "poll", target: "field", value: true, condition: true, poll: true },
+];
+
+const NO_ADDR_MAP = "__none__";
+
+const SAMPLE = {
+  "rdfBlocks": [
+    {
+      "name": "demo_control_rdf.json",
+      "json": {
+        "registers": "demo_control_reg",
+        "reg_field_out": true,
+        "reg_addr_width": 32,
+        "reg_data_width": "32",
+        "map_to": "demoDecoder",
+        "hdl_path": "demo.control",
+        "variant": {
+          "fictional_demo": true
+        },
+        "DEMO_CONTROL": {
+          "description": "Fictional controller configuration",
+          "access": "RW",
+          "width": "32",
+          "offset": "0x0000",
+          "hdl_path": "demo.control.config",
+          "fields": {
+            "enable": {
+              "bit_range": "[0]",
+              "reset": "0x0",
+              "description": "Enable the fictional controller"
+            },
+            "mode": {
+              "bit_range": "[3..1]",
+              "reset": "0x0",
+              "description": "Select a demo operating mode"
+            },
+            "irq_enable": {
+              "bit_range": "[8]",
+              "reset": "0x1",
+              "description": "Enable demo completion interrupts"
+            }
+          }
+        },
+        "DEMO_IRQ_STATUS": {
+          "description": "Fictional interrupt status",
+          "access": "RW1C",
+          "width": "32",
+          "offset": "0x0004",
+          "hdl_path": "demo.control.irq_status",
+          "fields": {
+            "done": {
+              "bit_range": "[0]",
+              "reset": "0x0",
+              "description": "A demo operation completed"
+            },
+            "error": {
+              "bit_range": "[1]",
+              "reset": "0x0",
+              "description": "A demo operation reported an error"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "demo_sensor_rdf.json",
+      "json": {
+        "registers": "demo_sensor_reg",
+        "reg_field_out": true,
+        "reg_addr_width": 32,
+        "reg_data_width": "32",
+        "map_to": "demoDecoder",
+        "hdl_path": "demo.sensor",
+        "variant": {
+          "fictional_demo": true
+        },
+        "DEMO_SENSOR_CONFIG": {
+          "description": "Fictional sensor configuration",
+          "access": "RW",
+          "width": "32",
+          "offset": "0x0000",
+          "hdl_path": "demo.sensor.config",
+          "fields": {
+            "enable": {
+              "bit_range": "[0]",
+              "reset": "0x0",
+              "description": "Enable fictional sampling"
+            },
+            "sample_period": {
+              "bit_range": "[15..8]",
+              "reset": "0x10",
+              "description": "Demo sample interval in arbitrary ticks"
+            }
+          }
+        },
+        "DEMO_SENSOR_STATUS": {
+          "description": "Fictional sensor readiness",
+          "access": "RO",
+          "width": "32",
+          "offset": "0x0004",
+          "hdl_path": "demo.sensor.status",
+          "fields": {
+            "ready": {
+              "bit_range": "[0]",
+              "reset": "0x0",
+              "description": "The fictional sensor is ready"
+            },
+            "sample_count": {
+              "bit_range": "[15..8]",
+              "reset": "0x0",
+              "description": "Number of fictional samples"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "addrMaps": [
+    {
+      "name": "demo_addr_map.json",
+      "json": {
+        "decodes": {
+          "demo_control_reg.demo_control_reg.demoDecoder": {
+            "offset": "0x00001000",
+            "size": "0x00001000",
+            "visibility": "all",
+            "comment": "Fictional demo controller window"
+          },
+          "demo_sensor_reg.demo_sensor_reg.demoDecoder": {
+            "offset": "0x00002000",
+            "size": "0x00001000",
+            "visibility": "all",
+            "comment": "Fictional demo sensor window"
+          }
+        }
+      }
+    }
+  ],
+  "rnocMaps": [
+    {
+      "name": "demo_bus_map.json",
+      "json": {
+        "version": "fictional-demo-1",
+        "decodes": {
+          "demo.demo_bus.demoDecoder": {
+            "offset": "0x40000000",
+            "size": "0x00010000",
+            "visibility": "all",
+            "comment": "Synthetic demo bus window; no hardware assignment"
+          }
+        }
+      }
+    }
+  ]
+};
+
+const state = {
+  rdfFiles: new Map(),
+  addrFiles: new Map(),
+  rnocFiles: new Map(),
+  registers: [],
+  blocks: [],
+  addrEntries: [],
+  rnocEntries: [],
+  blockSettings: new Map(),
+  selectedRegId: "",
+  selectedField: "",
+  selectedFields: [],
+  fieldValues: {},
+  phases: [{ id: "phase_1", title: "phase_1", owner: "bootloader", steps: [] }],
+  activePhase: 0,
+  editingStepIndex: null,
+  previewTab: "guide",
+};
+
+const els = {
+  loadSample: document.getElementById("loadSample"),
+  configFile: document.getElementById("configFile"),
+  saveConfig: document.getElementById("saveConfig"),
+  rdfFiles: document.getElementById("rdfFiles"),
+  addrFiles: document.getElementById("addrFiles"),
+  rnocFiles: document.getElementById("rnocFiles"),
+  importStatus: document.getElementById("importStatus"),
+  loadedFiles: document.getElementById("loadedFiles"),
+  mappingSummary: document.getElementById("mappingSummary"),
+  mappingWarnings: document.getElementById("mappingWarnings"),
+  blockMappings: document.getElementById("blockMappings"),
+  registerCount: document.getElementById("registerCount"),
+  registerSearch: document.getElementById("registerSearch"),
+  blockFilter: document.getElementById("blockFilter"),
+  registerList: document.getElementById("registerList"),
+  phaseTabs: document.getElementById("phaseTabs"),
+  addPhase: document.getElementById("addPhase"),
+  flowId: document.getElementById("flowId"),
+  flowScope: document.getElementById("flowScope"),
+  flowDesc: document.getElementById("flowDesc"),
+  phaseTitle: document.getElementById("phaseTitle"),
+  phaseOwner: document.getElementById("phaseOwner"),
+  selectedRegister: document.getElementById("selectedRegister"),
+  operation: document.getElementById("operation"),
+  targetKind: document.getElementById("targetKind"),
+  fieldSelect: document.getElementById("fieldSelect"),
+  valueInput: document.getElementById("valueInput"),
+  fieldEditSummary: document.getElementById("fieldEditSummary"),
+  valueHint: document.getElementById("valueHint"),
+  valueZero: document.getElementById("valueZero"),
+  valueReset: document.getElementById("valueReset"),
+  valueMax: document.getElementById("valueMax"),
+  advancedFields: document.getElementById("advancedFields"),
+  stepComment: document.getElementById("stepComment"),
+  addStep: document.getElementById("addStep"),
+  cancelEditStep: document.getElementById("cancelEditStep"),
+  clearSelection: document.getElementById("clearSelection"),
+  stepCount: document.getElementById("stepCount"),
+  stepList: document.getElementById("stepList"),
+  preview: document.getElementById("preview"),
+  downloadPreview: document.getElementById("downloadPreview"),
+  toast: document.getElementById("toast"),
+};
+
+init();
+
+function init() {
+  OPERATIONS.forEach((op) => {
+    const option = document.createElement("option");
+    option.value = op.id;
+    option.textContent = op.label;
+    els.operation.appendChild(option);
+  });
+
+  els.loadSample.addEventListener("click", loadSampleData);
+  els.configFile.addEventListener("change", handleConfigFile);
+  els.saveConfig.addEventListener("click", saveConfig);
+  els.downloadPreview.addEventListener("click", downloadPreview);
+  els.rdfFiles.addEventListener("change", (event) => loadFiles(event.target.files, "rdf"));
+  els.addrFiles.addEventListener("change", (event) => loadFiles(event.target.files, "addr"));
+  els.rnocFiles.addEventListener("change", (event) => loadFiles(event.target.files, "rnoc"));
+  els.registerSearch.addEventListener("input", renderRegisterList);
+  els.blockFilter.addEventListener("change", renderRegisterList);
+  els.operation.addEventListener("change", handleOperationChange);
+  els.targetKind.addEventListener("change", () => {
+    renderSelectedRegister();
+    validateValue();
+    renderPreview();
+  });
+  els.fieldSelect.addEventListener("change", () => {
+    state.selectedField = els.fieldSelect.value;
+    syncSelectedFieldsFromSelect();
+    renderSelectedRegister();
+    validateValue();
+  });
+  els.valueInput.addEventListener("input", () => {
+    syncActiveFieldValue(els.valueInput.value);
+    validateValue();
+  });
+  els.valueZero.addEventListener("click", () => setValue("0x0"));
+  els.valueReset.addEventListener("click", setResetValue);
+  els.valueMax.addEventListener("click", setMaxValue);
+  els.addStep.addEventListener("click", addCurrentStep);
+  els.cancelEditStep.addEventListener("click", cancelStepEdit);
+  els.clearSelection.addEventListener("click", clearSelection);
+  els.addPhase.addEventListener("click", addPhase);
+  [els.flowId, els.flowScope, els.flowDesc, els.stepComment].forEach((input) => {
+    input.addEventListener("input", renderPreview);
+  });
+  els.phaseTitle.addEventListener("input", updateActivePhaseMeta);
+  els.phaseOwner.addEventListener("input", updateActivePhaseMeta);
+  document.querySelectorAll("[data-tab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.previewTab = button.dataset.tab;
+      renderPreviewTabs();
+      renderPreview();
+    });
+  });
+
+  handleOperationChange();
+  renderAll();
+}
+
+async function loadFiles(fileList, kind) {
+  const files = Array.from(fileList || []);
+  const errors = [];
+  for (const file of files) {
+    try {
+      const json = JSON.parse(await file.text());
+      if (kind === "rdf") state.rdfFiles.set(file.name, json);
+      if (kind === "addr") state.addrFiles.set(file.name, json);
+      if (kind === "rnoc") state.rnocFiles.set(file.name, json);
+    } catch (error) {
+      errors.push(`${file.name}: ${error.message}`);
+    }
+  }
+  if (errors.length) showToast(errors.join("; "));
+  recomputeModel();
+  renderAll();
+}
+
+function loadSampleData() {
+  state.rdfFiles.clear();
+  state.addrFiles.clear();
+  state.rnocFiles.clear();
+  state.blockSettings.clear();
+  SAMPLE.rdfBlocks.forEach((file) => state.rdfFiles.set(file.name, file.json));
+  SAMPLE.addrMaps.forEach((file) => state.addrFiles.set(file.name, file.json));
+  SAMPLE.rnocMaps.forEach((file) => state.rnocFiles.set(file.name, file.json));
+  state.selectedRegId = "";
+  state.selectedField = "";
+  state.selectedFields = [];
+  state.fieldValues = {};
+  state.phases = [{
+    id: "demo_init", title: "Demo initialization", owner: "demo_owner",
+    steps: [
+      makeStep({ op: "read", targetKind: "register", reg: "DEMO_CONTROL", comment: "Inspect the fictional controller before configuration." }),
+      makeStep({ op: "write", targetKind: "register", reg: "DEMO_SENSOR_CONFIG", value: "0x00001001", comment: "Enable fictional sampling with a 16-tick demo period." }),
+      makeStep({ op: "rmw", targetKind: "field", reg: "DEMO_CONTROL", field: "enable", value: "0x1", comment: "Enable the fictional controller while preserving other fields." }),
+      makeStep({ op: "poll", targetKind: "field", reg: "DEMO_SENSOR_STATUS", field: "ready", value: "0x1", condition: "eq", timeout_us: 1000, interval_us: 10, comment: "Wait for fictional sensor readiness with a bounded timeout." }),
+    ],
+  }];
+  state.activePhase = 0;
+  state.editingStepIndex = null;
+  els.flowId.value = "demo.sensor_init";
+  els.flowScope.value = "fictional_soc";
+  els.flowDesc.value = "Synthetic controller and sensor initialization; all names and addresses are fictional";
+  recomputeModel();
+  renderAll();
+  showToast("Fictional demo inputs loaded");
+}
+
+function recomputeModel() {
+  const regs = [];
+  for (const [sourceName, root] of state.rdfFiles.entries()) {
+    try {
+      regs.push(...extractRegisters(root, sourceName));
+    } catch (error) {
+      showToast(`${sourceName}: ${error.message}`);
+    }
+  }
+  state.registers = mergeRegisters(regs);
+  state.addrEntries = mergeDecodeFiles(state.addrFiles, "addr");
+  state.rnocEntries = mergeDecodeFiles(state.rnocFiles, "rnoc");
+  rebuildBlocks();
+  recomputeMappings();
+  normalizeStepModel();
+  hydrateStepsFromModel();
+  if (!state.selectedRegId && state.registers.length) {
+    state.selectedRegId = state.registers[0].id;
+    state.selectedField = state.registers[0].fields[0]?.name || "";
+  }
+  const reg = selectedReg();
+  if (reg) {
+    const valid = new Set(reg.fields.map((field) => field.name));
+    state.selectedFields = state.selectedFields.filter((name) => valid.has(name));
+    Object.keys(state.fieldValues).forEach((name) => {
+      if (!valid.has(name)) delete state.fieldValues[name];
+    });
+  }
+}
+
+function extractRegisters(root, sourceName) {
+  if (!root || typeof root !== "object" || Array.isArray(root)) {
+    throw new Error("RDF root must be an object");
+  }
+  const blockName = asText(root.registers) || sourceName.replace(/\.json$/i, "").replace(/_rdf$/i, "");
+  const base = {
+    block: blockName,
+    blockId: `${sourceName}:${blockName}`,
+    mapTo: asText(root.map_to),
+    hdlPath: asText(root.hdl_path),
+    source: sourceName,
+    aliases: buildBlockAliases(blockName, sourceName, root.map_to),
+  };
+  return Object.entries(root)
+    .filter(([name, value]) => isRegisterEntry(name, value))
+    .map(([name, value]) => normalizeRegister(name, value, base));
+}
+
+function isRegisterEntry(name, value) {
+  return !META_KEYS.has(name) && value && typeof value === "object" && !Array.isArray(value) && Boolean(value.offset || value.fields || value.access || value.width);
+}
+
+function normalizeRegister(name, value, base) {
+  const fields = Object.entries(value.fields || {}).map(([fieldName, field]) => ({
+    name: fieldName,
+    bitRange: asText(field.bit_range || field.bitRange || field.bits),
+    reset: asText(field.reset),
+    description: asText(field.description),
+  }));
+  return {
+    id: `${base.source}:${name}`,
+    name,
+    description: asText(value.description),
+    access: asText(value.access),
+    width: asText(value.width),
+    offset: normalizeHex(value.offset),
+    localOffset: normalizeHex(value.offset),
+    mapTo: asText(value.map_to) || base.mapTo,
+    hdlPath: asText(value.hdl_path) || base.hdlPath,
+    block: base.block,
+    blockId: base.blockId,
+    blockAliases: base.aliases,
+    source: base.source,
+    fields,
+    searchText: "",
+  };
+}
+
+function mergeRegisters(registers) {
+  const byId = new Map();
+  registers.forEach((reg) => {
+    refreshRegisterSearchText(reg);
+    byId.set(reg.id, reg);
+  });
+  return Array.from(byId.values()).sort((a, b) => a.block.localeCompare(b.block) || addressSort(a, b) || a.name.localeCompare(b.name));
+}
+
+function mergeDecodeFiles(fileMap, kind) {
+  const entries = [];
+  for (const [source, root] of fileMap.entries()) {
+    if (!root?.decodes || typeof root.decodes !== "object") continue;
+    Object.entries(root.decodes).forEach(([key, value]) => {
+      entries.push({
+        id: `${kind}:${source}:${key}`,
+        kind,
+        source,
+        key,
+        offset: normalizeHex(value?.offset),
+        size: normalizeHex(value?.size),
+        visibility: asText(value?.visibility),
+        comment: asText(value?.comment),
+        tokens: tokenizeDecodeKey(key),
+      });
+    });
+  }
+  return entries.sort((a, b) => a.key.localeCompare(b.key));
+}
+
+function rebuildBlocks() {
+  const blocks = new Map();
+  state.registers.forEach((reg) => {
+    const current = blocks.get(reg.blockId) || {
+      id: reg.blockId,
+      name: reg.block,
+      source: reg.source,
+      mapTo: reg.mapTo,
+      aliases: new Set(reg.blockAliases || []),
+      registerCount: 0,
+      maxLocalOffset: 0n,
+    };
+    current.registerCount += 1;
+    const parsed = parseAddressValue(reg.localOffset);
+    if (parsed.ok && parsed.value > current.maxLocalOffset) current.maxLocalOffset = parsed.value;
+    (reg.blockAliases || []).forEach((alias) => current.aliases.add(alias));
+    blocks.set(reg.blockId, current);
+  });
+  state.blocks = Array.from(blocks.values()).map((block) => ({
+    ...block,
+    aliases: Array.from(block.aliases).filter(Boolean),
+  }));
+  cleanupBlockSettings();
+}
+
+function recomputeMappings() {
+  state.blocks.forEach((block) => {
+    const settings = getBlockSettings(block.id);
+    const noAddrMap = settings.addrId === NO_ADDR_MAP;
+    const selectedAddr = !noAddrMap && settings.addrId ? state.addrEntries.find((entry) => entry.id === settings.addrId) : null;
+    const selectedRnoc = settings.rnocId ? state.rnocEntries.find((entry) => entry.id === settings.rnocId) : null;
+    const addrEntry = noAddrMap ? null : selectedAddr || bestDecodeMatch(state.addrEntries, [...block.aliases, block.name, block.mapTo, block.source]);
+    const rnocEntry =
+      selectedRnoc ||
+      bestDecodeMatch(state.rnocEntries, [...block.aliases, block.name, block.mapTo, addrEntry?.key, addrEntry?.comment, block.source]);
+    const manual = parseAddressValue(settings.manualOffset);
+    const addressMode = settings.addressMode === "manual" ? "manual" : "map";
+    const addrOffset = parseAddressValue(addrEntry?.offset);
+    const rnocOffset = parseAddressValue(rnocEntry?.offset);
+    const defaultZero = !state.addrEntries.length && !state.rnocEntries.length && state.blocks.length <= 1;
+    const manualValue = manual.ok ? manual.value : 0n;
+    const mapReady = noAddrMap || addrOffset.ok || defaultZero;
+    block.addressMode = addressMode;
+    block.addrEntry = addressMode === "map" ? addrEntry || null : null;
+    block.rnocEntry = addressMode === "map" ? rnocEntry || null : null;
+    block.manualOffsetValue = manualValue;
+    block.blockOffsetSource = addressMode === "manual" ? (manual.ok ? "manual_address" : "") : noAddrMap ? "no_addr_map" : addrOffset.ok ? "addr_map" : defaultZero ? "default" : "";
+    block.blockOffsetValue = addressMode === "manual" ? manualValue : noAddrMap ? 0n : addrOffset.ok ? addrOffset.value : defaultZero ? 0n : null;
+    block.rnocOffsetValue = addressMode === "map" && rnocOffset.ok ? rnocOffset.value : 0n;
+    block.baseAddress = addressMode === "manual" ? (manual.ok ? manualValue : null) : mapReady ? block.rnocOffsetValue + block.blockOffsetValue : null;
+    block.addressReady = block.baseAddress !== null;
+    block.rangeSize = addressMode === "map" && parseAddressValue(addrEntry?.size).ok ? parseAddressValue(addrEntry?.size).value : block.maxLocalOffset + 4n;
+  });
+
+  state.registers.forEach((reg) => {
+    const block = state.blocks.find((item) => item.id === reg.blockId);
+    const local = parseAddressValue(reg.localOffset);
+    reg.addrMapKey = block?.addrEntry?.key || "";
+    reg.addrMapOffset = block?.addrEntry?.offset || "";
+    reg.rnocMapKey = block?.rnocEntry?.key || "";
+    reg.rnocOffset = block?.rnocEntry?.offset || "";
+    reg.blockOffset = block?.blockOffsetValue !== null && block?.blockOffsetValue !== undefined ? formatBigIntHex(block.blockOffsetValue) : "";
+    reg.finalAddress = block?.addressReady && local.ok ? formatBigIntHex(block.baseAddress + local.value) : "";
+    reg.addressReady = Boolean(reg.finalAddress);
+    refreshRegisterSearchText(reg);
+  });
+}
+
+function refreshRegisterSearchText(reg) {
+  reg.searchText = [
+    reg.name,
+    reg.description,
+    reg.access,
+    reg.offset,
+    reg.finalAddress,
+    reg.block,
+    reg.source,
+    reg.mapTo,
+    reg.hdlPath,
+    reg.addrMapKey,
+    reg.rnocMapKey,
+    ...reg.fields.flatMap((field) => [field.name, field.description, field.bitRange, field.reset]),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function getBlockSettings(blockId) {
+  if (!state.blockSettings.has(blockId)) {
+    state.blockSettings.set(blockId, { addressMode: "map", manualOffset: "", addrId: "", rnocId: "", simNamespace: "" });
+  }
+  const settings = state.blockSettings.get(blockId);
+  if (!settings.addressMode) settings.addressMode = "map";
+  return settings;
+}
+
+function cleanupBlockSettings() {
+  const ids = new Set(state.blocks.map((block) => block.id));
+  Array.from(state.blockSettings.keys()).forEach((key) => {
+    if (!ids.has(key)) state.blockSettings.delete(key);
+  });
+}
+
+function renderAll() {
+  renderImportState();
+  renderMappingPanel();
+  renderRegisterFilters();
+  renderRegisterList();
+  renderPhases();
+  renderSelectedRegister();
+  renderAdvancedFields();
+  renderSteps();
+  validateValue();
+  renderPreviewTabs();
+  renderPreview();
+}
+
+function renderImportState() {
+  els.importStatus.textContent = `${state.registers.length} registers - ${state.addrEntries.length + state.rnocEntries.length} maps`;
+  const chips = [
+    ...Array.from(state.rdfFiles.keys()).map((name) => ({ kind: "rdf", label: "RDF", name })),
+    ...Array.from(state.addrFiles.keys()).map((name) => ({ kind: "addr", label: "ADDR", name })),
+    ...Array.from(state.rnocFiles.keys()).map((name) => ({ kind: "rnoc", label: "RNOC", name })),
+  ];
+  if (!chips.length) {
+    els.loadedFiles.innerHTML = '<span class="status-pill">No JSON files loaded</span>';
+    return;
+  }
+  els.loadedFiles.innerHTML = "";
+  chips.forEach((chip) => {
+    const node = document.createElement("span");
+    node.className = "loaded-chip";
+    node.innerHTML = `<strong>${escapeHtml(chip.label)}</strong> ${escapeHtml(chip.name)} <button title="Remove">x</button>`;
+    node.querySelector("button").addEventListener("click", () => removeFile(chip.kind, chip.name));
+    els.loadedFiles.appendChild(node);
+  });
+}
+
+function removeFile(kind, name) {
+  if (kind === "rdf") state.rdfFiles.delete(name);
+  if (kind === "addr") state.addrFiles.delete(name);
+  if (kind === "rnoc") state.rnocFiles.delete(name);
+  recomputeModel();
+  if (!state.registers.some((reg) => reg.id === state.selectedRegId)) {
+    state.selectedRegId = state.registers[0]?.id || "";
+    state.selectedField = state.registers[0]?.fields[0]?.name || "";
+  }
+  renderAll();
+}
+
+function renderMappingPanel() {
+  if (!state.blocks.length) {
+    els.mappingSummary.textContent = "Load RDF block files or sample data to begin.";
+    els.mappingWarnings.innerHTML = "";
+    els.blockMappings.innerHTML = "";
+    return;
+  }
+  const unresolved = state.blocks.filter((block) => !block.addressReady);
+  els.mappingSummary.textContent = `${state.blocks.length} blocks - ${unresolved.length} unresolved`;
+  els.mappingWarnings.innerHTML = "";
+  if (unresolved.length) {
+    const warning = document.createElement("div");
+    warning.className = "warning";
+    warning.textContent = `${unresolved.length} block(s) need address map or manual address: ${unresolved.map((block) => block.name).join(", ")}`;
+    els.mappingWarnings.appendChild(warning);
+  } else {
+    const ok = document.createElement("div");
+    ok.className = "ok";
+    ok.textContent = "All block base addresses are resolved.";
+    els.mappingWarnings.appendChild(ok);
+  }
+
+  els.blockMappings.innerHTML = "";
+  state.blocks.forEach((block) => {
+    const settings = getBlockSettings(block.id);
+    const useManual = settings.addressMode === "manual";
+    const noAddrMap = settings.addrId === NO_ADDR_MAP;
+    const addrOffsetText = noAddrMap ? "none (0x00000000)" : block.addrEntry?.offset || "unresolved";
+    const rnocOffsetText = block.rnocEntry?.offset || "0x00000000";
+    const manualText = formatBigIntHex(block.manualOffsetValue || 0n);
+    const baseText = block.baseAddress === null ? "unresolved" : formatBigIntHex(block.baseAddress);
+    const groupName = `addressMode-${cssSafeId(block.id)}`;
+    const row = document.createElement("div");
+    row.className = "block-row";
+    row.innerHTML = `
+      <div>
+        <div class="block-name">${escapeHtml(block.name)}</div>
+        <div class="block-meta">${escapeHtml(block.source)} - ${block.registerCount} regs</div>
+        <div class="offset-note"><strong>base</strong> ${escapeHtml(baseText)}</div>
+        <div class="offset-note">${useManual ? "manual address" : noAddrMap ? "RNOC only" : "RNOC + addr_map"}</div>
+      </div>
+      <div class="mapping-choice ${useManual ? "disabled" : ""}">
+        <label class="mapping-choice-head">
+          <input type="radio" name="${escapeHtml(groupName)}" data-kind="mode" value="map" ${useManual ? "" : "checked"} />
+          <span>Use address map</span>
+        </label>
+        <div class="mapping-choice-grid">
+          <label>
+            <span>addr_map</span>
+            <select data-kind="addr" ${useManual ? "disabled" : ""}></select>
+            <div class="offset-note">offset ${escapeHtml(addrOffsetText)}</div>
+          </label>
+          <label>
+            <span>RNOC map</span>
+            <select data-kind="rnoc" ${useManual ? "disabled" : ""}></select>
+            <div class="offset-note">offset ${escapeHtml(rnocOffsetText)}</div>
+          </label>
+        </div>
+      </div>
+      <div class="mapping-choice ${useManual ? "" : "disabled"}">
+        <label class="mapping-choice-head">
+          <input type="radio" name="${escapeHtml(groupName)}" data-kind="mode" value="manual" ${useManual ? "checked" : ""} />
+          <span>Use manual address</span>
+        </label>
+        <label>
+          <span>manual address</span>
+          <input data-kind="manual" value="${escapeHtml(settings.manualOffset)}" placeholder="0x50000000" ${useManual ? "" : "disabled"} />
+          <div class="offset-note">base ${escapeHtml(manualText)}</div>
+        </label>
+      </div>
+    `;
+    const addrSelect = row.querySelector('select[data-kind="addr"]');
+    const rnocSelect = row.querySelector('select[data-kind="rnoc"]');
+    const manualInput = row.querySelector('input[data-kind="manual"]');
+    fillDecodeSelect(addrSelect, state.addrEntries, settings.addrId, block.addrEntry?.id, { allowNone: true });
+    fillDecodeSelect(rnocSelect, state.rnocEntries, settings.rnocId, block.rnocEntry?.id);
+    row.querySelectorAll('input[data-kind="mode"]').forEach((input) => {
+      input.addEventListener("change", () => {
+        settings.addressMode = input.value === "manual" ? "manual" : "map";
+        refreshAfterMappingChange();
+      });
+    });
+    addrSelect.addEventListener("change", () => {
+      settings.addrId = addrSelect.value;
+      refreshAfterMappingChange();
+    });
+    rnocSelect.addEventListener("change", () => {
+      settings.rnocId = rnocSelect.value;
+      refreshAfterMappingChange();
+    });
+    manualInput.addEventListener("input", (event) => {
+      settings.manualOffset = event.target.value.trim();
+      refreshAfterMappingChange();
+    });
+    els.blockMappings.appendChild(row);
+  });
+}
+
+function refreshAfterMappingChange() {
+  recomputeMappings();
+  hydrateStepsFromModel();
+  renderAll();
+}
+
+function fillDecodeSelect(select, entries, selectedId, inferredId, options = {}) {
+  select.innerHTML = '<option value="">auto</option>';
+  if (options.allowNone) {
+    const none = document.createElement("option");
+    none.value = NO_ADDR_MAP;
+    none.textContent = "none / no addr_map";
+    select.appendChild(none);
+  }
+  entries.forEach((entry) => {
+    const option = document.createElement("option");
+    option.value = entry.id;
+    option.textContent = entry.id === inferredId && !selectedId ? `auto: ${entry.key}` : entry.key;
+    select.appendChild(option);
+  });
+  select.value = selectedId || "";
+}
+
+function renderRegisterFilters() {
+  const blocks = Array.from(new Set(state.registers.map((reg) => reg.block))).sort();
+  const current = els.blockFilter.value || "all";
+  els.blockFilter.innerHTML = '<option value="all">All blocks</option>';
+  blocks.forEach((block) => {
+    const option = document.createElement("option");
+    option.value = block;
+    option.textContent = block;
+    els.blockFilter.appendChild(option);
+  });
+  els.blockFilter.value = blocks.includes(current) ? current : "all";
+}
+
+function renderRegisterList() {
+  const query = els.registerSearch.value.trim().toLowerCase();
+  const blockFilter = els.blockFilter.value || "all";
+  const ranked = fuzzyRank(
+    state.registers.filter((reg) => blockFilter === "all" || reg.block === blockFilter),
+    query,
+    (reg) => reg.searchText,
+  );
+  els.registerCount.textContent = String(ranked.length);
+  els.registerList.innerHTML = "";
+  if (!ranked.length) {
+    els.registerList.className = "result-list empty";
+    els.registerList.textContent = state.registers.length ? "No matching registers." : "No registers loaded.";
+    return;
+  }
+  els.registerList.className = "result-list";
+  ranked.forEach(({ item: reg, terms }) => {
+    const node = document.createElement("div");
+    node.className = `reg-card ${reg.id === state.selectedRegId ? "active" : ""}`;
+    node.innerHTML = `
+      <div class="reg-title">
+        <strong>${highlightText(reg.name, terms)}</strong>
+        <span class="badge ${escapeHtml(reg.access || "").toLowerCase()}">${escapeHtml(reg.access || "access?")}</span>
+      </div>
+      <div class="reg-meta">
+        ${escapeHtml(reg.block)} - ${escapeHtml(reg.finalAddress || "unresolved")} - offset ${escapeHtml(reg.localOffset || "-")}
+        ${matchingFieldSummary(reg, terms)}
+      </div>
+    `;
+    node.addEventListener("click", () => selectRegister(reg));
+    els.registerList.appendChild(node);
+  });
+}
+
+function selectRegister(reg) {
+  state.selectedRegId = reg.id;
+  state.selectedField = reg.fields[0]?.name || "";
+  state.selectedFields = [];
+  state.fieldValues = {};
+  renderRegisterList();
+  renderSelectedRegister();
+  validateValue();
+  renderPreview();
+}
+
+function selectedReg() {
+  return state.registers.find((reg) => reg.id === state.selectedRegId) || null;
+}
+
+function selectedField() {
+  const reg = selectedReg();
+  return reg?.fields.find((field) => field.name === state.selectedField) || null;
+}
+
+function selectedFieldNames() {
+  const reg = selectedReg();
+  if (!reg) return [];
+  const valid = new Set(reg.fields.map((field) => field.name));
+  return state.selectedFields.filter((name) => valid.has(name));
+}
+
+function selectedFieldObjects() {
+  const reg = selectedReg();
+  const names = new Set(selectedFieldNames());
+  return reg ? reg.fields.filter((field) => names.has(field.name)) : [];
+}
+
+function fieldValue(field) {
+  const stored = state.fieldValues[field.name];
+  if (stored !== undefined) return stored;
+  return field.reset || "0x0";
+}
+
+function setFieldValue(fieldName, value, options = {}) {
+  const reg = selectedReg();
+  const field = reg?.fields.find((item) => item.name === fieldName);
+  if (!field) return;
+  state.fieldValues[fieldName] = value;
+  if (options.select) {
+    addSelectedField(fieldName);
+    state.selectedField = fieldName;
+  }
+  if (options.switchToRmw) switchToFieldRmw();
+  if (options.render !== false) {
+    renderSelectedRegister();
+    validateValue();
+    renderPreview();
+  }
+}
+
+function addSelectedField(fieldName) {
+  if (!state.selectedFields.includes(fieldName)) state.selectedFields.push(fieldName);
+  markFieldDomSelection(fieldName, true);
+}
+
+function removeSelectedField(fieldName) {
+  state.selectedFields = state.selectedFields.filter((name) => name !== fieldName);
+  markFieldDomSelection(fieldName, false);
+}
+
+function markFieldDomSelection(fieldName, selected) {
+  const row = els.selectedRegister.querySelector(`[data-field="${cssEscape(fieldName)}"]`);
+  const checkbox = els.selectedRegister.querySelector(`[data-field-check="${cssEscape(fieldName)}"]`);
+  if (row) row.classList.toggle("selected", selected);
+  if (checkbox) checkbox.checked = selected;
+}
+
+function toggleFieldSelection(fieldName, checked) {
+  if (checked) {
+    selectFieldForEdit(fieldName, { add: true, switchToRmw: true });
+  } else {
+    removeSelectedField(fieldName);
+    if (state.selectedField === fieldName) state.selectedField = selectedFieldNames()[0] || selectedReg()?.fields[0]?.name || "";
+    renderSelectedRegister();
+    validateValue();
+    renderPreview();
+  }
+}
+
+function selectFieldForEdit(fieldName, options = {}) {
+  const reg = selectedReg();
+  const field = reg?.fields.find((item) => item.name === fieldName);
+  if (!field) return;
+  state.selectedField = fieldName;
+  if (options.add) addSelectedField(fieldName);
+  if (state.fieldValues[fieldName] === undefined) state.fieldValues[fieldName] = field.reset || "0x0";
+  if (options.switchToRmw) switchToFieldRmw();
+  syncValueInputFromActiveField();
+  renderSelectedRegister();
+  validateValue();
+  renderPreview();
+}
+
+function switchToFieldRmw() {
+  if (els.operation.value !== "rmw") {
+    els.operation.value = "rmw";
+    renderAdvancedFields();
+  }
+  els.targetKind.value = "field";
+  updateTargetControls();
+}
+
+function syncSelectedFieldsFromSelect() {
+  const fieldName = els.fieldSelect.value;
+  if (!fieldName) return;
+  addSelectedField(fieldName);
+  if (state.fieldValues[fieldName] === undefined) {
+    const field = selectedField();
+    if (field) state.fieldValues[fieldName] = field.reset || "0x0";
+  }
+  switchToFieldRmw();
+  syncValueInputFromActiveField();
+}
+
+function syncActiveFieldValue(value) {
+  if (els.targetKind.value !== "field" || !state.selectedField || !operationDef().value) return;
+  state.fieldValues[state.selectedField] = value;
+}
+
+function syncValueInputFromActiveField() {
+  const field = selectedField();
+  if (field && operationDef().value) els.valueInput.value = fieldValue(field);
+}
+
+function fieldSpecsForStep(reg, fields = selectedFieldObjects()) {
+  return fields.map((field) => {
+    const bitInfo = parseBitRange(field.bitRange);
+    return {
+      name: field.name,
+      value: fieldValue(field),
+      bit_range: field.bitRange || "",
+      reset: field.reset || "",
+      width: bitInfo?.width || "",
+      description: field.description || "",
+    };
+  });
+}
+
+function setFieldBits(base, bitInfo, value) {
+  const mask = ((1n << BigInt(bitInfo.width)) - 1n) << BigInt(bitInfo.lsb);
+  return (base & ~mask) | ((value & ((1n << BigInt(bitInfo.width)) - 1n)) << BigInt(bitInfo.lsb));
+}
+
+function composeRegisterValue(reg, fields = selectedFieldObjects()) {
+  const regInfo = registerBitInfo(reg);
+  if (!regInfo) return { ok: false, error: "register width unknown" };
+  const reset = registerDefaultValue(reg);
+  let value = reset.ok ? reset.value : 0n;
+  for (const field of fields) {
+    const bitInfo = parseBitRange(field.bitRange);
+    if (!bitInfo) return { ok: false, error: `${field.name}: bit range unknown` };
+    const parsed = parseInputValue(fieldValue(field));
+    if (!parsed.ok) return { ok: false, error: `${field.name}: ${parsed.error}` };
+    if (parsed.symbolic) return { ok: false, error: `${field.name}: symbolic value cannot compose register write` };
+    if (parsed.value > bitInfo.max) return { ok: false, error: `${field.name}: value does not fit ${bitInfo.width} bits` };
+    value = setFieldBits(value, bitInfo, parsed.value);
+  }
+  return { ok: true, value, text: formatBigIntHex(value) };
+}
+
+function registerDefaultValue(reg) {
+  const regInfo = registerBitInfo(reg);
+  if (!regInfo) return { ok: false, error: "register width unknown" };
+  let value = 0n;
+  let symbolic = false;
+  for (const field of reg.fields || []) {
+    const bitInfo = parseBitRange(field.bitRange);
+    if (!bitInfo) continue;
+    const parsedReset = parseInputValue(field.reset || "0x0");
+    if (!parsedReset.ok || parsedReset.symbolic) {
+      symbolic = true;
+      continue;
+    }
+    value = setFieldBits(value, bitInfo, parsedReset.value);
+  }
+  return { ok: !symbolic, value, text: formatBigIntHex(value), partial: symbolic };
+}
+
+function renderSelectedRegister() {
+  const reg = selectedReg();
+  if (!reg) {
+    els.selectedRegister.className = "selected-card";
+    els.selectedRegister.textContent = "Select a register to inspect fields.";
+    els.fieldSelect.innerHTML = "";
+    return;
+  }
+  els.selectedRegister.className = "selected-card has-selection";
+  const selectedNames = new Set(selectedFieldNames());
+  const regDefault = registerDefaultValue(reg);
+  const defaultText = regDefault.ok || regDefault.partial ? regDefault.text : "unknown";
+  const fieldRows = reg.fields.length ? `
+      <div class="field-row header">
+        <div></div>
+        <div>Field</div>
+        <div>Bits</div>
+        <div>Reset</div>
+        <div>Value</div>
+        <div>Description</div>
+      </div>
+    ` + reg.fields
+    .map(
+      (field) => {
+        const selected = selectedNames.has(field.name);
+        const value = fieldValue(field);
+        return `
+        <div class="field-row selectable ${selected ? "selected" : ""}" data-field="${escapeHtml(field.name)}">
+          <div><input type="checkbox" data-field-check="${escapeHtml(field.name)}" ${selected ? "checked" : ""} /></div>
+          <div class="field-name">${escapeHtml(field.name)}</div>
+          <div class="field-bits">${escapeHtml(field.bitRange || "-")}</div>
+          <div class="field-reset">${escapeHtml(field.reset || "-")}</div>
+          <div><input class="field-value-input" data-field-value="${escapeHtml(field.name)}" type="text" value="${escapeHtml(value)}" /></div>
+          <div class="field-desc">${escapeHtml(field.description || "-")}</div>
+        </div>
+      `;
+      },
+    )
+    .join("") : "";
+  els.selectedRegister.innerHTML = `
+    <div class="reg-detail-head">
+      <div class="reg-main">
+        <strong>${escapeHtml(reg.name)}</strong>
+        <span class="badge ${escapeHtml(reg.access || "").toLowerCase()}">${escapeHtml(reg.access || "access?")}</span>
+      </div>
+      <div class="reg-desc">${escapeHtml(reg.description || "-")}</div>
+    </div>
+    <div class="reg-kv-grid">
+      <div class="reg-kv"><span>Final</span><code>${escapeHtml(reg.finalAddress || "unresolved")}</code></div>
+      <div class="reg-kv"><span>Default</span><code>${escapeHtml(defaultText)}</code></div>
+      <div class="reg-kv"><span>Local</span><code>${escapeHtml(reg.localOffset || "-")}</code></div>
+      <div class="reg-kv"><span>Block Offset</span><code>${escapeHtml(reg.blockOffset || "-")}</code></div>
+      <div class="reg-kv"><span>Width</span><code>${escapeHtml(reg.width || "-")}</code></div>
+      <div class="reg-kv"><span>Block</span><code>${escapeHtml(reg.block || "-")}</code></div>
+      <div class="reg-kv"><span>Map To</span><code>${escapeHtml(reg.mapTo || "-")}</code></div>
+      <div class="reg-kv"><span>Addr Map</span><code>${escapeHtml(reg.addrMapKey || "-")}</code></div>
+      <div class="reg-kv"><span>RNOC</span><code>${escapeHtml(reg.rnocMapKey || "-")}</code></div>
+      <div class="reg-kv"><span>Addr Offset</span><code>${escapeHtml(reg.addrMapOffset || "-")}</code></div>
+      <div class="reg-kv"><span>RNOC Offset</span><code>${escapeHtml(reg.rnocOffset || "-")}</code></div>
+      <div class="reg-kv"><span>Source</span><code>${escapeHtml(reg.source || "-")}</code></div>
+      <div class="reg-kv"><span>HDL</span><code>${escapeHtml(reg.hdlPath || "-")}</code></div>
+    </div>
+    <div class="field-toolbar">
+      <strong>Fields</strong>
+      <span>${selectedNames.size ? `${selectedNames.size} selected` : "Click a field to build RMW"}</span>
+    </div>
+    <div class="field-list">${fieldRows || '<div class="field-meta">No fields in this register.</div>'}</div>
+  `;
+  els.selectedRegister.querySelectorAll(".field-row.selectable").forEach((row) => {
+    row.addEventListener("click", (event) => {
+      if (event.target.matches("input")) return;
+      selectFieldForEdit(row.dataset.field, { add: true, switchToRmw: true });
+    });
+  });
+  els.selectedRegister.querySelectorAll("[data-field-check]").forEach((checkbox) => {
+    checkbox.addEventListener("click", (event) => {
+      event.stopPropagation();
+    });
+    checkbox.addEventListener("change", () => {
+      toggleFieldSelection(checkbox.dataset.fieldCheck, checkbox.checked);
+    });
+  });
+  els.selectedRegister.querySelectorAll("[data-field-value]").forEach((input) => {
+    input.addEventListener("focus", () => {
+      const fieldName = input.dataset.fieldValue;
+      const field = selectedReg()?.fields.find((item) => item.name === fieldName);
+      if (!field) return;
+      state.selectedField = fieldName;
+      addSelectedField(fieldName);
+      if (state.fieldValues[fieldName] === undefined) state.fieldValues[fieldName] = field.reset || "0x0";
+      switchToFieldRmw();
+      syncValueInputFromActiveField();
+      validateValue();
+    });
+    input.addEventListener("input", () => {
+      setFieldValue(input.dataset.fieldValue, input.value, { select: true, switchToRmw: true, render: false });
+      syncValueInputFromActiveField();
+      validateValue();
+      renderPreview();
+    });
+  });
+  const keep = state.selectedField;
+  els.fieldSelect.innerHTML = "";
+  reg.fields.forEach((field) => {
+    const option = document.createElement("option");
+    option.value = field.name;
+    option.textContent = `${field.name} ${field.bitRange || ""}`;
+    els.fieldSelect.appendChild(option);
+  });
+  if (reg.fields.some((field) => field.name === keep)) {
+    els.fieldSelect.value = keep;
+  } else {
+    state.selectedField = reg.fields[0]?.name || "";
+    els.fieldSelect.value = state.selectedField;
+  }
+  updateTargetControls();
+}
+
+function handleOperationChange() {
+  const op = operationDef();
+  els.targetKind.value = op.target;
+  updateTargetControls();
+  renderAdvancedFields();
+  validateValue();
+  renderPreview();
+}
+
+function setFormOperation(opId, target) {
+  if (OPERATIONS.some((op) => op.id === opId)) {
+    els.operation.value = opId;
+  }
+  const op = operationDef();
+  els.targetKind.value = target || op.target;
+  updateTargetControls();
+  renderAdvancedFields();
+}
+
+function operationDef() {
+  return OPERATIONS.find((op) => op.id === els.operation.value) || OPERATIONS[0];
+}
+
+function updateTargetControls() {
+  const target = els.targetKind.value;
+  const fieldMode = target === "field" || (els.operation.value === "write" && selectedFieldNames().length > 0);
+  els.fieldSelect.disabled = !fieldMode || !selectedReg();
+  els.valueInput.disabled = !operationDef().value;
+  renderFieldEditSummary();
+}
+
+function renderFieldEditSummary() {
+  const reg = selectedReg();
+  const fields = selectedFieldObjects();
+  if (!reg || !fields.length) {
+    els.fieldEditSummary.textContent = "No field selected.";
+    return;
+  }
+  const fieldText = fields.map((field) => `${field.name}=${fieldValue(field)}`).join(", ");
+  if (els.operation.value === "write") {
+    const composed = composeRegisterValue(reg, fields);
+    const finalText = composed.ok ? composed.text : composed.error;
+    els.fieldEditSummary.textContent = `Selected fields: ${fieldText}. Write value from reset/default: ${finalText}`;
+    return;
+  }
+  els.fieldEditSummary.textContent = `Selected fields: ${fieldText}`;
+}
+
+function renderAdvancedFields() {
+  const op = operationDef();
+  let html = "";
+  if (op.condition) {
+    html += `
+      <label><span>condition</span><select id="conditionOp">
+        <option value="eq">eq</option>
+        <option value="ne">ne</option>
+        <option value="mask_set">mask_set</option>
+        <option value="mask_clear">mask_clear</option>
+      </select></label>
+    `;
+  }
+  if (op.poll) {
+    html += `
+      <label><span>timeout_us</span><input id="timeoutUs" type="text" value="1000" /></label>
+      <label><span>interval_us</span><input id="intervalUs" type="text" value="10" /></label>
+    `;
+  }
+  els.advancedFields.innerHTML = html;
+  els.advancedFields.querySelectorAll("input, select").forEach((input) => input.addEventListener("input", renderPreview));
+}
+
+function setAdvancedFieldValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value ?? "";
+}
+
+function validateValue() {
+  const op = operationDef();
+  updateTargetControls();
+  const reg = selectedReg();
+  const field = selectedField();
+  const fields = selectedFieldObjects();
+  const fieldMode = els.targetKind.value === "field";
+
+  if (!reg) {
+    setValueState(false, "Select a register before adding this step.");
+    return false;
+  }
+  if (fieldMode && !fields.length && !field) {
+    setValueState(false, "Select a field before adding this step.");
+    return false;
+  }
+  if (!reg.addressReady) {
+    setValueState(false, "Address is unresolved. Fix address map or set manual address first.", true);
+    return false;
+  }
+  if (!op.value) {
+    setValueState(true, "No value required for this operation.");
+    return true;
+  }
+  if ((op.id === "rmw" || fieldMode) && fields.length) {
+    const errors = [];
+    fields.forEach((item) => {
+      const info = parseBitRange(item.bitRange);
+      const parsed = parseInputValue(fieldValue(item));
+      if (!parsed.ok) errors.push(`${item.name}: ${parsed.error}`);
+      else if (!parsed.symbolic && info && parsed.value > info.max) errors.push(`${item.name}: ${formatBigIntHex(parsed.value)} does not fit ${info.width} bits`);
+    });
+    if (errors.length) {
+      setValueState(false, errors.join("; "), true);
+      return false;
+    }
+    setValueState(true, `${fields.length} field value${fields.length > 1 ? "s" : ""} valid.`);
+    return true;
+  }
+  if (op.id === "write" && fields.length) {
+    const composed = composeRegisterValue(reg, fields);
+    if (!composed.ok) {
+      setValueState(false, composed.error, true);
+      return false;
+    }
+    setValueState(true, `Final register write value ${composed.text} from reset/default plus ${fields.length} selected field${fields.length > 1 ? "s" : ""}.`);
+    return true;
+  }
+  const raw = els.valueInput.value.trim();
+  const info = els.targetKind.value === "register" ? registerBitInfo(reg) : parseBitRange(field?.bitRange);
+  const rangeText = info ? `${info.width} bits, valid 0x0 to ${formatBigIntHex(info.max)}` : "width unknown; numeric format will still be checked";
+  if (!raw) {
+    setValueState(false, `${rangeText}. Enter a value or symbolic expression.`);
+    return false;
+  }
+  const parsed = parseInputValue(raw);
+  if (!parsed.ok) {
+    setValueState(false, parsed.error, true);
+    return false;
+  }
+  if (parsed.symbolic) {
+    setValueState(true, `Symbolic value accepted. ${rangeText}.`);
+    return true;
+  }
+  if (info && parsed.value > info.max) {
+    setValueState(false, `Value ${formatBigIntHex(parsed.value)} does not fit ${info.width} bits.`, true);
+    return false;
+  }
+  setValueState(true, `${rangeText}. Current value ${formatBigIntHex(parsed.value)} is valid.`);
+  return true;
+}
+
+function setValueState(ok, message, error = false) {
+  els.valueHint.textContent = message;
+  els.valueHint.className = `value-hint ${error ? "error" : ""}`;
+  els.addStep.disabled = !ok;
+  const hasTarget = Boolean(selectedReg());
+  els.valueZero.disabled = !hasTarget || !operationDef().value;
+  els.valueReset.disabled = !hasTarget || els.targetKind.value !== "field" || !selectedField()?.reset;
+  els.valueMax.disabled = !hasTarget || !operationDef().value;
+}
+
+function setValue(value) {
+  els.valueInput.value = value;
+  syncActiveFieldValue(value);
+  renderSelectedRegister();
+  validateValue();
+}
+
+function setResetValue() {
+  const field = selectedField();
+  if (field?.reset) setValue(field.reset);
+}
+
+function setMaxValue() {
+  const info = els.targetKind.value === "register" ? registerBitInfo(selectedReg()) : parseBitRange(selectedField()?.bitRange);
+  if (info) setValue(formatBigIntHex(info.max));
+}
+
+function addCurrentStep() {
+  if (!validateValue()) return;
+  const step = buildStepFromForm();
+  if (state.editingStepIndex !== null) {
+    activePhase().steps[state.editingStepIndex] = step;
+  } else {
+    activePhase().steps.push(step);
+  }
+  els.stepComment.value = "";
+  const wasEditing = state.editingStepIndex !== null;
+  state.editingStepIndex = null;
+  updateStepEditUi();
+  renderSteps();
+  renderPreview();
+  showToast(wasEditing ? "Step updated" : "Step added");
+}
+
+function buildStepFromForm() {
+  const op = operationDef();
+  const reg = selectedReg();
+  const field = selectedField();
+  const selectedFields = op.id === "poll" ? selectedFieldObjects().slice(0, 1) : selectedFieldObjects();
+  const targetKind = els.targetKind.value;
+  const fieldSpecs = fieldSpecsForStep(reg, selectedFields);
+  const composed = op.id === "write" && selectedFields.length ? composeRegisterValue(reg, selectedFields) : null;
+  let stepValue = "";
+  if (composed?.ok) {
+    stepValue = composed.text;
+  } else if (op.id === "poll" && selectedFields.length) {
+    stepValue = fieldValue(selectedFields[0]);
+  } else if (targetKind === "field" && selectedFields.length === 1) {
+    stepValue = fieldValue(selectedFields[0]);
+  } else if (op.value && !selectedFields.length) {
+    stepValue = els.valueInput.value.trim();
+  }
+  const step = makeStep({
+    op: op.id,
+    targetKind,
+    reg: reg?.name || "",
+    field: selectedFields.length ? selectedFields.map((item) => item.name).join(",") : targetKind === "field" ? field?.name || "" : "",
+    value: stepValue,
+    comment: els.stepComment.value.trim(),
+    fields: fieldSpecs,
+    write_base: composed?.ok ? "reset" : "",
+  });
+  if (op.condition) {
+    step.condition = document.getElementById("conditionOp")?.value || "eq";
+  }
+  if (op.poll) {
+    step.timeout_us = numberOrText(document.getElementById("timeoutUs")?.value || "1000");
+    step.interval_us = numberOrText(document.getElementById("intervalUs")?.value || "10");
+  }
+  const sourceField = selectedFields.length === 1 ? selectedFields[0] : field;
+  const sourceTarget = targetKind === "field" && selectedFields.length <= 1 ? "field" : "register";
+  step.source = buildStepSource(reg, sourceField, sourceTarget);
+  return step;
+}
+
+function makeStep(input) {
+  const step = {
+    op: normalizeOperationId(input.op),
+    target: input.targetKind || (input.field ? "field" : "register"),
+    reg: input.reg || "",
+    field: input.field || "",
+    value: input.value || "",
+    condition: input.condition || "",
+    timeout_us: input.timeout_us || "",
+    interval_us: input.interval_us || "",
+    comment: input.comment || "",
+    source: input.source || {},
+  };
+  if (Array.isArray(input.fields) && input.fields.length) step.fields = input.fields;
+  if (input.write_base) step.write_base = input.write_base;
+  return step;
+}
+
+function normalizeOperationId(op) {
+  const map = {
+    write_reg: "write",
+    write_field: "write",
+    read_reg: "read",
+    read_field: "read",
+    read_check: "poll",
+    rmw_field: "rmw",
+  };
+  return map[op] || op || "write";
+}
+
+function normalizeStepModel() {
+  state.phases.forEach((phase) => {
+    phase.steps = (phase.steps || [])
+      .map((step) => {
+        if (!step || typeof step !== "object") return null;
+        const op = normalizeOperationId(step.op);
+        const target = step.target && step.target !== "none" ? step.target : step.field ? "field" : "register";
+        return { ...step, op, target };
+      })
+      .filter(Boolean);
+  });
+}
+
+function buildStepSource(reg, field, targetKind) {
+  if (!reg) return {};
+  const bitInfo = targetKind === "register" ? registerBitInfo(reg) : parseBitRange(field?.bitRange);
+  const macroParts = svMacroParts(reg);
+  return {
+    block: reg.block,
+    block_id: reg.blockId,
+    file: reg.source,
+    map_to: reg.mapTo,
+    address: reg.finalAddress,
+    local_offset: reg.localOffset,
+    block_offset: reg.blockOffset,
+    addr_map: reg.addrMapKey,
+    rnoc_map: reg.rnocMapKey,
+    sv_macro_namespace: macroParts.namespace,
+    sv_macro_block: macroParts.block || "",
+    hdl_path: reg.hdlPath,
+    access: reg.access,
+    bit_range: targetKind === "register" ? registerBitRange(reg) : field?.bitRange || "",
+    width: bitInfo?.width || "",
+    reset: targetKind === "field" ? field?.reset || "" : "",
+    description: targetKind === "field" ? field?.description || reg.description : reg.description,
+  };
+}
+
+function hydrateStepsFromModel() {
+  state.phases.forEach((phase) => {
+    (phase.steps || []).forEach((step) => {
+      const reg = findRegisterForStep(step);
+      if (!reg) return;
+      const names = stepFieldNames(step);
+      if (names.length) {
+        step.fields = names
+          .map((name) => {
+            const existing = Array.isArray(step.fields) ? step.fields.find((item) => item.name === name) : null;
+            const field = reg.fields.find((item) => item.name === name);
+            if (!field && existing) return existing;
+            if (!field) return null;
+            return {
+              name,
+              value: existing?.value || step.value || field.reset || "0x0",
+              bit_range: existing?.bit_range || field.bitRange || "",
+              reset: existing?.reset || field.reset || "",
+              width: existing?.width || parseBitRange(field.bitRange)?.width || "",
+              description: existing?.description || field.description || "",
+            };
+          })
+          .filter(Boolean);
+      }
+      const field = names.length === 1 ? reg.fields.find((item) => item.name === names[0]) || null : null;
+      const target = step.target || (names.length ? "field" : "register");
+      step.source = buildStepSource(reg, field, target === "field" && names.length === 1 ? "field" : "register");
+    });
+  });
+}
+
+function findRegisterForStep(step) {
+  if (!step?.reg) return null;
+  const source = step.source || {};
+  return (
+    state.registers.find((reg) => reg.name === step.reg && source.file && reg.source === source.file) ||
+    state.registers.find((reg) => reg.name === step.reg && source.block && reg.block === source.block) ||
+    state.registers.find((reg) => reg.name === step.reg) ||
+    null
+  );
+}
+
+function renderPhases() {
+  els.phaseTabs.innerHTML = "";
+  state.phases.forEach((phase, index) => {
+    const button = document.createElement("button");
+    button.className = index === state.activePhase ? "active" : "";
+    button.textContent = phase.title || phase.id;
+    button.title = `${phase.id} - ${phase.owner}`;
+    button.addEventListener("click", () => {
+      state.activePhase = index;
+      renderPhases();
+      renderSteps();
+      renderPreview();
+    });
+    els.phaseTabs.appendChild(button);
+  });
+  renderActivePhaseMeta();
+}
+
+function addPhase() {
+  const index = state.phases.length + 1;
+  state.phases.push({ id: `phase_${index}`, title: `phase_${index}`, owner: "bootloader", steps: [] });
+  state.activePhase = state.phases.length - 1;
+  renderPhases();
+  renderSteps();
+  renderPreview();
+}
+
+function activePhase() {
+  return state.phases[state.activePhase] || state.phases[0];
+}
+
+function renderActivePhaseMeta() {
+  const phase = activePhase();
+  if (!phase) return;
+  els.phaseTitle.value = phase.title || phase.id || "";
+  els.phaseOwner.value = phase.owner || "";
+}
+
+function updateActivePhaseMeta() {
+  const phase = activePhase();
+  if (!phase) return;
+  const title = els.phaseTitle.value.trim() || "unnamed_step_group";
+  phase.title = title;
+  phase.id = phaseIdFromTitle(title);
+  phase.owner = els.phaseOwner.value.trim();
+  renderPhases();
+  renderSteps();
+  renderPreview();
+}
+
+function renderSteps() {
+  const phase = activePhase();
+  const steps = phase?.steps || [];
+  els.stepCount.textContent = `${steps.length} steps`;
+  els.stepList.innerHTML = "";
+  if (!steps.length) {
+    els.stepList.className = "steps empty";
+    els.stepList.textContent = "No steps yet.";
+    return;
+  }
+  els.stepList.className = "steps";
+  steps.forEach((step, index) => {
+    const node = document.createElement("div");
+    node.className = `step-card ${state.editingStepIndex === index ? "editing" : ""}`;
+    node.innerHTML = `
+      <div class="step-top">
+        <span class="step-op">${escapeHtml(step.op)}</span>
+        <div class="step-title">${index + 1}. ${escapeHtml(stepTargetLabel(step))}</div>
+        <div class="step-actions">
+          <button title="Edit step" data-action="edit">Edit</button>
+          <button title="Move up" data-action="up">Up</button>
+          <button title="Move down" data-action="down">Dn</button>
+          <button title="Remove" data-action="remove">Del</button>
+        </div>
+      </div>
+      <div class="step-meta">${escapeHtml(stepSummary(step))}</div>
+    `;
+    node.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", () => mutateStep(index, button.dataset.action));
+    });
+    els.stepList.appendChild(node);
+  });
+}
+
+function mutateStep(index, action) {
+  const steps = activePhase().steps;
+  if (action === "edit") {
+    startStepEdit(index);
+    return;
+  }
+  if (action === "remove") {
+    steps.splice(index, 1);
+    if (state.editingStepIndex === index) {
+      state.editingStepIndex = null;
+    } else if (state.editingStepIndex !== null && state.editingStepIndex > index) {
+      state.editingStepIndex -= 1;
+    }
+  } else if (action === "up" && index > 0) {
+    [steps[index - 1], steps[index]] = [steps[index], steps[index - 1]];
+    if (state.editingStepIndex === index) state.editingStepIndex = index - 1;
+    else if (state.editingStepIndex === index - 1) state.editingStepIndex = index;
+  } else if (action === "down" && index < steps.length - 1) {
+    [steps[index + 1], steps[index]] = [steps[index], steps[index + 1]];
+    if (state.editingStepIndex === index) state.editingStepIndex = index + 1;
+    else if (state.editingStepIndex === index + 1) state.editingStepIndex = index;
+  }
+  updateStepEditUi();
+  renderSteps();
+  renderPreview();
+}
+
+function startStepEdit(index) {
+  const step = activePhase().steps[index];
+  if (!step) return;
+  state.editingStepIndex = index;
+  selectStepTarget(step);
+  setFormOperation(step.op, step.target || (step.field ? "field" : step.reg ? "register" : "none"));
+  renderSelectedRegister();
+  const names = stepFieldNames(step);
+  if (names.length) {
+    state.selectedFields = names;
+    state.selectedField = names[0];
+    (step.fields || []).forEach((item) => {
+      if (item?.name) state.fieldValues[item.name] = item.value || item.reset || "0x0";
+    });
+    renderSelectedRegister();
+    if (Array.from(els.fieldSelect.options).some((option) => option.value === state.selectedField)) {
+      els.fieldSelect.value = state.selectedField;
+    }
+  }
+  syncValueInputFromActiveField();
+  if (!names.length) els.valueInput.value = step.value || "";
+  els.stepComment.value = step.comment || "";
+  setAdvancedFieldValue("conditionOp", step.condition || "eq");
+  setAdvancedFieldValue("timeoutUs", step.timeout_us || "1000");
+  setAdvancedFieldValue("intervalUs", step.interval_us || "10");
+  updateStepEditUi();
+  validateValue();
+  renderSteps();
+}
+
+function selectStepTarget(step) {
+  if (!step.reg) return;
+  const reg =
+    state.registers.find((item) => item.name === step.reg && step.source?.file && item.source === step.source.file) ||
+    state.registers.find((item) => item.name === step.reg && step.source?.block && item.block === step.source.block) ||
+    state.registers.find((item) => item.name === step.reg);
+  if (reg) {
+    state.selectedRegId = reg.id;
+    const names = stepFieldNames(step);
+    state.selectedField = names[0] || reg.fields[0]?.name || "";
+    state.selectedFields = names;
+    state.fieldValues = {};
+    (step.fields || []).forEach((item) => {
+      if (item?.name) state.fieldValues[item.name] = item.value || item.reset || "0x0";
+    });
+    renderRegisterList();
+    renderSelectedRegister();
+  }
+}
+
+function cancelStepEdit() {
+  state.editingStepIndex = null;
+  els.stepComment.value = "";
+  updateStepEditUi();
+  renderSteps();
+  validateValue();
+}
+
+function updateStepEditUi() {
+  const editing = state.editingStepIndex !== null;
+  els.addStep.textContent = editing ? "Update Step" : "Add Step";
+  els.cancelEditStep.hidden = !editing;
+}
+
+function clearSelection() {
+  state.selectedRegId = "";
+  state.selectedField = "";
+  state.selectedFields = [];
+  state.fieldValues = {};
+  state.editingStepIndex = null;
+  updateStepEditUi();
+  renderRegisterList();
+  renderSelectedRegister();
+  validateValue();
+}
+
+function buildRecipe() {
+  return {
+    schema: "xpg.programming_guide.v0.2",
+    register_input_format: "company_rdf_json",
+    generated_at: new Date().toISOString(),
+    files: {
+      rdf_blocks: Array.from(state.rdfFiles.keys()),
+      addr_maps: Array.from(state.addrFiles.keys()),
+      rnoc_maps: Array.from(state.rnocFiles.keys()),
+    },
+    flow: {
+      id: els.flowId.value || "unnamed.flow",
+      description: els.flowDesc.value || "",
+      scope: els.flowScope.value || "",
+      applies_to: {
+        ip_sim: true,
+        soc_sim: true,
+        post_si: true,
+        programming_guide: true,
+      },
+      phases: state.phases,
+    },
+  };
+}
+
+function buildConfig() {
+  return {
+    schema: "xpg.config.v0.1",
+    generated_at: new Date().toISOString(),
+    files: {
+      rdf_blocks: mapToFileObjects(state.rdfFiles),
+      addr_maps: mapToFileObjects(state.addrFiles),
+      rnoc_maps: mapToFileObjects(state.rnocFiles),
+    },
+    block_settings: Object.fromEntries(Array.from(state.blockSettings.entries()).map(([key, value]) => [key, { ...value }])),
+    ui: {
+      selected_reg_id: state.selectedRegId,
+      selected_field: state.selectedField,
+      selected_fields: [...state.selectedFields],
+      field_values: { ...state.fieldValues },
+      active_phase: state.activePhase,
+      preview_tab: state.previewTab,
+      register_search: els.registerSearch.value || "",
+      block_filter: els.blockFilter.value || "all",
+    },
+    recipe: buildRecipe(),
+  };
+}
+
+function mapToFileObjects(fileMap) {
+  return Array.from(fileMap.entries()).map(([name, json]) => ({ name, json }));
+}
+
+function loadFileObjects(targetMap, files) {
+  targetMap.clear();
+  (files || []).forEach((file) => {
+    if (file?.name && file.json !== undefined) targetMap.set(file.name, file.json);
+  });
+}
+
+function renderPreviewTabs() {
+  document.querySelectorAll("[data-tab]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.tab === state.previewTab);
+  });
+}
+
+function renderPreview() {
+  const tab = state.previewTab;
+  if (tab === "json") {
+    els.preview.innerHTML = `<pre>${escapeHtml(JSON.stringify(buildRecipe(), null, 2))}</pre>`;
+  } else if (tab === "yaml") {
+    els.preview.innerHTML = `<pre>${escapeHtml(buildYaml())}</pre>`;
+  } else if (tab === "csv") {
+    els.preview.innerHTML = renderCsvTable();
+  } else if (tab === "sv") {
+    els.preview.innerHTML = `<pre>${escapeHtml(buildSimulationCode())}</pre>`;
+  } else {
+    els.preview.innerHTML = buildGuideHtml();
+  }
+}
+
+function buildGuideHtml() {
+  const recipe = buildRecipe();
+  const phases = recipe.flow.phases
+    .map((phase, pIndex) => {
+      const rows = phase.steps
+        .map(
+          (step, sIndex) => `
+          <tr>
+            <td>${pIndex + 1}.${sIndex + 1}</td>
+            <td><code>${escapeHtml(step.op)}</code></td>
+            <td><code>${escapeHtml(stepTargetLabel(step))}</code></td>
+            <td>${escapeHtml(stepSummary(step))}</td>
+            <td>${escapeHtml(step.comment || "")}</td>
+          </tr>
+        `,
+        )
+        .join("");
+      return `
+        <h3>${escapeHtml(phase.title || phase.id)} <span class="badge">${escapeHtml(phase.owner || "")}</span></h3>
+        <table>
+          <thead><tr><th>#</th><th>Operation</th><th>Target</th><th>Programming Detail</th><th>Comment</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="5">No steps</td></tr>'}</tbody>
+        </table>
+      `;
+    })
+    .join("");
+  return `
+    <div class="guide">
+      <h2>${escapeHtml(recipe.flow.id)}</h2>
+      <table>
+        <tbody>
+          <tr><th>scope</th><td>${escapeHtml(recipe.flow.scope)}</td></tr>
+          <tr><th>description</th><td>${escapeHtml(recipe.flow.description)}</td></tr>
+          <tr><th>input format</th><td>${escapeHtml(recipe.register_input_format)}</td></tr>
+          <tr><th>loaded RDF</th><td>${escapeHtml(recipe.files.rdf_blocks.join(", ") || "-")}</td></tr>
+        </tbody>
+      </table>
+      ${phases}
+    </div>
+  `;
+}
+
+function buildYaml() {
+  const lines = [
+    "flows:",
+    `  ${yamlKey(els.flowId.value || "unnamed.flow")}:`,
+    `    description: ${yamlValue(els.flowDesc.value || "")}`,
+    `    scope: ${yamlValue(els.flowScope.value || "")}`,
+    "    applies_to:",
+    "      ip_sim: true",
+    "      soc_sim: true",
+    "      post_si: true",
+    "      programming_guide: true",
+    "    phases:",
+  ];
+  state.phases.forEach((phase) => {
+    lines.push(`      - id: ${yamlValue(phase.id)}`);
+    lines.push(`        title: ${yamlValue(phase.title)}`);
+    lines.push(`        owner: ${yamlValue(phase.owner)}`);
+    lines.push("        steps:");
+    if (!phase.steps.length) {
+      lines.push("          []");
+    } else {
+      phase.steps.forEach((step) => appendYamlStep(lines, step, "          "));
+    }
+  });
+  return lines.join("\n");
+}
+
+function appendYamlStep(lines, step, pad) {
+  lines.push(`${pad}- ${step.op}:`);
+  lines.push(`${pad}    target: ${yamlValue(step.target || "")}`);
+  if (step.reg) lines.push(`${pad}    reg: ${yamlValue(step.reg)}`);
+  if (step.field) lines.push(`${pad}    field: ${yamlValue(step.field)}`);
+  if (step.value) lines.push(`${pad}    ${isExpectOperation(step.op) ? "expect" : "value"}: ${yamlScalar(step.value)}`);
+  if (Array.isArray(step.fields) && step.fields.length) {
+    lines.push(`${pad}    fields:`);
+    step.fields.forEach((field) => {
+      lines.push(`${pad}      - name: ${yamlValue(field.name || "")}`);
+      lines.push(`${pad}        value: ${yamlScalar(field.value || "")}`);
+      if (field.bit_range) lines.push(`${pad}        bit_range: ${yamlValue(field.bit_range)}`);
+      if (field.reset) lines.push(`${pad}        reset: ${yamlValue(field.reset)}`);
+    });
+  }
+  if (step.write_base) lines.push(`${pad}    write_base: ${yamlValue(step.write_base)}`);
+  if (step.condition) lines.push(`${pad}    condition: ${yamlValue(step.condition)}`);
+  if (step.timeout_us) lines.push(`${pad}    timeout_us: ${step.timeout_us}`);
+  if (step.interval_us) lines.push(`${pad}    interval_us: ${step.interval_us}`);
+  if (step.comment) lines.push(`${pad}    comment: ${yamlValue(step.comment)}`);
+  if (step.source && Object.keys(step.source).length) {
+    lines.push(`${pad}    source:`);
+    Object.entries(step.source).forEach(([key, value]) => {
+      lines.push(`${pad}      ${key}: ${yamlValue(value || "")}`);
+    });
+  }
+}
+
+function csvRows() {
+  const rows = [[
+    "flow_id",
+    "phase",
+    "step_index",
+    "operation",
+    "target",
+    "reg",
+    "field",
+    "value",
+    "expect",
+    "condition",
+    "timeout_us",
+    "interval_us",
+    "comment",
+    "address",
+    "local_offset",
+    "block_offset",
+    "block",
+    "source_file",
+    "map_to",
+    "addr_map",
+    "rnoc_map",
+    "bit_range",
+    "width",
+    "reset",
+    "description",
+  ]];
+  state.phases.forEach((phase) => {
+    phase.steps.forEach((step, index) => {
+      const expect = isExpectOperation(step.op);
+      rows.push([
+        els.flowId.value || "unnamed.flow",
+        phase.id,
+        index + 1,
+        step.op,
+        step.target || "",
+        step.reg || "",
+        step.field || "",
+        expect ? "" : step.value || "",
+        expect ? step.value || "" : "",
+        step.condition || "",
+        step.timeout_us || "",
+        step.interval_us || "",
+        step.comment || "",
+        step.source?.address || "",
+        step.source?.local_offset || "",
+        step.source?.block_offset || "",
+        step.source?.block || "",
+        step.source?.file || "",
+        step.source?.map_to || "",
+        step.source?.addr_map || "",
+        step.source?.rnoc_map || "",
+        step.source?.bit_range || "",
+        step.source?.width || "",
+        step.source?.reset || "",
+        step.source?.description || "",
+      ]);
+    });
+  });
+  return rows;
+}
+
+function buildCsv() {
+  return csvRows().map((row) => row.map(csvCell).join(",")).join("\n");
+}
+
+function renderCsvTable() {
+  const rows = csvRows();
+  if (rows.length <= 1) return '<div class="result-list empty">No CSV rows yet.</div>';
+  const head = rows[0].map((cell) => `<th>${escapeHtml(cell)}</th>`).join("");
+  const body = rows
+    .slice(1)
+    .map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`)
+    .join("");
+  return `<table class="csv-table"><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+
+function buildSimulationCode() {
+  const lines = [];
+  state.phases.forEach((phase) => {
+    lines.push(`// Phase: ${phase.id}`);
+    phase.steps.forEach((step) => lines.push(...simulationStepLines(step)));
+    lines.push("");
+  });
+  return lines.join("\n").trim() || "// No simulation steps yet.";
+}
+
+function simulationStepLines(step) {
+  const lines = [];
+  if (step.comment) lines.push(...String(step.comment).split(/\r?\n/).map((line) => `// ${line}`));
+  const macro = step.reg ? simulationMacro(step) : "";
+  const info = parseBitRange(step.source?.bit_range);
+  const parsed = parseInputValue(step.value);
+  const literal = parsed.ok && !parsed.symbolic && info ? `${info.width}'h${parsed.value.toString(16).toUpperCase()}` : step.value || "";
+  const slice = step.target === "field" && info ? `[${info.msb}:${info.lsb}]` : "";
+  const fieldAssignments = simulationFieldAssignments(step);
+  if (step.op === "write" && step.target === "register") return [...lines, `write_reg(0, ${macro}, ${literal});`];
+  if (step.op === "write" && step.target === "field") return [...lines, `read_reg(0, ${macro}, regval);`, ...(fieldAssignments.length ? fieldAssignments : [`regval${slice} = ${literal};`]), `write_reg(0, ${macro}, regval);`];
+  if (step.op === "rmw") return [...lines, `read_reg(0, ${macro}, regval);`, ...(fieldAssignments.length ? fieldAssignments : [`regval${slice} = ${literal};`]), `write_reg(0, ${macro}, regval);`];
+  if (step.op === "read") return [...lines, `read_reg(0, ${macro}, regval);`];
+  if (step.op === "poll") return [...lines, ...simulationPollLines(step, macro, slice, literal)];
+  return [...lines, `// Unsupported operation: ${step.op}`];
+}
+
+function simulationPollLines(step, macro, slice, literal) {
+  const timeout = svExpr(step.timeout_us || "1000");
+  const interval = svExpr(step.interval_us || "10");
+  const condition = simulationPollCondition(step.condition || "eq", slice, literal);
+  const label = `POLL_${svToken(step.reg)}_${svToken(step.field || "REG")}`;
+  return [
+    `begin : ${label}`,
+    `  int unsigned poll_elapsed_us;`,
+    `  bit poll_done;`,
+    `  poll_elapsed_us = 0;`,
+    `  poll_done = 1'b0;`,
+    `  while (poll_elapsed_us <= ${timeout}) begin`,
+    `    read_reg(0, ${macro}, regval);`,
+    `    if (${condition}) begin`,
+    `      poll_done = 1'b1;`,
+    `      break;`,
+    `    end`,
+    `    if (poll_elapsed_us >= ${timeout}) break;`,
+    `    #(${interval} * 1us);`,
+    `    poll_elapsed_us += ${interval};`,
+    `  end`,
+    `  if (!poll_done) $error("poll timeout: ${escapeSv(stepTargetLabel(step))}, condition ${escapeSv(step.condition || "eq")} ${escapeSv(step.value || "")}, timeout_us=${escapeSv(step.timeout_us || "1000")}");`,
+    `end`,
+  ];
+}
+
+function simulationPollCondition(condition, slice, literal) {
+  const target = `regval${slice}`;
+  if (condition === "ne") return `(${target} != ${literal})`;
+  if (condition === "mask_set") return `((${target} & ${literal}) == ${literal})`;
+  if (condition === "mask_clear") return `((${target} & ${literal}) == '0)`;
+  return `(${target} == ${literal})`;
+}
+
+function svExpr(value) {
+  const text = String(value ?? "").trim();
+  return text || "0";
+}
+
+function simulationFieldAssignments(step) {
+  if (!Array.isArray(step.fields) || !step.fields.length) return [];
+  return step.fields.map((field) => {
+    const info = parseBitRange(field.bit_range);
+    const parsed = parseInputValue(field.value);
+    const slice = info ? `[${info.msb}:${info.lsb}]` : "";
+    const literal = parsed.ok && !parsed.symbolic && info ? `${info.width}'h${parsed.value.toString(16).toUpperCase()}` : field.value || "";
+    return `regval${slice} = ${literal};`;
+  });
+}
+
+function simulationMacro(step) {
+  const namespace = svNamespaceFromRnoc(step.source?.rnoc_map) || step.source?.sv_macro_namespace || "";
+  const block = svBlockFromAddrMap(step.source?.addr_map) || step.source?.block || "";
+  const parts = ["REG", namespace, block, step.reg].filter(Boolean).map(svToken);
+  return "`" + parts.join("__");
+}
+
+async function saveConfig() {
+  await saveTextFile(JSON.stringify(buildConfig(), null, 2), `${safeName(els.flowId.value || "xpg_flow")}.config.json`, "application/json");
+}
+
+async function downloadPreview() {
+  const base = safeName(els.flowId.value || "xpg_flow");
+  const tab = state.previewTab;
+  if (tab === "json") {
+    await saveTextFile(JSON.stringify(buildRecipe(), null, 2), `${base}.json`, "application/json");
+  } else if (tab === "yaml") {
+    await saveTextFile(buildYaml(), `${base}.yaml`, "text/yaml");
+  } else if (tab === "csv") {
+    await saveTextFile(buildCsv(), `${base}.csv`, "text/csv");
+  } else if (tab === "sv") {
+    await saveTextFile(buildSimulationCode() + "\n", `${base}.sv`, "text/plain");
+  } else {
+    await saveTextFile(`<!doctype html>\n<meta charset="utf-8">\n${buildGuideHtml()}\n`, `${base}.html`, "text/html");
+  }
+}
+
+async function handleConfigFile(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (data.schema === "xpg.config.v0.1" || data.recipe) {
+      loadConfig(data);
+      showToast("Config loaded");
+    } else {
+      loadRecipe(data);
+      showToast("PG JSON loaded");
+    }
+  } catch (error) {
+    showToast(`Load config failed: ${error.message}`);
+  } finally {
+    event.target.value = "";
+  }
+}
+
+function loadConfig(config) {
+  loadFileObjects(state.rdfFiles, config.files?.rdf_blocks);
+  loadFileObjects(state.addrFiles, config.files?.addr_maps);
+  loadFileObjects(state.rnocFiles, config.files?.rnoc_maps);
+  state.blockSettings = new Map(Object.entries(config.block_settings || {}).map(([key, value]) => [key, { ...value }]));
+  loadRecipe(config.recipe || config, { render: false });
+  recomputeModel();
+  const ui = config.ui || {};
+  state.selectedRegId = ui.selected_reg_id || state.selectedRegId;
+  state.selectedField = ui.selected_field || state.selectedField;
+  state.selectedFields = Array.isArray(ui.selected_fields) ? ui.selected_fields : [];
+  state.fieldValues = ui.field_values && typeof ui.field_values === "object" ? { ...ui.field_values } : {};
+  state.activePhase = Number.isInteger(ui.active_phase) ? ui.active_phase : 0;
+  state.previewTab = ui.preview_tab || state.previewTab;
+  if (!state.registers.some((reg) => reg.id === state.selectedRegId)) {
+    state.selectedRegId = state.registers[0]?.id || "";
+  }
+  const selectedRegAfterLoad = selectedReg();
+  const validFields = new Set((selectedRegAfterLoad?.fields || []).map((field) => field.name));
+  if (!validFields.has(state.selectedField)) {
+    state.selectedField = selectedRegAfterLoad?.fields[0]?.name || "";
+  }
+  state.selectedFields = state.selectedFields.filter((name) => validFields.has(name));
+  Object.keys(state.fieldValues).forEach((name) => {
+    if (!validFields.has(name)) delete state.fieldValues[name];
+  });
+  if (state.activePhase < 0 || state.activePhase >= state.phases.length) {
+    state.activePhase = 0;
+  }
+  if (!["guide", "json", "yaml", "csv", "sv"].includes(state.previewTab)) {
+    state.previewTab = "guide";
+  }
+  els.registerSearch.value = ui.register_search || "";
+  renderAll();
+  renderRegisterFilters();
+  if (ui.block_filter) els.blockFilter.value = Array.from(els.blockFilter.options).some((option) => option.value === ui.block_filter) ? ui.block_filter : "all";
+  renderRegisterList();
+  renderSelectedRegister();
+  validateValue();
+  renderPreviewTabs();
+  renderPreview();
+}
+
+function loadRecipe(recipe, options = {}) {
+  if (!recipe.flow) throw new Error("missing flow object");
+  els.flowId.value = recipe.flow.id || "unnamed.flow";
+  els.flowDesc.value = recipe.flow.description || "";
+  els.flowScope.value = recipe.flow.scope || "";
+  state.phases = Array.isArray(recipe.flow.phases) && recipe.flow.phases.length ? recipe.flow.phases : state.phases;
+  state.activePhase = 0;
+  normalizeStepModel();
+  hydrateStepsFromModel();
+  if (options.render !== false) renderAll();
+}
+
+async function saveTextFile(text, filename, type) {
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: filePickerTypes(filename, type),
+      });
+      const writable = await handle.createWritable();
+      await writable.write(new Blob([text], { type }));
+      await writable.close();
+      showToast(`Saved ${filename}`);
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") {
+        showToast("Save canceled");
+        return;
+      }
+      console.warn("Save picker failed, fallback to browser download.", error);
+    }
+  }
+  downloadText(text, filename, type);
+  showToast(`Downloaded ${filename}`);
+}
+
+function filePickerTypes(filename, type) {
+  const ext = filename.includes(".") ? `.${filename.split(".").pop()}` : ".txt";
+  return [{ description: `${ext.toUpperCase()} file`, accept: { [type || "text/plain"]: [ext] } }];
+}
+
+function downloadText(text, filename, type) {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function stepFieldNames(step) {
+  if (Array.isArray(step.fields) && step.fields.length) return step.fields.map((item) => item.name).filter(Boolean);
+  return String(step.field || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function stepFieldSummary(step) {
+  if (Array.isArray(step.fields) && step.fields.length) {
+    return step.fields.map((item) => `${item.name}=${item.value || ""}`).join(", ");
+  }
+  return step.field && step.value ? `${step.field}=${step.value}` : "";
+}
+
+function stepTargetLabel(step) {
+  const fields = stepFieldNames(step);
+  if (fields.length === 1) return `${step.reg}.${fields[0]}`;
+  if (fields.length > 1) return `${step.reg}.{${fields.join(", ")}}`;
+  if (step.reg) return step.reg;
+  return step.op;
+}
+
+function stepSummary(step) {
+  if (step.op === "poll") return `${step.condition || "eq"} ${step.value}, interval ${step.interval_us}us, timeout ${step.timeout_us}us - ${step.source?.address || ""}`;
+  if (isExpectOperation(step.op)) return `${step.condition || "eq"} ${step.value} - ${step.source?.address || ""}`;
+  if (Array.isArray(step.fields) && step.fields.length) {
+    const finalValue = step.op === "write" ? `; final ${step.value}` : "";
+    return `${stepFieldSummary(step)}${finalValue} - ${step.source?.address || ""}`;
+  }
+  if (step.value) return `value ${step.value} - ${step.source?.address || ""}`;
+  return step.comment || step.source?.address || "";
+}
+
+function isExpectOperation(op) {
+  return op === "poll";
+}
+
+function parseBitRange(bitRange) {
+  const text = String(bitRange || "").trim();
+  const match = text.match(/^\[\s*(\d+)\s*(?:(?:\.\.|:)\s*(\d+)\s*)?\]$/);
+  if (!match) return null;
+  const first = Number(match[1]);
+  const second = match[2] === undefined ? first : Number(match[2]);
+  const msb = Math.max(first, second);
+  const lsb = Math.min(first, second);
+  const width = msb - lsb + 1;
+  if (!Number.isSafeInteger(width) || width <= 0) return null;
+  return { msb, lsb, width, max: (1n << BigInt(width)) - 1n };
+}
+
+function registerBitInfo(reg) {
+  const width = Number.parseInt(String(reg?.width || ""), 10);
+  if (!Number.isSafeInteger(width) || width <= 0) return null;
+  return { msb: width - 1, lsb: 0, width, max: (1n << BigInt(width)) - 1n };
+}
+
+function registerBitRange(reg) {
+  const info = registerBitInfo(reg);
+  return info ? `[${info.msb}:0]` : "";
+}
+
+function parseInputValue(raw) {
+  const text = String(raw || "").trim().replaceAll("_", "");
+  if (!text) return { ok: false, error: "Value is empty." };
+  if (/^\$|[A-Za-z]/.test(text) && !/^0x[0-9a-f]+$/i.test(text) && !/^0b[01]+$/i.test(text)) {
+    return { ok: true, symbolic: true, text };
+  }
+  try {
+    if (/^0x[0-9a-f]+$/i.test(text)) return { ok: true, value: BigInt(text) };
+    if (/^0b[01]+$/i.test(text)) return { ok: true, value: BigInt(`0b${text.slice(2)}`) };
+    if (/^\d+$/.test(text)) return { ok: true, value: BigInt(text) };
+  } catch {
+    return { ok: false, error: "Unsupported numeric value." };
+  }
+  return { ok: false, error: "Use hex like 0x3, binary like 0b11, decimal like 3, or symbolic value like $param." };
+}
+
+function parseAddressValue(raw) {
+  const parsed = parseInputValue(raw);
+  if (!parsed.ok || parsed.symbolic) return { ok: false, value: 0n };
+  return { ok: true, value: parsed.value };
+}
+
+function normalizeHex(value) {
+  const parsed = parseAddressValue(value);
+  return parsed.ok ? formatBigIntHex(parsed.value) : asText(value);
+}
+
+function formatBigIntHex(value) {
+  return `0x${BigInt(value).toString(16).toUpperCase().padStart(8, "0")}`;
+}
+
+function asText(value) {
+  if (value === undefined || value === null) return "";
+  return String(value);
+}
+
+function addressSort(a, b) {
+  const pa = parseAddressValue(a.finalAddress || a.localOffset);
+  const pb = parseAddressValue(b.finalAddress || b.localOffset);
+  if (pa.ok && pb.ok) return pa.value < pb.value ? -1 : pa.value > pb.value ? 1 : 0;
+  return 0;
+}
+
+function buildBlockAliases(blockName, sourceName, mapTo) {
+  const stem = sourceName.replace(/\.json$/i, "").replace(/_rdf$/i, "");
+  const aliases = new Set([blockName, stem, stem.replace(/_reg$/i, ""), mapTo]);
+  Array.from(aliases).forEach((value) => tokenizeDecodeKey(value).forEach((token) => aliases.add(token)));
+  return Array.from(aliases).filter(Boolean);
+}
+
+function tokenizeDecodeKey(value) {
+  return String(value || "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .split(/[^A-Za-z0-9]+/)
+    .map((token) => normalizeToken(token))
+    .filter(Boolean);
+}
+
+function normalizeToken(value) {
+  return String(value || "").trim().toLowerCase().replace(/_+/g, "_");
+}
+
+function bestDecodeMatch(entries, hints) {
+  let best = null;
+  let bestScore = 0;
+  const hintTokens = new Set(hints.flatMap((hint) => tokenizeDecodeKey(hint)).filter((token) => token.length >= 2));
+  entries.forEach((entry) => {
+    let score = 0;
+    hintTokens.forEach((token) => {
+      if (entry.tokens.includes(token)) score += token.length >= 5 ? 10 : 4;
+    });
+    const key = entry.key.toLowerCase();
+    hints.filter(Boolean).forEach((hint) => {
+      const norm = normalizeToken(hint);
+      if (norm && key.includes(norm)) score += 24;
+    });
+    if (score > bestScore) {
+      best = entry;
+      bestScore = score;
+    }
+  });
+  return bestScore ? best : null;
+}
+
+function fuzzyRank(items, query, textGetter) {
+  if (!query) return items.map((item, index) => ({ item, score: 1000 - index, terms: [] }));
+  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return items
+    .map((item) => ({ item, score: scoreText(textGetter(item), terms), terms }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score);
+}
+
+function scoreText(text, terms) {
+  let score = 0;
+  terms.forEach((term) => {
+    if (text.includes(term)) {
+      score += 120 + term.length * 4;
+      return;
+    }
+    let cursor = 0;
+    let local = 0;
+    for (const char of term) {
+      const pos = text.indexOf(char, cursor);
+      if (pos === -1) {
+        local = 0;
+        break;
+      }
+      local += 6;
+      cursor = pos + 1;
+    }
+    score += local;
+  });
+  return score;
+}
+
+function highlightText(value, terms) {
+  const text = String(value || "");
+  if (!terms.length || !text) return escapeHtml(text);
+  let html = escapeHtml(text);
+  terms.forEach((term) => {
+    const escaped = escapeRegExp(escapeHtml(term));
+    html = html.replace(new RegExp(escaped, "ig"), (match) => `<mark>${match}</mark>`);
+  });
+  return html;
+}
+
+function matchingFieldSummary(reg, terms) {
+  if (!terms.length) return "";
+  const matches = reg.fields.filter((field) => terms.some((term) => [field.name, field.description, field.bitRange, field.reset].join(" ").toLowerCase().includes(term))).slice(0, 3);
+  return matches.length ? `<br>fields: ${matches.map((field) => `${highlightText(field.name, terms)} ${escapeHtml(field.bitRange || "")}`).join(", ")}` : "";
+}
+
+function numberOrText(value) {
+  const text = String(value || "").trim();
+  return /^\d+$/.test(text) ? Number(text) : text;
+}
+
+function yamlKey(value) {
+  return String(value || "unnamed").replace(/[^A-Za-z0-9_.-]+/g, "_");
+}
+
+function yamlValue(value) {
+  return JSON.stringify(String(value ?? ""));
+}
+
+function yamlScalar(value) {
+  const text = String(value ?? "");
+  return parseInputValue(text).ok && !parseInputValue(text).symbolic ? text : JSON.stringify(text);
+}
+
+function csvCell(value) {
+  const text = String(value ?? "");
+  return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+}
+
+function safeName(value) {
+  return String(value || "xpg_flow").replace(/[^\w.-]+/g, "_");
+}
+
+function cssSafeId(value) {
+  return String(value || "xpg").replace(/[^A-Za-z0-9_-]+/g, "_");
+}
+
+function phaseIdFromTitle(value) {
+  return String(value || "unnamed_step_group").trim().replace(/\s+/g, "_") || "unnamed_step_group";
+}
+
+function svMacroParts(reg) {
+  const namespace = svNamespaceFromRnoc(reg?.rnocMapKey) || svToken(reg?.block || "BLOCK");
+  return {
+    namespace,
+    block: svBlockFromAddrMap(reg?.addrMapKey) || svToken(reg?.block || ""),
+  };
+}
+
+function svNamespaceFromRnoc(rnocKey) {
+  const parts = String(rnocKey || "").split(".").filter(Boolean);
+  return parts.length >= 2 ? svToken(parts[1]) : "";
+}
+
+function svBlockFromAddrMap(addrMapKey) {
+  const parts = String(addrMapKey || "").split(".").filter(Boolean);
+  return parts.length >= 2 ? svToken(parts[1]) : "";
+}
+
+function svToken(value) {
+  return String(value || "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/[^A-Za-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .replace(/_+/g, "_")
+    .toUpperCase() || "UNNAMED";
+}
+
+function escapeSv(value) {
+  return String(value || "").replaceAll("\\", "\\\\").replaceAll('"', '\\"');
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function cssEscape(value) {
+  if (window.CSS?.escape) return CSS.escape(String(value));
+  return String(value).replace(/["\\]/g, "\\$&");
+}
+
+function showToast(message) {
+  els.toast.textContent = message;
+  els.toast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => els.toast.classList.remove("show"), 2300);
+}
+
+    </script>
+  </body>
+</html>
+
+

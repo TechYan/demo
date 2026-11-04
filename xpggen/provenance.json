@@ -1,0 +1,108 @@
+{
+  "project": "xpggen",
+  "source_repository": "https://github.com/TechYan/xpggen",
+  "source_commit": "42417d36867bdbc05992e09a72e5f500540291a4",
+  "source_visibility": "private at capture time",
+  "scope": "Synthetic bundled catalog, original previews, real headless Textual captures and source exporter outputs.",
+  "copied_evidence": [
+    {
+      "source_path": "examples/rnoc.sample.json",
+      "public_path": "examples/rnoc.sample.json",
+      "sha256": "1dc4fd25795a220dd8f91c7ed90abeaeebb651441cd45808e8b0bb18ca430f7b"
+    },
+    {
+      "source_path": "scripts/make_demo_rnoc.py",
+      "public_path": "scripts/make_demo_rnoc.py",
+      "sha256": "a520e0e2348143669bcbdde0d5730f25b7b90dbc030c9ffdb32f8ffdb2107033"
+    },
+    {
+      "source_path": "LICENSE",
+      "public_path": "LICENSE",
+      "sha256": "854eea322172f1a06a4cc3e2db4cc6eadc837ade7b5ac4c32360995612eb93df"
+    },
+    {
+      "source_path": "previews/xpggen-gruvbox-loaded.svg",
+      "public_path": "previews/xpggen-gruvbox-loaded.svg",
+      "sha256": "651bf7ebc3ac2aa13f4f0434040b8bb3ca5549cc93e6de282901a77f303ae38c"
+    },
+    {
+      "source_path": "previews/xpggen-gruvbox-mouse.svg",
+      "public_path": "previews/xpggen-gruvbox-mouse.svg",
+      "sha256": "3194610ac5de3150eac4056493883c04abc402376a7fd73cd83a3d0a520c2a38"
+    },
+    {
+      "source_path": "previews/xpggen-gruvbox-welcome.svg",
+      "public_path": "previews/xpggen-gruvbox-welcome.svg",
+      "sha256": "27aaa38c5ba950bc3e74f06d5ae20f58d56ecd58a34d19a1d5aaa8e327b6b4be"
+    },
+    {
+      "source_path": "previews/xpggen-home-buddy.svg",
+      "public_path": "previews/xpggen-home-buddy.svg",
+      "sha256": "6384fc0c27764ed0767137bf15d62087b19e28182e105d7f4ae592d686728da2"
+    }
+  ],
+  "exporter_paths": [
+    "src/xpggen/pg.py",
+    "src/xpggen/models.py",
+    "src/xpggen/rnoc.py"
+  ],
+  "exporter_sha256": {
+    "src/xpggen/pg.py": "4778b00d0794a8e9c913cf02cff8e0aa2c527e77c4c2a9dcde32e864d690be77",
+    "src/xpggen/models.py": "9e02f10904c781cd17e78e5b78680e5edcc12bb4838c8645e4bf6246431079ef",
+    "src/xpggen/rnoc.py": "287fb4286097236dde54a49c51797f1d0ad2eac53c8017e8026143d7fdab8db3"
+  },
+  "generation": {
+    "flow_id": "demo.register-bringup",
+    "format": "xpggen.pg.v2",
+    "source": "examples/rnoc.sample.json",
+    "ops": [
+      "read",
+      "write",
+      "rmw",
+      "read_check",
+      "poll",
+      "delay"
+    ],
+    "steps": 6,
+    "api": "make_step; render_pg_json; render_csv_preview; render_systemverilog_preview; render_markdown_guide"
+  },
+  "capture": {
+    "method": "Actual XpgGenApp.run_test and App.export_screenshot",
+    "terminal_cells": [
+      180,
+      52
+    ],
+    "textual": "8.2.8",
+    "rich": "15.0.0",
+    "normalization": "Truecolor terminal environment; HeaderClock hidden; input cursor blinking disabled; logo animation held at phase 0; finite animations awaited; nonvisual SVG identifiers normalized. No screenshot text or geometry edited.",
+    "setup": "Load bundled sample; F2 and PCIE search; F3; seed exported six-step model; select real preview tabs.",
+    "frames": [
+      {
+        "path": "captures/home.svg",
+        "sha256": "8e0962b8bcf34cbafa3a5139f82f457444700549c6026216c1b5740034339044"
+      },
+      {
+        "path": "captures/search.svg",
+        "sha256": "03ebfe56b7c2425ce3c020b85ab8ad249ad18c2b7426966ff66e0c5c53360637"
+      },
+      {
+        "path": "captures/pg-csv.svg",
+        "sha256": "355612b26911c44f5c22ef935f956227e0219731c8d2a7797dcaed9b77388a9e"
+      },
+      {
+        "path": "captures/pg-json.svg",
+        "sha256": "4d0c68b35ce4b0f85d6e635f68e2ba604a1b6501c1fa2212a7385079327db39c"
+      },
+      {
+        "path": "captures/pg-sv.svg",
+        "sha256": "50d0266b70979f3dfce9009ea8afacf37c60940dc6e875902b705d0d11f75b28"
+      }
+    ]
+  },
+  "limitations": [
+    "Screenshot gallery, not a live browser TUI or timed terminal recording.",
+    "Sample contains register offsets only; no final hardware addresses or real DUT data.",
+    "SV is the original exporter preview and requires project register macros, regval, read_reg/write_reg and a suitable time unit.",
+    "Original Rich SVGs reference optional CDN fonts; local monospace fallback works offline."
+  ]
+}

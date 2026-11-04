@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>AXI to PCIe Packet Studio</title>
+<style>
+html,body{margin:0;width:100%;min-height:100%;background:#06111d}
+body{min-height:100vh}
+</style>
+
+<style>
+.demo-back-nav{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;padding:10px 18px;background:#101823;border-bottom:1px solid #334155;color:#cbd5e1;font:13px/1.5 system-ui,sans-serif}
+.demo-back-nav a,.demo-package-note a{color:#b4d8ff;text-decoration:none}.demo-back-nav a:hover,.demo-package-note a:hover{text-decoration:underline}.demo-back-nav a:focus-visible,.demo-package-note a:focus-visible{outline:2px solid #93c5fd;outline-offset:3px}
+.demo-package-note{padding:9px 18px;background:#172230;color:#cbd5e1;font:12px/1.6 system-ui,sans-serif}.demo-package-note a{margin-left:12px}
+</style>
+</head>
+<body>
+<nav class="demo-back-nav" aria-label="Project navigation"><a href="../">&larr; Project hub</a><a href="../projects/bus-protocol-lab/">Bus Protocol Lab overview</a><a href="index.html">All protocol tools</a></nav>
+
+<div id="axi-pcie-packet-studio" data-theme="dark" data-resolved-theme="dark">
+  <div class="av-toolbar">
+    <div class="av-segment" aria-label="Operation">
+      <span class="av-toolbar-label">Operation</span>
+      <button type="button" class="av-chip" data-op="read" aria-pressed="true">Read path</button>
+      <button type="button" class="av-chip" data-op="write" aria-pressed="false">Write path</button>
+    </div>
+    <div class="av-segment" aria-label="Theme">
+      <span class="av-toolbar-label">Theme</span>
+      <button type="button" class="av-chip" data-theme-choice="dark" aria-pressed="true">Dark</button>
+      <button type="button" class="av-chip" data-theme-choice="light" aria-pressed="false">Light</button>
+      <button type="button" class="av-chip" data-theme-choice="auto" aria-pressed="false">Auto</button>
+    </div>
+  </div>
+
+  <section class="av-examples" aria-labelledby="av-examples-title">
+    <div class="av-examples-heading">
+      <span>Preset laboratory</span>
+      <strong id="av-examples-title">Typical examples</strong>
+    </div>
+    <div class="av-examples-body">
+      <div class="av-example-list" aria-label="Typical AXI to PCIe examples">
+        <button type="button" class="av-example-button" data-example="rcb64" aria-pressed="false">RCB 64 split</button>
+        <button type="button" class="av-example-button" data-example="rcb128" aria-pressed="false">RCB 128 split</button>
+        <button type="button" class="av-example-button" data-example="boundary4k" aria-pressed="false">4 KB crossing</button>
+        <button type="button" class="av-example-button" data-example="mrrs" aria-pressed="false">MRRS read split</button>
+        <button type="button" class="av-example-button" data-example="mpswrite" aria-pressed="false">MPS write split</button>
+        <button type="button" class="av-example-button" data-example="unaligned" aria-pressed="false">Unaligned BE</button>
+        <button type="button" class="av-example-button" data-example="axi1024" aria-pressed="false">1024-bit AXI</button>
+        <button type="button" class="av-example-button" data-example="combined" aria-pressed="false">4 KB + MRRS + RCB</button>
+        <button type="button" class="av-example-button" data-example="largewrite" aria-pressed="false">Large write</button>
+      </div>
+      <div class="av-example-note" id="av-example-note">Choose an example to load its memory range and AXI/PCIe parameters.</div>
+    </div>
+  </section>
+
+  <div class="av-metrics" aria-live="polite">
+    <div class="av-metric"><span>Selected payload</span><strong id="av-selected-metric">—</strong></div>
+    <div class="av-metric"><span>AXI burst decomposition</span><strong id="av-axi-metric">—</strong></div>
+    <div class="av-metric"><span>PCIe TLP decomposition</span><strong id="av-tlp-metric">—</strong></div>
+  </div>
+
+  <div class="av-route" aria-label="转换流水线">
+    <div class="av-route-node av-route-memory"><span>Selected address ranges</span><strong id="av-route-memory">—</strong></div>
+    <div class="av-route-arrow" aria-hidden="true"><span></span></div>
+    <div class="av-route-node av-route-axi"><span>Ingress AXI bursts</span><strong id="av-route-axi">—</strong></div>
+    <div class="av-route-arrow" aria-hidden="true"><span></span></div>
+    <div class="av-route-node av-route-pcie"><span>PCIe request / completion TLPs</span><strong id="av-route-pcie">—</strong></div>
+  </div>
+
+  <div class="av-workspace">
+    <section class="av-panel av-memory-panel" aria-labelledby="av-memory-title">
+      <header class="av-panel-head">
+        <div><span class="av-step">01</span><h2 id="av-memory-title">Memory map</h2></div>
+        <span class="av-count" id="av-memory-count">0 blocks</span>
+      </header>
+      <div class="av-controls av-controls-three av-memory-controls">
+        <label>Viewport base
+          <input id="av-base" class="av-input" value="0x10000E00" spellcheck="false" inputmode="text" aria-label="Memory base address">
+        </label>
+        <div class="av-readout"><span>Cell size</span><strong id="av-granularity">—</strong></div>
+        <div class="av-readout"><span>Visible span</span><strong id="av-visible-span">—</strong></div>
+      </div>
+      <div class="av-memory-frame">
+        <div class="av-memory-tools">
+          <div class="av-zoom-tools" aria-label="Memory semantic zoom">
+            <button type="button" class="av-tool-button" id="av-zoom-out" aria-label="Zoom out to coarser memory blocks">−</button>
+            <input type="range" id="av-zoom" min="0" max="8" value="6" step="1" aria-label="Memory cell size">
+            <button type="button" class="av-tool-button" id="av-zoom-in" aria-label="Zoom in to finer memory blocks">+</button>
+            <strong id="av-zoom-label">16 B / cell</strong>
+            <button type="button" class="av-tool-button" id="av-page-prev" aria-label="Previous memory window">← Page</button>
+            <button type="button" class="av-tool-button" id="av-page-next" aria-label="Next memory window">Page →</button>
+          </div>
+          <div class="av-pattern-tools" aria-label="Memory selection patterns">
+            <button type="button" class="av-tool-button" id="av-clear">Clear</button>
+            <button type="button" class="av-tool-button" id="av-pattern-boundary">4 KB edge</button>
+            <button type="button" class="av-tool-button" id="av-pattern-stripes">Burst stripes</button>
+            <button type="button" class="av-tool-button" id="av-pattern-random">Random</button>
+          </div>
+        </div>
+        <div class="av-memory-viewport">
+          <div class="av-memory-scroll" id="av-memory-scroll">
+            <div class="av-memory-grid" id="av-memory-grid" role="grid" aria-label="Selectable memory address table"></div>
+          </div>
+          <input type="range" id="av-address-scroll" min="0" max="1000000" value="0" step="1" aria-label="64-bit address position">
+        </div>
+        <div class="av-memory-legend"><span><i class="av-dot av-dot-selected"></i>Selected</span><span><i class="av-dot"></i>Available</span><span>64-bit paged address window</span><span>Click: one · drag down: sweep rows · wheel: addresses · middle-drag: pan</span></div>
+        <div class="av-overview-shell">
+          <span>Global overview</span>
+          <canvas id="av-overview" width="180" height="70" role="img" aria-label="Overview of selected memory ranges and current viewport"></canvas>
+        </div>
+        <div class="av-cell-decision" id="av-cell-decision" hidden>
+          <strong id="av-cell-decision-title">Partially selected cell</strong>
+          <span id="av-cell-decision-range"></span>
+          <div>
+            <button type="button" class="av-tool-button" id="av-cell-select-all">Select entire cell</button>
+            <button type="button" class="av-tool-button" id="av-cell-refine">Open detail view</button>
+          </div>
+        </div>
+      </div>
+      <div class="av-range-strip" id="av-range-strip">No memory selected</div>
+    </section>
+
+    <section class="av-panel av-axi-panel" aria-labelledby="av-axi-title">
+      <header class="av-panel-head">
+        <div><span class="av-step">02</span><h2 id="av-axi-title">AXI4 bursts</h2></div>
+        <span class="av-count" id="av-axi-count">0 bursts</span>
+      </header>
+      <div class="av-section-title av-map-title-top">AXI transfer map <span id="av-axi-map-label">all controller-facing bursts</span></div>
+      <div class="av-linked-memory-scroll">
+        <div class="av-linked-memory-grid" id="av-axi-memory-grid" role="grid" aria-label="AXI burst memory transfer map"></div>
+      </div>
+      <div class="av-map-legend"><span><i class="av-map-key av-map-key-selected"></i>Selected payload</span><span><i class="av-map-key av-map-key-axi"></i>AXI burst coverage</span><span><i class="av-map-key av-map-key-focus"></i>Focused burst</span></div>
+      <div class="av-controls av-controls-three">
+        <label>AXI data width
+          <select id="av-bus"><option value="8">64 bit</option><option value="16">128 bit</option><option value="32" selected>256 bit</option><option value="64">512 bit</option><option value="128">1024 bit</option></select>
+        </label>
+        <label>AxSIZE (bytes / beat)
+          <select id="av-beat"><option value="auto" selected>Auto</option><option value="4">4 B</option><option value="8">8 B</option><option value="16">16 B</option><option value="32">32 B</option><option value="64">64 B</option><option value="128">128 B</option></select>
+        </label>
+        <label>Ingress max beats
+          <select id="av-max-beats"><option value="4">4 beats</option><option value="8">8 beats</option><option value="16" selected>16 beats</option><option value="32">32 beats</option><option value="64">64 beats</option><option value="256">256 beats</option></select>
+        </label>
+      </div>
+      <div class="av-lane-head"><span id="av-axi-direction">AXI4 Read Bursts</span><span>AxBURST = INCR · bursts never cross 4 KB</span></div>
+      <div class="av-packet-grid" id="av-axi-packets" aria-label="AXI transaction packets"></div>
+    </section>
+
+    <section class="av-panel av-pcie-panel" aria-labelledby="av-pcie-title">
+      <header class="av-panel-head">
+        <div><span class="av-step">03</span><h2 id="av-pcie-title">PCIe TLPs</h2></div>
+        <span class="av-count" id="av-pcie-count">0 packets</span>
+      </header>
+      <div class="av-section-title av-map-title-top">TLP transfer map <span id="av-tlp-map-label">all request TLPs</span></div>
+      <div class="av-linked-memory-scroll">
+        <div class="av-linked-memory-grid" id="av-tlp-memory-grid" role="grid" aria-label="PCIe TLP memory transfer map"></div>
+      </div>
+      <div class="av-map-legend"><span><i class="av-map-key av-map-key-selected"></i>Selected payload</span><span><i class="av-map-key av-map-key-tlp"></i>TLP coverage</span><span><i class="av-map-key av-map-key-focus"></i>Focused TLP</span></div>
+      <div class="av-controls av-controls-three">
+        <label>MPS
+          <select id="av-mps"><option value="128" selected>128 B</option><option value="256">256 B</option><option value="512">512 B</option><option value="1024">1 KB</option></select>
+        </label>
+        <label>MRRS
+          <select id="av-mrrs"><option value="128">128 B</option><option value="256" selected>256 B</option><option value="512">512 B</option><option value="1024">1 KB</option></select>
+        </label>
+        <label>RCB
+          <select id="av-rcb"><option value="64" selected>64 B</option><option value="128">128 B</option></select>
+        </label>
+      </div>
+      <div class="av-boundary-note">4 KB is an absolute address boundary; MRRS and MPS are packet-size limits. Each box ends where the corresponding split is applied.</div>
+      <div class="av-section-title">TLP split map</div>
+      <div id="av-boundary-map" class="av-boundary-map" aria-label="PCIe TLP split boundary map"></div>
+      <div class="av-section-title">Request TLP headers</div>
+      <div id="av-request-headers" class="av-header-stack"></div>
+      <div class="av-section-title" id="av-completion-title">Completion TLP headers</div>
+      <div id="av-completion-headers" class="av-header-stack"></div>
+    </section>
+  </div>
+
+  <div class="av-inspector" id="av-inspector" aria-live="polite">
+    <span class="av-inspector-label">Lineage</span>
+    <span id="av-inspector-text">Select an AXI transaction or TLP to trace its one-to-many mapping.</span>
+  </div>
+</div>
+
+<style>
+#axi-pcie-packet-studio{
+  --av-bg:#06111d;--av-bg-2:#081826;--av-panel:#0b1d2b;--av-panel-2:#0e2434;--av-border:#1c3b49;
+  --av-text:#d8edf0;--av-muted:#7694a0;--av-dim:#476675;--av-accent:#35d6c1;--av-accent-soft:#123f43;
+  --av-blue:#4bb8ed;--av-blue-soft:#12364d;--av-violet:#a98cf5;--av-violet-soft:#2a234b;
+  --av-amber:#e9ba61;--av-amber-soft:#483a20;--av-red:#ee7a8c;--av-shadow:0 18px 50px rgba(0,0,0,.22);
+  color:var(--av-text);background:radial-gradient(circle at 18% 0%,rgba(53,214,193,.08),transparent 30%),linear-gradient(145deg,var(--av-bg),var(--av-bg-2));
+  border:1px solid var(--av-border);border-radius:16px;padding:18px;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  box-shadow:var(--av-shadow);width:100%;box-sizing:border-box;overflow:hidden;color-scheme:dark;
+}
+#axi-pcie-packet-studio[data-theme="light"],#axi-pcie-packet-studio[data-theme="auto"][data-resolved-theme="light"]{
+  --av-bg:#eef5f7;--av-bg-2:#f8fbfc;--av-panel:#ffffff;--av-panel-2:#edf6f7;--av-border:#c7dde2;
+  --av-text:#17313b;--av-muted:#5d7c86;--av-dim:#8ba3aa;--av-accent:#087f75;--av-accent-soft:#d4eeea;
+  --av-blue:#1678a8;--av-blue-soft:#d8ebf5;--av-violet:#7055b5;--av-violet-soft:#e8e1f7;
+  --av-amber:#9a6812;--av-amber-soft:#f5e8cb;--av-red:#b63b55;--av-shadow:0 18px 50px rgba(34,67,76,.12);color-scheme:light;
+}
+#axi-pcie-packet-studio *{box-sizing:border-box}
+#axi-pcie-packet-studio [hidden]{display:none!important}
+#axi-pcie-packet-studio button,#axi-pcie-packet-studio select{font:inherit}
+#axi-pcie-packet-studio button:focus-visible,#axi-pcie-packet-studio select:focus-visible,#axi-pcie-packet-studio input:focus-visible{outline:2px solid var(--av-accent);outline-offset:2px}
+#axi-pcie-packet-studio .av-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+#axi-pcie-packet-studio .av-segment{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+#axi-pcie-packet-studio .av-toolbar-label{color:var(--av-muted);margin-right:3px;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+#axi-pcie-packet-studio .av-chip{border:1px solid var(--av-border);background:transparent;color:var(--av-muted);border-radius:7px;padding:6px 10px;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease,color .16s ease}
+#axi-pcie-packet-studio .av-chip:hover{border-color:var(--av-accent);color:var(--av-text);transform:translateY(-1px)}
+#axi-pcie-packet-studio .av-chip[aria-pressed="true"]{background:var(--av-accent-soft);border-color:var(--av-accent);color:var(--av-accent)}
+#axi-pcie-packet-studio .av-examples{display:grid;grid-template-columns:132px minmax(0,1fr);gap:13px;align-items:start;margin-bottom:14px;padding:10px 12px;border:1px solid var(--av-border);border-radius:10px;background:color-mix(in srgb,var(--av-panel) 82%,transparent)}
+#axi-pcie-packet-studio .av-examples-heading span{display:block;color:var(--av-muted);font:500 9px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;text-transform:uppercase;letter-spacing:.06em}
+#axi-pcie-packet-studio .av-examples-heading strong{display:block;margin-top:3px;color:var(--av-text);font-size:13px;font-weight:500}
+#axi-pcie-packet-studio .av-examples-body{min-width:0}
+#axi-pcie-packet-studio .av-example-list{display:flex;gap:6px;flex-wrap:wrap}
+#axi-pcie-packet-studio .av-example-button{border:1px solid var(--av-border);border-radius:6px;background:var(--av-bg);color:var(--av-muted);padding:5px 8px;font-size:10px;line-height:1.2;cursor:pointer;white-space:nowrap}
+#axi-pcie-packet-studio .av-example-button:hover{border-color:var(--av-violet);color:var(--av-text)}
+#axi-pcie-packet-studio .av-example-button[aria-pressed="true"]{border-color:var(--av-violet);background:var(--av-violet-soft);color:var(--av-text);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--av-violet) 28%,transparent)}
+#axi-pcie-packet-studio .av-example-note{margin-top:7px;color:var(--av-muted);font:400 10px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
+#axi-pcie-packet-studio .av-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+#axi-pcie-packet-studio .av-metric{background:color-mix(in srgb,var(--av-panel) 88%,transparent);border:1px solid var(--av-border);border-radius:10px;padding:10px 12px;min-width:0}
+#axi-pcie-packet-studio .av-metric span{display:block;color:var(--av-muted);font-size:11px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
+#axi-pcie-packet-studio .av-metric strong{font:500 15px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--av-text)}
+#axi-pcie-packet-studio .av-route{display:grid;grid-template-columns:minmax(110px,1fr) 34px minmax(110px,1fr) 34px minmax(110px,1fr);align-items:center;margin:0 0 14px;padding:10px 12px;border:1px solid var(--av-border);border-radius:11px;background:rgba(5,16,27,.18)}
+#axi-pcie-packet-studio .av-route-node{min-width:0;padding:7px 9px;border-left:2px solid var(--av-dim)}
+#axi-pcie-packet-studio .av-route-node span{display:block;color:var(--av-muted);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#axi-pcie-packet-studio .av-route-node strong{display:block;margin-top:2px;font:500 12px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#axi-pcie-packet-studio .av-route-memory{border-color:var(--av-accent)}#axi-pcie-packet-studio .av-route-axi{border-color:var(--av-blue)}#axi-pcie-packet-studio .av-route-hub{border-color:var(--av-violet)}#axi-pcie-packet-studio .av-route-pcie{border-color:var(--av-amber)}
+#axi-pcie-packet-studio .av-route-hub.is-bypassed{opacity:.42}
+#axi-pcie-packet-studio .av-route-arrow{height:1px;background:var(--av-border);position:relative}
+#axi-pcie-packet-studio .av-route-arrow:after{content:"";position:absolute;right:-1px;top:-3px;border-left:6px solid var(--av-border);border-top:3px solid transparent;border-bottom:3px solid transparent}
+#axi-pcie-packet-studio .av-route-arrow span{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--av-accent);top:-3px;left:0;opacity:0}
+#axi-pcie-packet-studio.is-updating .av-route-arrow span{animation:av-flow .55s ease-out 1}
+@keyframes av-flow{0%{opacity:0;transform:translateX(0)}20%{opacity:1}100%{opacity:0;transform:translateX(28px)}}
+#axi-pcie-packet-studio .av-workspace{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.13fr) minmax(0,1.15fr);gap:12px;align-items:start}
+#axi-pcie-packet-studio .av-panel{background:linear-gradient(160deg,color-mix(in srgb,var(--av-panel) 96%,transparent),color-mix(in srgb,var(--av-panel-2) 90%,transparent));border:1px solid var(--av-border);border-radius:12px;padding:12px;min-width:0}
+#axi-pcie-packet-studio .av-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}
+#axi-pcie-packet-studio .av-panel-head>div{display:flex;align-items:center;gap:8px;min-width:0}
+#axi-pcie-packet-studio .av-panel h2{font-size:16px;line-height:1.2;font-weight:500;margin:0;color:var(--av-text)}
+#axi-pcie-packet-studio .av-step{font:500 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--av-accent);border:1px solid var(--av-accent);border-radius:4px;padding:4px}
+#axi-pcie-packet-studio .av-count{font:500 11px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--av-muted);white-space:nowrap}
+#axi-pcie-packet-studio .av-controls{display:grid;gap:8px;margin-bottom:10px}
+#axi-pcie-packet-studio .av-controls-two{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
+#axi-pcie-packet-studio .av-controls-three{grid-template-columns:repeat(3,minmax(0,1fr))}
+#axi-pcie-packet-studio label,#axi-pcie-packet-studio .av-readout{display:flex;flex-direction:column;gap:4px;color:var(--av-muted);font-size:11px;min-width:0}
+#axi-pcie-packet-studio select{width:100%;min-width:0;border:1px solid var(--av-border);border-radius:6px;background:var(--av-bg);color:var(--av-text);padding:6px 25px 6px 7px}
+#axi-pcie-packet-studio .av-input{width:100%;min-width:0;border:1px solid var(--av-border);border-radius:6px;background:var(--av-bg);color:var(--av-text);padding:6px 7px;font:inherit}
+#axi-pcie-packet-studio .av-readout{border:1px solid var(--av-border);border-radius:6px;padding:6px 8px;background:rgba(5,16,27,.18)}
+#axi-pcie-packet-studio .av-readout strong{font:500 12px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--av-accent)}
+#axi-pcie-packet-studio .av-memory-frame{position:relative;border:1px solid var(--av-border);border-radius:9px;padding:9px 9px 78px;background:rgba(3,14,24,.22)}
+#axi-pcie-packet-studio .av-memory-tools{display:flex;align-items:center;justify-content:space-between;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+#axi-pcie-packet-studio .av-zoom-tools,#axi-pcie-packet-studio .av-pattern-tools{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+#axi-pcie-packet-studio .av-zoom-tools input{width:86px;accent-color:var(--av-accent)}
+#axi-pcie-packet-studio .av-zoom-tools strong{min-width:70px;color:var(--av-accent);font:500 9px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace}
+#axi-pcie-packet-studio .av-tool-button{border:1px solid var(--av-border);border-radius:5px;background:var(--av-bg);color:var(--av-muted);padding:4px 7px;font-size:9px;line-height:1.2;cursor:pointer;white-space:nowrap}
+#axi-pcie-packet-studio .av-tool-button:hover{border-color:var(--av-accent);color:var(--av-text)}
+#axi-pcie-packet-studio .av-tool-button:disabled{opacity:.35;cursor:default}
+#axi-pcie-packet-studio .av-memory-scroll{height:250px;min-height:120px;overflow-x:auto;overflow-y:hidden;scrollbar-color:var(--av-accent) var(--av-bg);scrollbar-width:thin;overscroll-behavior:contain}
+#axi-pcie-packet-studio .av-memory-viewport{display:grid;grid-template-columns:minmax(0,1fr) 16px;gap:5px;align-items:stretch}
+#axi-pcie-packet-studio .av-memory-viewport.is-panning,#axi-pcie-packet-studio .av-memory-viewport.is-panning *{cursor:grabbing!important;user-select:none}
+#axi-pcie-packet-studio #av-address-scroll{width:16px;height:100%;min-height:120px;margin:0;padding:0;writing-mode:vertical-lr;direction:ltr;-webkit-appearance:none;appearance:none;background:transparent;cursor:ns-resize}
+#axi-pcie-packet-studio #av-address-scroll::-webkit-slider-runnable-track{width:4px;height:100%;border:1px solid var(--av-dim);border-radius:99px;background:var(--av-border)}
+#axi-pcie-packet-studio #av-address-scroll::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;margin-left:-6px;border:1px solid var(--av-panel);border-radius:50%;background:var(--av-accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--av-accent) 35%,transparent)}
+#axi-pcie-packet-studio #av-address-scroll::-moz-range-track{width:4px;height:100%;border:1px solid var(--av-dim);border-radius:99px;background:var(--av-border)}
+#axi-pcie-packet-studio #av-address-scroll::-moz-range-progress{width:4px;background:var(--av-border)}
+#axi-pcie-packet-studio #av-address-scroll::-moz-range-thumb{width:14px;height:14px;border:1px solid var(--av-panel);border-radius:50%;background:var(--av-accent);box-shadow:0 0 0 1px color-mix(in srgb,var(--av-accent) 35%,transparent)}
+#axi-pcie-packet-studio .av-memory-grid,#axi-pcie-packet-studio .av-linked-memory-grid{--av-memory-cell:clamp(16px,1.25vw,22px);--av-cols:16;display:grid;grid-template-columns:92px repeat(var(--av-cols),var(--av-memory-cell));grid-template-rows:24px;grid-auto-rows:var(--av-memory-cell);gap:2px;width:max-content;min-width:100%;touch-action:none;user-select:none;align-items:stretch}
+#axi-pcie-packet-studio .av-memory-corner,#axi-pcie-packet-studio .av-memory-col{position:sticky;top:0;z-index:4;height:24px;display:flex;align-items:center;justify-content:center;background:var(--av-panel);color:var(--av-muted);font:500 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;border-bottom:1px solid var(--av-border)}
+#axi-pcie-packet-studio .av-memory-corner{left:0;z-index:6;justify-content:flex-start;padding-left:7px;color:var(--av-accent)}
+#axi-pcie-packet-studio .av-memory-address{position:sticky;left:0;z-index:3;display:flex;align-items:center;padding:0 7px;background:var(--av-panel);border-right:1px solid var(--av-border);color:var(--av-muted);font:400 9px/1 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}
+#axi-pcie-packet-studio .av-cell,#axi-pcie-packet-studio .av-map-cell{width:var(--av-memory-cell);height:var(--av-memory-cell);aspect-ratio:1;border:1px solid var(--av-border);border-radius:3px;background:color-mix(in srgb,var(--av-panel-2) 78%,var(--av-bg));color:transparent;padding:0;transition:background .12s ease,border-color .12s ease;touch-action:none}
+#axi-pcie-packet-studio .av-cell{cursor:pointer}
+#axi-pcie-packet-studio .av-cell:hover{transform:translateY(-1px);border-color:var(--av-accent);color:var(--av-text)}
+#axi-pcie-packet-studio .av-cell[aria-pressed="true"]{background:linear-gradient(145deg,var(--av-accent-soft),color-mix(in srgb,var(--av-accent) 44%,var(--av-accent-soft)));border-color:var(--av-accent);color:var(--av-text);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--av-accent) 35%,transparent)}
+#axi-pcie-packet-studio .av-cell[data-state="mixed"]{background:repeating-linear-gradient(135deg,var(--av-accent-soft) 0 3px,var(--av-panel-2) 3px 6px);border-color:color-mix(in srgb,var(--av-accent) 68%,var(--av-border))}
+#axi-pcie-packet-studio .av-memory-legend{display:flex;gap:9px;flex-wrap:wrap;color:var(--av-muted);font-size:10px;margin-top:7px}
+#axi-pcie-packet-studio .av-memory-legend span{display:flex;align-items:center;gap:4px}
+#axi-pcie-packet-studio .av-dot{display:inline-block;width:7px;height:7px;border-radius:2px;background:var(--av-panel-2);border:1px solid var(--av-border)}
+#axi-pcie-packet-studio .av-dot-selected{background:var(--av-accent);border-color:var(--av-accent)}
+#axi-pcie-packet-studio .av-overview-shell{position:absolute;right:9px;bottom:8px;width:180px;height:64px;border:1px solid var(--av-border);border-radius:5px;background:color-mix(in srgb,var(--av-panel) 92%,transparent);overflow:hidden}
+#axi-pcie-packet-studio .av-overview-shell span{position:absolute;left:5px;top:4px;z-index:1;color:var(--av-muted);font:500 8px/1 ui-monospace,SFMono-Regular,Consolas,monospace;text-transform:uppercase;letter-spacing:.04em}
+#axi-pcie-packet-studio #av-overview{display:block;width:100%;height:100%}
+#axi-pcie-packet-studio .av-cell-decision{position:absolute;z-index:20;width:230px;padding:9px;border:1px solid var(--av-accent);border-radius:7px;background:var(--av-panel);box-shadow:var(--av-shadow);color:var(--av-text)}
+#axi-pcie-packet-studio .av-cell-decision:before{content:"";position:absolute;left:18px;top:-6px;width:10px;height:10px;transform:rotate(45deg);background:var(--av-panel);border-left:1px solid var(--av-accent);border-top:1px solid var(--av-accent)}
+#axi-pcie-packet-studio .av-cell-decision strong,#axi-pcie-packet-studio .av-cell-decision span{display:block;font:500 10px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace}
+#axi-pcie-packet-studio .av-cell-decision span{margin:3px 0 7px;color:var(--av-muted);font-weight:400}
+#axi-pcie-packet-studio .av-cell-decision>div{display:flex;gap:5px;flex-wrap:wrap}
+#axi-pcie-packet-studio .av-range-strip{font:400 10px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--av-muted);margin-top:9px;overflow-wrap:anywhere}
+#axi-pcie-packet-studio .av-linked-memory-scroll{max-height:150px;min-height:74px;overflow:auto;scrollbar-color:var(--av-blue) var(--av-bg);scrollbar-width:thin;overscroll-behavior:contain;border-top:1px solid var(--av-border);border-bottom:1px solid var(--av-border);padding:5px 0}
+#axi-pcie-packet-studio .av-linked-memory-grid{--av-memory-cell:clamp(14px,1.05vw,18px);grid-template-columns:86px repeat(var(--av-cols),var(--av-memory-cell));grid-template-rows:20px;grid-auto-rows:var(--av-memory-cell)}
+#axi-pcie-packet-studio .av-linked-memory-grid .av-memory-corner,#axi-pcie-packet-studio .av-linked-memory-grid .av-memory-col{height:20px;font-size:8px}
+#axi-pcie-packet-studio .av-linked-memory-grid .av-memory-address{font-size:8px;padding:0 5px}
+#axi-pcie-packet-studio .av-map-cell.is-payload{background:color-mix(in srgb,var(--av-accent-soft) 72%,var(--av-panel-2));border-color:color-mix(in srgb,var(--av-accent) 40%,var(--av-border))}
+#axi-pcie-packet-studio .av-map-cell.is-axi{background:color-mix(in srgb,var(--av-blue) 42%,var(--av-blue-soft));border-color:var(--av-blue)}
+#axi-pcie-packet-studio .av-map-cell.is-mrd{background:color-mix(in srgb,var(--av-violet) 42%,var(--av-violet-soft));border-color:var(--av-violet)}
+#axi-pcie-packet-studio .av-map-cell.is-mwr{background:color-mix(in srgb,var(--av-amber) 46%,var(--av-amber-soft));border-color:var(--av-amber)}
+#axi-pcie-packet-studio .av-map-cell.is-cpld{background:color-mix(in srgb,var(--av-accent) 45%,var(--av-accent-soft));border-color:var(--av-accent)}
+#axi-pcie-packet-studio .av-map-cell.is-focused{box-shadow:inset 0 0 0 2px var(--av-text);filter:brightness(1.3)}
+#axi-pcie-packet-studio button.av-map-cell{cursor:pointer}
+#axi-pcie-packet-studio button.av-map-cell:hover{filter:brightness(1.25);border-color:var(--av-text)}
+#axi-pcie-packet-studio .av-map-cell.is-partial{background-image:repeating-linear-gradient(135deg,transparent 0 3px,color-mix(in srgb,var(--av-text) 18%,transparent) 3px 5px)}
+#axi-pcie-packet-studio .av-map-legend{display:flex;gap:9px;flex-wrap:wrap;color:var(--av-muted);font-size:9px;margin-top:5px}
+#axi-pcie-packet-studio .av-map-legend span{display:flex;align-items:center;gap:4px}
+#axi-pcie-packet-studio .av-map-key{display:inline-block;width:8px;height:8px;border:1px solid var(--av-border);border-radius:2px;background:var(--av-panel-2)}
+#axi-pcie-packet-studio .av-map-key-selected{background:var(--av-accent-soft);border-color:var(--av-accent)}#axi-pcie-packet-studio .av-map-key-axi{background:var(--av-blue);border-color:var(--av-blue)}#axi-pcie-packet-studio .av-map-key-tlp{background:var(--av-violet);border-color:var(--av-violet)}#axi-pcie-packet-studio .av-map-key-focus{background:var(--av-text);border-color:var(--av-text)}
+#axi-pcie-packet-studio .av-boundary-note{color:var(--av-muted);font-size:10px;line-height:1.45;margin:2px 0 9px;padding-left:8px;border-left:2px solid var(--av-amber)}
+#axi-pcie-packet-studio .av-section-title{display:flex;align-items:center;gap:8px;margin:11px 0 7px;color:var(--av-muted);font:500 10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;text-transform:uppercase;letter-spacing:.06em}
+#axi-pcie-packet-studio .av-section-title:after{content:"";height:1px;flex:1;background:var(--av-border)}
+#axi-pcie-packet-studio .av-section-title span{color:var(--av-text);font-weight:400;text-transform:none;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#axi-pcie-packet-studio .av-map-title-top{margin-top:0}
+#axi-pcie-packet-studio .av-boundary-map{display:flex;flex-direction:column;gap:8px;max-height:250px;overflow:auto;padding-right:4px;scrollbar-color:var(--av-amber) var(--av-bg);scrollbar-width:thin;cursor:grab;overscroll-behavior:contain}
+#axi-pcie-packet-studio .av-boundary-map.is-dragging{cursor:grabbing;user-select:none}
+#axi-pcie-packet-studio .av-boundary-region{border:1px solid var(--av-red);border-radius:7px;padding:7px;background:color-mix(in srgb,var(--av-panel-2) 72%,transparent);min-width:0}
+#axi-pcie-packet-studio .av-boundary-region-head,#axi-pcie-packet-studio .av-limit-head{display:flex;justify-content:space-between;gap:7px;align-items:center;margin-bottom:5px;color:var(--av-muted);font:400 9px/1.25 ui-monospace,SFMono-Regular,Consolas,monospace}
+#axi-pcie-packet-studio .av-boundary-region-head strong{color:var(--av-red);font-weight:500}
+#axi-pcie-packet-studio .av-limit-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:8px}
+#axi-pcie-packet-studio .av-limit-box{min-width:0;border:1px solid var(--av-violet);border-radius:5px;padding:8px;background:color-mix(in srgb,var(--av-violet-soft) 60%,transparent)}
+#axi-pcie-packet-studio .av-limit-box.av-mps-box{border-color:var(--av-amber);background:color-mix(in srgb,var(--av-amber-soft) 62%,transparent)}
+#axi-pcie-packet-studio .av-limit-box.av-cpl-box{border-color:var(--av-accent);background:color-mix(in srgb,var(--av-accent-soft) 58%,transparent)}
+#axi-pcie-packet-studio .av-limit-hit,#axi-pcie-packet-studio .av-mini-cpl{width:100%;border:0;background:transparent;color:inherit;text-align:left;padding:0;cursor:pointer}
+#axi-pcie-packet-studio .av-limit-hit:hover,#axi-pcie-packet-studio .av-mini-cpl:hover{filter:brightness(1.3)}
+#axi-pcie-packet-studio .av-limit-hit[aria-pressed="true"],#axi-pcie-packet-studio .av-mini-cpl[aria-pressed="true"]{box-shadow:inset 0 0 0 1px var(--av-text);border-radius:3px}
+#axi-pcie-packet-studio .av-limit-box.is-focused{box-shadow:inset 0 0 0 2px var(--av-text)}
+#axi-pcie-packet-studio .av-limit-head strong{font-weight:500;color:var(--av-text);white-space:nowrap}
+#axi-pcie-packet-studio .av-limit-head span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#axi-pcie-packet-studio .av-split-reason{display:block;margin-top:5px;color:var(--av-muted);font:400 8px/1.25 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#axi-pcie-packet-studio .av-completion-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(96px,100%),1fr));gap:5px;margin-top:7px}
+#axi-pcie-packet-studio .av-mini-cpl{min-width:0;border-top:2px solid var(--av-accent);padding:5px 3px 2px;color:var(--av-muted);font:400 8px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace}
+#axi-pcie-packet-studio .av-mini-cpl strong{display:block;color:var(--av-text);font-weight:500}
+#axi-pcie-packet-studio .av-header-stack{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-x:hidden;overflow-y:scroll;padding-right:7px;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:var(--av-dim) var(--av-bg);overscroll-behavior:contain}
+#axi-pcie-packet-studio .av-header-stack::-webkit-scrollbar{width:10px}
+#axi-pcie-packet-studio .av-header-stack::-webkit-scrollbar-track{border-radius:99px;background:var(--av-bg)}
+#axi-pcie-packet-studio .av-header-stack::-webkit-scrollbar-thumb{border:2px solid var(--av-bg);border-radius:99px;background:var(--av-dim)}
+#axi-pcie-packet-studio .av-header-stack::-webkit-scrollbar-thumb:hover{background:var(--av-accent)}
+#axi-pcie-packet-studio .av-tlp-header{display:block;flex:none;border:1px solid var(--av-border);border-radius:7px;overflow:hidden;background:color-mix(in srgb,var(--av-panel-2) 76%,transparent);cursor:pointer;color:var(--av-text);padding:0;text-align:left;width:100%;transition:border-color .15s ease,transform .15s ease}
+#axi-pcie-packet-studio .av-tlp-header:hover{border-color:var(--av-header-color,var(--av-accent));transform:translateY(-1px)}
+#axi-pcie-packet-studio .av-tlp-header[aria-pressed="true"]{border-color:var(--av-header-color,var(--av-accent));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--av-header-color,var(--av-accent)) 35%,transparent)}
+#axi-pcie-packet-studio .av-tlp-header.av-mrd{--av-header-color:var(--av-violet)}#axi-pcie-packet-studio .av-tlp-header.av-mwr{--av-header-color:var(--av-amber)}#axi-pcie-packet-studio .av-tlp-header.av-cpld{--av-header-color:var(--av-accent)}
+#axi-pcie-packet-studio .av-tlp-header-title{display:flex;justify-content:space-between;gap:8px;padding:6px 7px;color:var(--av-muted);font:400 9px/1.25 ui-monospace,SFMono-Regular,Consolas,monospace;border-bottom:1px solid var(--av-border)}
+#axi-pcie-packet-studio .av-tlp-header-title strong{color:var(--av-header-color);font-weight:500}
+#axi-pcie-packet-studio .av-dword{display:grid;grid-template-columns:34px minmax(0,1fr);border-bottom:1px solid var(--av-border)}
+#axi-pcie-packet-studio .av-dword:last-child{border-bottom:0}
+#axi-pcie-packet-studio .av-dword-label{display:flex;align-items:center;justify-content:center;background:var(--av-bg);color:var(--av-muted);font:500 8px/1 ui-monospace,SFMono-Regular,Consolas,monospace;border-right:1px solid var(--av-border)}
+#axi-pcie-packet-studio .av-fields{display:flex;min-width:0}
+#axi-pcie-packet-studio .av-field{flex:var(--bits,1) 1 0;min-width:0;padding:4px 3px;border-right:1px solid var(--av-border);text-align:center}
+#axi-pcie-packet-studio .av-field:last-child{border-right:0}
+#axi-pcie-packet-studio .av-field span{display:block;color:var(--av-muted);font:400 7px/1.15 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#axi-pcie-packet-studio .av-field strong{display:block;margin-top:2px;color:var(--av-text);font:500 9px/1.15 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#axi-pcie-packet-studio .av-plugin-stage{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.8fr) auto;gap:8px;align-items:end;border-left:2px solid var(--av-violet);padding:8px 0 8px 9px;margin-bottom:10px;background:linear-gradient(90deg,var(--av-violet-soft),transparent 76%)}
+#axi-pcie-packet-studio .av-switch{display:grid;grid-template-columns:28px minmax(0,1fr);align-items:center;column-gap:7px;cursor:pointer}
+#axi-pcie-packet-studio .av-switch input{position:absolute;opacity:0;pointer-events:none}
+#axi-pcie-packet-studio .av-switch span{width:28px;height:16px;border-radius:99px;border:1px solid var(--av-border);background:var(--av-bg);position:relative;grid-row:1 / span 2}
+#axi-pcie-packet-studio .av-switch span:after{content:"";position:absolute;width:10px;height:10px;left:2px;top:2px;border-radius:50%;background:var(--av-muted);transition:transform .18s ease,background .18s ease}
+#axi-pcie-packet-studio .av-switch input:checked+span{border-color:var(--av-violet)}#axi-pcie-packet-studio .av-switch input:checked+span:after{transform:translateX(12px);background:var(--av-violet)}
+#axi-pcie-packet-studio .av-switch b{font-size:11px;font-weight:500;color:var(--av-text)}
+#axi-pcie-packet-studio .av-plugin-note{align-self:center;color:var(--av-violet);font:400 9px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:nowrap}
+#axi-pcie-packet-studio .av-lane-head{display:flex;justify-content:space-between;gap:8px;color:var(--av-muted);font:400 10px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace;margin-bottom:6px}
+#axi-pcie-packet-studio .av-lane{margin-top:9px}#axi-pcie-packet-studio .av-lane:first-child{margin-top:0}
+#axi-pcie-packet-studio .av-lane-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;color:var(--av-muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+#axi-pcie-packet-studio .av-lane-title strong{font-weight:500;color:var(--av-text)}
+#axi-pcie-packet-studio .av-packet-grid{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+#axi-pcie-packet-studio .av-packet{--av-packet-color:var(--av-blue);--av-packet-soft:var(--av-blue-soft);flex:var(--weight,1) 1 128px;min-width:0;max-width:100%;border:1px solid var(--av-border);border-radius:7px;background:color-mix(in srgb,var(--av-panel-2) 82%,transparent);color:var(--av-text);padding:7px;text-align:left;cursor:pointer;transition:transform .15s ease,border-color .15s ease,background .15s ease}
+#axi-pcie-packet-studio .av-packet:hover{transform:translateY(-1px);border-color:var(--av-packet-color)}
+#axi-pcie-packet-studio .av-packet[aria-pressed="true"]{border-color:var(--av-packet-color);background:var(--av-packet-soft);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--av-packet-color) 30%,transparent)}
+#axi-pcie-packet-studio .av-packet.av-mrd{--av-packet-color:var(--av-violet);--av-packet-soft:var(--av-violet-soft)}
+#axi-pcie-packet-studio .av-packet.av-mwr{--av-packet-color:var(--av-amber);--av-packet-soft:var(--av-amber-soft)}
+#axi-pcie-packet-studio .av-packet.av-cpld{--av-packet-color:var(--av-accent);--av-packet-soft:var(--av-accent-soft)}
+#axi-pcie-packet-studio .av-packet-top{display:flex;justify-content:space-between;gap:5px;align-items:center;font:500 10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace}
+#axi-pcie-packet-studio .av-packet-top span:first-child{color:var(--av-packet-color)}#axi-pcie-packet-studio .av-packet-top span:last-child{color:var(--av-muted)}
+#axi-pcie-packet-studio .av-address{font:400 10px/1.25 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--av-text);margin:5px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#axi-pcie-packet-studio .av-payload-bar{height:4px;background:var(--av-bg);border-radius:99px;overflow:hidden;margin-bottom:6px}
+#axi-pcie-packet-studio .av-payload-bar span{display:block;height:100%;width:var(--fill,50%);background:var(--av-packet-color);border-radius:inherit;transition:width .25s ease}
+#axi-pcie-packet-studio .av-packet-meta{display:flex;justify-content:space-between;gap:5px;color:var(--av-muted);font:400 9px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace}
+#axi-pcie-packet-studio .av-empty,#axi-pcie-packet-studio .av-more{width:100%;border:1px dashed var(--av-border);border-radius:7px;padding:11px;color:var(--av-muted);font-size:10px;text-align:center}
+#axi-pcie-packet-studio .av-inspector{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--av-border);margin-top:13px;padding-top:11px;min-width:0}
+#axi-pcie-packet-studio .av-inspector-label{color:var(--av-accent);font:500 10px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;text-transform:uppercase;letter-spacing:.07em}
+#axi-pcie-packet-studio #av-inspector-text{color:var(--av-muted);font:400 11px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}
+@media (max-width:980px){#axi-pcie-packet-studio .av-workspace{grid-template-columns:1fr 1fr}#axi-pcie-packet-studio .av-pcie-panel{grid-column:1 / -1}#axi-pcie-packet-studio .av-route{grid-template-columns:1fr 24px 1fr 24px 1fr}}
+@media (max-width:680px){#axi-pcie-packet-studio{padding:12px;border-radius:12px}#axi-pcie-packet-studio .av-examples{grid-template-columns:1fr}#axi-pcie-packet-studio .av-metrics,#axi-pcie-packet-studio .av-workspace{grid-template-columns:1fr}#axi-pcie-packet-studio .av-pcie-panel{grid-column:auto}#axi-pcie-packet-studio .av-route{grid-template-columns:1fr;gap:5px}#axi-pcie-packet-studio .av-route-arrow{width:1px;height:14px;margin-left:17px}#axi-pcie-packet-studio .av-route-arrow:after{right:-3px;top:auto;bottom:-1px;border-left:3px solid transparent;border-right:3px solid transparent;border-top:6px solid var(--av-border);border-bottom:0}#axi-pcie-packet-studio .av-controls-three{grid-template-columns:1fr 1fr}#axi-pcie-packet-studio .av-plugin-stage{grid-template-columns:1fr 1fr}#axi-pcie-packet-studio .av-plugin-note{display:none}}
+@media (max-width:420px){#axi-pcie-packet-studio .av-controls-two,#axi-pcie-packet-studio .av-controls-three,#axi-pcie-packet-studio .av-plugin-stage{grid-template-columns:1fr}#axi-pcie-packet-studio .av-memory-grid{gap:3px}#axi-pcie-packet-studio .av-cell{font-size:9px}}
+@media (prefers-reduced-motion:reduce){#axi-pcie-packet-studio *,#axi-pcie-packet-studio *:before,#axi-pcie-packet-studio *:after{animation:none!important;transition:none!important}}
+</style>
+
+<script type="text/plain" id="legacy-packet-studio-script">
+(()=>{
+const root=document.getElementById('axi-pcie-packet-studio');if(!root)return;
+const BASE=0x10000000,CELL_COUNT=64,MAX_VISIBLE=12;
+const selected=new Set(Array.from({length:12},(_,i)=>i+10));
+let operation='read',painting=false,paintValue=true,focused=null,firstRender=true,model=null,animationTimer=null;
+const $=q=>root.querySelector(q),$$=q=>Array.from(root.querySelectorAll(q));
+const ui={space:$('#av-space'),bus:$('#av-bus'),beat:$('#av-beat'),maxBeats:$('#av-max-beats'),hub:$('#av-hub-enabled'),hubLimit:$('#av-hub-limit'),mps:$('#av-mps'),mrrs:$('#av-mrrs'),rcb:$('#av-rcb')};
+const fmtBytes=n=>n>=1048576?`${trim(n/1048576)} MB`:n>=1024?`${trim(n/1024)} KB`:`${n} B`;
+const trim=n=>Number.isInteger(n)?String(n):n.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+const hex=(n,w=8)=>`0x${n.toString(16).toUpperCase().padStart(w,'0')}`;
+const log2=n=>Math.round(Math.log2(n));
+
+function config(){
+  const space=Number(ui.space.value),cell=space/CELL_COUNT,bus=Number(ui.bus.value);
+  const wanted=ui.beat.value==='auto'?Math.min(bus,cell):Number(ui.beat.value);
+  return{space,cell,bus,beat:Math.min(wanted,bus),maxBeats:Number(ui.maxBeats.value),hubEnabled:ui.hub.checked,hubLimit:Number(ui.hubLimit.value),mps:Number(ui.mps.value),mrrs:Number(ui.mrrs.value),rcb:Number(ui.rcb.value),operation};
+}
+function memoryRanges(c){
+  const out=[];
+  Array.from(selected).sort((a,b)=>a-b).forEach(index=>{const addr=BASE+index*c.cell,prev=out[out.length-1];if(prev&&prev.addr+prev.bytes===addr){prev.bytes+=c.cell;prev.last=index}else out.push({addr,bytes:c.cell,first:index,last:index})});
+  return out;
+}
+function alignedBeat(addr,remaining,preferred){let beat=preferred;while(beat>remaining||addr%beat!==0)beat/=2;return Math.max(1,beat)}
+function normalizeAxi(ranges,c){
+  const out=[];
+  ranges.forEach(range=>{let addr=range.addr,remaining=range.bytes;while(remaining>0){const beat=alignedBeat(addr,remaining,c.beat),room=Math.min(remaining,4096-addr%4096,beat*c.maxBeats),beats=Math.max(1,Math.floor(room/beat)),payload=beats*beat,id=`A${String(out.length).padStart(3,'0')}`;out.push({id,sourceId:id,addr,bytes:payload,beats,beat,len:beats-1,size:log2(beat),stage:'AXI normalize'});addr+=payload;remaining-=payload}});
+  return out;
+}
+function hubSplit(input,c){
+  if(!c.hubEnabled)return input.map(tx=>({...tx}));
+  const out=[];
+  input.forEach(tx=>{let addr=tx.addr,remaining=tx.bytes;while(remaining>0){const limit=Math.max(tx.beat,Math.floor(c.hubLimit/tx.beat)*tx.beat),payload=Math.min(remaining,limit),beats=payload/tx.beat;out.push({...tx,id:`H${String(out.length).padStart(3,'0')}`,addr,bytes:payload,beats,len:beats-1,stage:'Hub splitter'});addr+=payload;remaining-=payload}});
+  return out;
+}
+const AXI_STAGES=[
+  {id:'normalize',label:'AXI normalize',enabled:()=>true,run:(input,c)=>normalizeAxi(input,c)},
+  {id:'hub',label:'Hub splitter',enabled:c=>c.hubEnabled,run:(input,c)=>hubSplit(input,c)}
+];
+function runAxiPipeline(ranges,c){
+  let current=ranges;const history=[];
+  AXI_STAGES.forEach(stage=>{if(stage.enabled(c)){current=stage.run(current,c);history.push({id:stage.id,label:stage.label,count:current.length,transactions:current})}});
+  return{history,source:history[0]?.transactions||[],final:current};
+}
+function writeTlps(axi,c){
+  const requests=[];
+  axi.forEach(tx=>{let addr=tx.addr,remaining=tx.bytes,part=0;while(remaining>0){const payload=Math.min(remaining,c.mps,4096-addr%4096);requests.push({id:`W${tx.id}.${part}`,type:'MWr',axiId:tx.id,addr,bytes:payload,dw:Math.ceil(payload/4)});addr+=payload;remaining-=payload;part++}});
+  return{requests,completions:[]};
+}
+function completionChunk(addr,remaining,mps,rcb){const limit=Math.min(remaining,mps);if(remaining<=limit)return limit;const aligned=limit-(addr+limit)%rcb;return aligned>0?aligned:Math.min(limit,rcb-addr%rcb)}
+function readTlps(axi,c){
+  const requests=[],completions=[];
+  axi.forEach(tx=>{let addr=tx.addr,remaining=tx.bytes,part=0;while(remaining>0){const payload=Math.min(remaining,c.mrrs,4096-addr%4096),req={id:`R${tx.id}.${part}`,type:'MRd',axiId:tx.id,addr,bytes:payload,dw:Math.ceil(payload/4)};requests.push(req);let ca=addr,cr=payload,cp=0;while(cr>0){const chunk=completionChunk(ca,cr,c.mps,c.rcb);completions.push({id:`C${tx.id}.${part}.${cp}`,type:'CplD',axiId:tx.id,requestId:req.id,addr:ca,bytes:chunk,dw:Math.ceil(chunk/4),byteCount:cr,lowerAddress:ca&0x7f});ca+=chunk;cr-=chunk;cp++}addr+=payload;remaining-=payload;part++}});
+  return{requests,completions};
+}
+function buildModel(){const c=config(),ranges=memoryRanges(c),axi=runAxiPipeline(ranges,c),tlp=c.operation==='read'?readTlps(axi.final,c):writeTlps(axi.final,c);return{c,ranges,axi,tlp,selectedBytes:ranges.reduce((sum,r)=>sum+r.bytes,0)}}
+function setCell(index,value){value?selected.add(index):selected.delete(index);focused=null;update()}
+function related(kind,item){if(!focused)return false;if(focused.kind==='axi')return kind==='axi'?item.id===focused.id:item.axiId===focused.id;return kind==='axi'?item.id===focused.axiId:item.id===focused.id||item.axiId===focused.axiId}
+function setInspector(text){$('#av-inspector-text').textContent=text}
+
+function renderMemory(s){
+  const grid=$('#av-memory-grid');grid.innerHTML='';
+  for(let i=0;i<CELL_COUNT;i++){
+    const addr=BASE+i*s.c.cell,button=document.createElement('button');button.type='button';button.className='av-cell';button.textContent=i.toString(16).toUpperCase().padStart(2,'0');button.setAttribute('aria-pressed',selected.has(i)?'true':'false');button.setAttribute('aria-label',`Block ${i}, ${hex(addr)}, ${fmtBytes(s.c.cell)}, ${selected.has(i)?'selected':'available'}`);
+    button.addEventListener('pointerdown',event=>{painting=true;paintValue=!selected.has(i);setCell(i,paintValue);button.focus();event.preventDefault()});
+    button.addEventListener('pointerenter',()=>{if(painting)setCell(i,paintValue);else if(!focused)setInspector(`Block ${i.toString(16).toUpperCase().padStart(2,'0')} · ${hex(addr)} · ${fmtBytes(s.c.cell)}`)});
+    button.addEventListener('click',event=>{if(event.detail===0)setCell(i,!selected.has(i));event.preventDefault()});grid.appendChild(button);
+  }
+  $('#av-granularity').textContent=fmtBytes(s.c.cell);$('#av-base-address').textContent=hex(BASE);$('#av-end-address').textContent=hex(BASE+s.c.space-1);$('#av-memory-count').textContent=`${selected.size} blocks`;
+  $('#av-range-strip').textContent=s.ranges.length?s.ranges.map(r=>`${hex(r.addr)}–${hex(r.addr+r.bytes-1)} · ${fmtBytes(r.bytes)}`).join('  |  '):'No memory selected';
+}
+function packetWeight(value,total){if(!total)return 1;return Math.max(.75,Math.min(2.5,value/(total/4||1)))}
+function packetFill(value,max){return `${Math.max(10,Math.min(100,value/Math.max(1,max)*100))}%`}
+function makePacket(item,kind,label,maxBytes,totalBytes,meta){
+  const button=document.createElement('button');button.type='button';button.className=`av-packet ${kind==='axi'?'av-axi':item.type==='MRd'?'av-mrd':item.type==='MWr'?'av-mwr':'av-cpld'}`;button.style.setProperty('--weight',packetWeight(item.bytes,totalBytes));button.style.setProperty('--fill',packetFill(item.bytes,maxBytes));button.setAttribute('aria-pressed',related(kind,item)?'true':'false');button.setAttribute('aria-label',`${label} ${item.id}, address ${hex(item.addr)}, ${item.bytes} bytes`);
+  const top=document.createElement('div');top.className='av-packet-top';const type=document.createElement('span');type.textContent=`${label} ${item.id}`;const amount=document.createElement('span');amount.textContent=fmtBytes(item.bytes);top.append(type,amount);
+  const address=document.createElement('div');address.className='av-address';address.textContent=hex(item.addr);
+  const bar=document.createElement('div');bar.className='av-payload-bar';const fill=document.createElement('span');bar.appendChild(fill);
+  const detail=document.createElement('div');detail.className='av-packet-meta';const left=document.createElement('span');left.textContent=meta.left;const right=document.createElement('span');right.textContent=meta.right;detail.append(left,right);button.append(top,address,bar,detail);
+  button.addEventListener('mouseenter',()=>{if(!focused)setInspector(`${label} ${item.id} · ${hex(item.addr)} · ${fmtBytes(item.bytes)} · ${meta.left} · ${meta.right}`)});
+  button.addEventListener('click',()=>{focused={kind,id:item.id,axiId:kind==='axi'?item.id:item.axiId};renderTransactions(model);renderInspector(model)});return button;
+}
+function renderPacketSet(container,items,kind,label,maxBytes,totalBytes,metaBuilder){
+  container.innerHTML='';if(!items.length){const empty=document.createElement('div');empty.className='av-empty';empty.textContent='No transactions';container.appendChild(empty);return}
+  items.slice(0,MAX_VISIBLE).forEach(item=>container.appendChild(makePacket(item,kind,label,maxBytes,totalBytes,metaBuilder(item))));
+  if(items.length>MAX_VISIBLE){const more=document.createElement('div');more.className='av-more';more.textContent=`+ ${items.length-MAX_VISIBLE} more packets`;container.appendChild(more)}
+}
+function lane(title,subtitle,items,label,maxBytes,totalBytes,metaBuilder){const wrap=document.createElement('div');wrap.className='av-lane';const head=document.createElement('div');head.className='av-lane-title';const name=document.createElement('strong');name.textContent=title;const sub=document.createElement('span');sub.textContent=subtitle;head.append(name,sub);const grid=document.createElement('div');grid.className='av-packet-grid';renderPacketSet(grid,items,'tlp',label,maxBytes,totalBytes,metaBuilder);wrap.append(head,grid);return wrap}
+function renderTransactions(s){
+  $('#av-axi-direction').textContent=s.c.operation==='read'?'AR / R':'AW / W / B';$('#av-axi-count').textContent=`${s.axi.final.length} txns`;
+  const axiTotal=s.axi.final.reduce((sum,t)=>sum+t.bytes,0),axiMax=Math.max(1,...s.axi.final.map(t=>t.bytes));
+  renderPacketSet($('#av-axi-packets'),s.axi.final,'axi',s.c.operation==='read'?'AR':'AW',axiMax,axiTotal,t=>({left:`LEN ${t.len}`,right:`SIZE ${t.size} · ${t.beats}×${t.beat}B`}));
+  const lanes=$('#av-tlp-lanes');lanes.innerHTML='';const reqTotal=s.tlp.requests.reduce((sum,t)=>sum+t.bytes,0),reqMax=Math.max(1,...s.tlp.requests.map(t=>t.bytes));
+  if(s.c.operation==='read'){
+    lanes.append(lane('Outbound  →  MRd',`${s.tlp.requests.length} packets · MRRS ${fmtBytes(s.c.mrrs)}`,s.tlp.requests,'MRd',reqMax,reqTotal,t=>({left:`LEN ${t.dw}DW`,right:`Req ${fmtBytes(t.bytes)}`})));
+    const cplTotal=s.tlp.completions.reduce((sum,t)=>sum+t.bytes,0),cplMax=Math.max(1,...s.tlp.completions.map(t=>t.bytes));
+    lanes.append(lane('CplD  ←  Return',`${s.tlp.completions.length} packets · MPS ${fmtBytes(s.c.mps)} · RCB ${s.c.rcb}B`,s.tlp.completions,'CplD',cplMax,cplTotal,t=>({left:`BC ${t.byteCount}`,right:`LA ${hex(t.lowerAddress,2)}`})));
+  }else lanes.append(lane('Outbound  →  MWr',`${s.tlp.requests.length} packets · MPS ${fmtBytes(s.c.mps)}`,s.tlp.requests,'MWr',reqMax,reqTotal,t=>({left:`LEN ${t.dw}DW`,right:`Payload ${fmtBytes(t.bytes)}`})));
+  $('#av-pcie-count').textContent=`${s.tlp.requests.length+s.tlp.completions.length} packets`;
+}
+function renderInspector(s){
+  if(!focused){setInspector('Select an AXI transaction or TLP to trace its one-to-many mapping.');return}
+  const axi=s.axi.final.find(t=>t.id===focused.axiId);if(!axi){focused=null;setInspector('Select an AXI transaction or TLP to trace its one-to-many mapping.');return}
+  const req=s.tlp.requests.filter(t=>t.axiId===axi.id),cpl=s.tlp.completions.filter(t=>t.axiId===axi.id);setInspector(`${axi.id} (${fmtBytes(axi.bytes)})  →  ${req.map(t=>t.id).join(', ')||'no request'}${cpl.length?`  →  ${cpl.map(t=>t.id).join(', ')}`:''}`);
+}
+function renderStatus(s){
+  const total=s.tlp.requests.length+s.tlp.completions.length,hubCount=s.c.hubEnabled?s.axi.final.length:s.axi.source.length;
+  $('#av-selected-metric').textContent=`${fmtBytes(s.selectedBytes)} · ${s.ranges.length} range${s.ranges.length===1?'':'s'}`;
+  $('#av-axi-metric').textContent=`${s.axi.source.length} source → ${s.axi.final.length} final`;
+  $('#av-tlp-metric').textContent=s.c.operation==='read'?`${s.tlp.requests.length} MRd + ${s.tlp.completions.length} CplD`:`${s.tlp.requests.length} MWr`;
+  $('#av-route-memory').textContent=`${selected.size} blocks · ${fmtBytes(s.selectedBytes)}`;$('#av-route-axi').textContent=`${s.axi.source.length} transactions`;$('#av-route-hub').textContent=s.c.hubEnabled?`${hubCount} transactions`:'bypassed';$('#av-route-pcie').textContent=`${total} TLPs`;
+  $('#av-route-hub-node').classList.toggle('is-bypassed',!s.c.hubEnabled);ui.hubLimit.disabled=!s.c.hubEnabled;ui.mrrs.disabled=s.c.operation!=='read';ui.rcb.disabled=s.c.operation!=='read';
+}
+function animateUpdate(){if(firstRender){firstRender=false;return}root.classList.remove('is-updating');void root.offsetWidth;root.classList.add('is-updating');clearTimeout(animationTimer);animationTimer=setTimeout(()=>root.classList.remove('is-updating'),650)}
+function hideCellDecision(){pendingDecision=null;$('#av-cell-decision').hidden=true}
+function showCellDecision(cell,start,end){const pop=$('#av-cell-decision'),frame=$('.av-memory-frame'),frameRect=frame.getBoundingClientRect(),cellRect=cell.getBoundingClientRect();pendingDecision={start,end};$('#av-cell-decision-title').textContent=`Partially selected ${fmtBytes(end-start)} cell`;$('#av-cell-decision-range').textContent=`${hex(start)}–${hex(end-1n)}`;pop.hidden=false;const left=Math.max(6,Math.min(frameRect.width-pop.offsetWidth-6,cellRect.left-frameRect.left)),below=cellRect.bottom-frameRect.top+6,top=below+pop.offsetHeight<frameRect.height?below:Math.max(6,cellRect.top-frameRect.top-pop.offsetHeight-6);pop.style.left=`${left}px`;pop.style.top=`${top}px`}
+function update(){hideCellDecision();model=buildModel();renderMemory(model);renderTransactions(model);renderStatus(model);renderInspector(model);animateUpdate()}
+function applyTheme(choice){root.dataset.theme=choice;root.dataset.resolvedTheme=choice==='auto'&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':choice==='light'?'light':'dark';$$('[data-theme-choice]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.themeChoice===choice?'true':'false'))}
+$$('[data-op]').forEach(button=>button.addEventListener('click',()=>{operation=button.dataset.op;$$('[data-op]').forEach(b=>b.setAttribute('aria-pressed',b===button?'true':'false'));focused=null;update()}));
+$$('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>applyTheme(button.dataset.themeChoice)));
+Object.values(ui).forEach(control=>control.addEventListener('change',()=>{focused=null;update()}));
+window.addEventListener('pointerup',()=>painting=false);window.addEventListener('pointercancel',()=>painting=false);
+const scheme=window.matchMedia('(prefers-color-scheme:light)');if(scheme.addEventListener)scheme.addEventListener('change',()=>{if(root.dataset.theme==='auto')applyTheme('auto')});
+update();
+})();
+</script>
+
+<script type="text/plain" id="fixed-window-packet-studio-script">
+(()=>{
+const root=document.getElementById('axi-pcie-packet-studio');if(!root)return;
+const COLS=16,ROWS=64,CELL_COUNT=COLS*ROWS,MAX_VISIBLE=16,MAX_HEADERS=12,ZOOM_GROUPS=[16,8,4,2,1];
+const selected=new Set(Array.from({length:12},(_,i)=>i+124));
+let baseAddress=0x10000E00,operation='read',focused=null,model=null,firstRender=true,animationTimer=null,pointerState=null,zoomLevel=2,pendingZoomAnchor=null;
+const $=q=>root.querySelector(q),$$=q=>Array.from(root.querySelectorAll(q));
+const ui={space:$('#av-space'),base:$('#av-base'),bus:$('#av-bus'),beat:$('#av-beat'),maxBeats:$('#av-max-beats'),hub:$('#av-hub-enabled'),hubLimit:$('#av-hub-limit'),mps:$('#av-mps'),mrrs:$('#av-mrrs'),rcb:$('#av-rcb')};
+const trim=n=>Number.isInteger(n)?String(n):n.toFixed(2).replace(/0+$/,'').replace(/\.$/,'');
+const fmtBytes=n=>n>=1048576?`${trim(n/1048576)} MB`:n>=1024?`${trim(n/1024)} KB`:`${n} B`;
+const hex=(n,w=8)=>`0x${Math.max(0,Math.floor(n)).toString(16).toUpperCase().padStart(w,'0')}`;
+const log2=n=>Math.round(Math.log2(n));
+const parseAddress=value=>{const text=String(value).trim();if(!/^(0x[0-9a-f]+|[0-9]+)$/i.test(text))return null;const n=Number(text);return Number.isSafeInteger(n)&&n>=0?n:null};
+
+function config(){
+  const space=Number(ui.space.value),cell=space/CELL_COUNT,bus=Number(ui.bus.value),wanted=ui.beat.value==='auto'?Math.min(bus,cell):Number(ui.beat.value);
+  return{space,cell,bus,beat:Math.max(1,Math.min(wanted,bus)),maxBeats:Number(ui.maxBeats.value),hubEnabled:ui.hub.checked,hubLimit:Number(ui.hubLimit.value),mps:Number(ui.mps.value),mrrs:Number(ui.mrrs.value),rcb:Number(ui.rcb.value),operation,base:baseAddress};
+}
+function viewSpec(c){const group=ZOOM_GROUPS[zoomLevel],rows=Math.ceil(CELL_COUNT/(COLS*group));return{group,rows,bytes:c.cell*group}}
+function selectionState(start,count){let hits=0;for(let i=start;i<Math.min(CELL_COUNT,start+count);i++)if(selected.has(i))hits++;return hits===0?'none':hits===Math.min(count,CELL_COUNT-start)?'all':'mixed'}
+function memoryRanges(c){
+  const out=[];
+  Array.from(selected).sort((a,b)=>a-b).forEach(index=>{const addr=c.base+index*c.cell,prev=out[out.length-1];if(prev&&prev.addr+prev.bytes===addr){prev.bytes+=c.cell;prev.last=index}else out.push({addr,bytes:c.cell,first:index,last:index})});
+  return out;
+}
+function alignedBeat(addr,remaining,preferred){let beat=preferred;while(beat>1&&(beat>remaining||addr%beat!==0))beat/=2;return Math.max(1,beat)}
+function normalizeAxi(ranges,c){
+  const out=[];
+  ranges.forEach((range,rangeIndex)=>{let addr=range.addr,remaining=range.bytes;while(remaining>0){const beat=alignedBeat(addr,remaining,c.beat),room=Math.min(remaining,4096-(addr%4096),beat*c.maxBeats),beats=Math.max(1,Math.floor(room/beat)),bytes=beats*beat;out.push({id:`A${String(out.length).padStart(3,'0')}`,rangeIndex,addr,bytes,beats,beat,len:beats-1,size:log2(beat),stage:'Ingress AXI burst'});addr+=bytes;remaining-=bytes}});
+  return out;
+}
+function hubSplit(input,c){
+  if(!c.hubEnabled)return input.map(tx=>({...tx}));
+  const out=[];
+  input.forEach(tx=>{let addr=tx.addr,remaining=tx.bytes,part=0;while(remaining>0){const limit=Math.max(tx.beat,Math.floor(c.hubLimit/tx.beat)*tx.beat),bytes=Math.min(remaining,limit),beats=bytes/tx.beat;out.push({...tx,id:`H${String(out.length).padStart(3,'0')}`,parentId:tx.id,addr,bytes,beats,len:beats-1,stage:'Hub burst splitter',part});addr+=bytes;remaining-=bytes;part++}});
+  return out;
+}
+function runAxiPipeline(ranges,c){const source=normalizeAxi(ranges,c),final=hubSplit(source,c);return{source,final,history:[{label:'Ingress AXI bursts',transactions:source},{label:c.hubEnabled?'Controller-facing bursts':'Hub bypass',transactions:final}]}}
+function byteEnables(addr,bytes){
+  const offset=addr%4,dw=Math.ceil((offset+bytes)/4),firstBytes=Math.min(bytes,4-offset),first=((1<<firstBytes)-1)<<offset,lastBytes=(offset+bytes)%4||4,last=dw===1?0:(1<<lastBytes)-1;
+  return{dw,firstBE:first,lastBE:last};
+}
+function splitReason(after,bytes,boundaryRoom,limit,limitName){if(after<=0)return bytes===boundaryRoom?'4 KB boundary':'range end';const reasons=[];if(bytes===boundaryRoom)reasons.push('4 KB boundary');if(bytes===limit)reasons.push(`${limitName} limit`);return reasons.join(' + ')||'range split'}
+function writeTlps(axi,c){
+  const requests=[];let sequence=0;
+  axi.forEach(tx=>{let addr=tx.addr,remaining=tx.bytes;while(remaining>0){const before=remaining,boundaryRoom=4096-(addr%4096),bytes=Math.min(before,c.mps,boundaryRoom),be=byteEnables(addr,bytes),after=before-bytes;requests.push({id:`MWr${String(sequence).padStart(2,'0')}`,type:'MWr',axiId:tx.id,addr,bytes,...be,requesterId:'0000',tag:sequence&0xff,reason:splitReason(after,bytes,boundaryRoom,c.mps,'MPS')});addr+=bytes;remaining=after;sequence++}});
+  return{requests,completions:[]};
+}
+function completionChunk(addr,remaining,mps,rcb){const limit=Math.min(remaining,mps);if(remaining<=limit)return limit;const aligned=limit-((addr+limit)%rcb);return aligned>0?aligned:Math.min(limit,rcb-(addr%rcb))}
+function readTlps(axi,c){
+  const requests=[],completions=[];let requestSequence=0,completionSequence=0;
+  axi.forEach(tx=>{let addr=tx.addr,remaining=tx.bytes;while(remaining>0){const before=remaining,boundaryRoom=4096-(addr%4096),bytes=Math.min(before,c.mrrs,boundaryRoom),be=byteEnables(addr,bytes),after=before-bytes,request={id:`MRd${String(requestSequence).padStart(2,'0')}`,type:'MRd',axiId:tx.id,addr,bytes,...be,requesterId:'0000',tag:requestSequence&0xff,reason:splitReason(after,bytes,boundaryRoom,c.mrrs,'MRRS')};requests.push(request);let ca=addr,cr=bytes;while(cr>0){const chunk=completionChunk(ca,cr,c.mps,c.rcb),left=cr-chunk,reasons=[];if(left<=0)reasons.push('request end');else{if(chunk===c.mps)reasons.push('MPS limit');if((ca+chunk)%c.rcb===0)reasons.push('RCB')}const cbe=byteEnables(ca,chunk);completions.push({id:`CplD${String(completionSequence).padStart(2,'0')}`,type:'CplD',axiId:tx.id,requestId:request.id,addr:ca,bytes:chunk,...cbe,byteCount:cr,lowerAddress:ca&0x7f,requesterId:'0000',completerId:'0000',tag:request.tag,status:'SC',bcm:0,reason:reasons.join(' + ')});ca+=chunk;cr=left;completionSequence++}addr+=bytes;remaining=after;requestSequence++}});
+  return{requests,completions};
+}
+function buildModel(){const c=config(),ranges=memoryRanges(c),axi=runAxiPipeline(ranges,c),tlp=c.operation==='read'?readTlps(axi.final,c):writeTlps(axi.final,c);return{c,ranges,axi,tlp,selectedBytes:ranges.reduce((sum,r)=>sum+r.bytes,0)}}
+function related(kind,item){if(!focused)return false;if(focused.kind==='axi')return kind==='axi'?item.id===focused.id:item.axiId===focused.id;return kind==='axi'?item.id===focused.axiId:item.id===focused.id||item.requestId===focused.id||item.axiId===focused.axiId}
+function setInspector(text){$('#av-inspector-text').textContent=text}
+
+function renderMemory(s){
+  const grid=$('#av-memory-grid'),scroll=$('#av-memory-scroll'),scrollTop=scroll.scrollTop,scrollLeft=scroll.scrollLeft,spec=viewSpec(s.c);grid.innerHTML='';
+  const corner=document.createElement('div');corner.className='av-memory-corner';corner.textContent='address';corner.setAttribute('role','columnheader');grid.appendChild(corner);
+  for(let col=COLS-1;col>=0;col--){const header=document.createElement('div');header.className='av-memory-col';header.textContent=String(col);header.setAttribute('role','columnheader');header.setAttribute('aria-label',`column ${col}`);grid.appendChild(header)}
+  for(let row=0;row<spec.rows;row++){
+    const rowBase=s.c.base+row*COLS*spec.bytes,label=document.createElement('div');label.className='av-memory-address';label.textContent=hex(rowBase);label.setAttribute('role','rowheader');grid.appendChild(label);
+    for(let col=COLS-1;col>=0;col--){
+      const start=(row*COLS+col)*spec.group,count=Math.min(spec.group,CELL_COUNT-start);if(count<=0)continue;const addr=s.c.base+start*s.c.cell,state=selectionState(start,count),button=document.createElement('button');button.type='button';button.className='av-cell';button.dataset.start=String(start);button.dataset.count=String(count);button.dataset.state=state;button.setAttribute('role','gridcell');button.setAttribute('aria-pressed',state==='all'?'true':'false');button.setAttribute('aria-label',`${hex(addr)}–${hex(addr+count*s.c.cell-1)}, ${fmtBytes(count*s.c.cell)}, ${state==='all'?'selected':state==='mixed'?'partially selected':'available'}`);grid.appendChild(button);
+    }
+  }
+  if(pendingZoomAnchor!==null){const firstCell=grid.querySelector('.av-cell'),rowHeight=(firstCell?.offsetHeight||18)+2,targetRow=Math.floor(pendingZoomAnchor/(COLS*spec.group));scroll.scrollTop=targetRow*rowHeight;pendingZoomAnchor=null}else scroll.scrollTop=scrollTop;scroll.scrollLeft=scrollLeft;
+  const viewSelected=Array.from({length:Math.ceil(CELL_COUNT/spec.group)},(_,g)=>selectionState(g*spec.group,spec.group)).filter(state=>state!=='none').length;$('#av-granularity').textContent=fmtBytes(s.c.cell);$('#av-memory-count').textContent=`${viewSelected} view cells`;
+  $('#av-zoom-label').textContent=`${fmtBytes(spec.bytes)} / cell`;$('#av-zoom').value=String(zoomLevel);$('#av-zoom-out').disabled=zoomLevel===0;$('#av-zoom-in').disabled=zoomLevel===ZOOM_GROUPS.length-1;
+  $('#av-range-strip').textContent=s.ranges.length?s.ranges.map(r=>`${hex(r.addr)}–${hex(r.addr+r.bytes-1)} · ${fmtBytes(r.bytes)}`).join('  |  '):'No memory selected';
+}
+function setGroupPreview(start,count,value){for(let i=start;i<Math.min(CELL_COUNT,start+count);i++)value?selected.add(i):selected.delete(i);const cell=$(`.av-cell[data-start="${start}"]`);if(cell){const c=config(),state=selectionState(start,count),addr=c.base+start*c.cell;cell.dataset.state=state;cell.setAttribute('aria-pressed',state==='all'?'true':'false');cell.setAttribute('aria-label',`${hex(addr)}–${hex(addr+count*c.cell-1)}, ${fmtBytes(count*c.cell)}, ${state==='all'?'selected':state==='mixed'?'partially selected':'available'}`)}}
+function cellAt(x,y){const el=document.elementFromPoint(x,y);return el&&el.closest?el.closest('.av-cell'):null}
+function finishPointer(cancelled=false){
+  if(!pointerState)return;const state=pointerState;pointerState=null;
+  if(cancelled){selected.clear();state.snapshot.forEach(i=>selected.add(i))}else if(!state.dragging)setGroupPreview(state.start,state.count,state.target);
+  focused=null;update();
+}
+
+function makeAxiPacket(item,s){
+  const button=document.createElement('button');button.type='button';button.className='av-packet av-axi';button.setAttribute('aria-pressed',related('axi',item)?'true':'false');button.setAttribute('aria-label',`${s.c.operation==='read'?'AXI4 read':'AXI4 write'} burst ${item.id}, ${hex(item.addr)}, ${item.bytes} bytes`);
+  const channel=s.c.operation==='read'?'AR':'AW';button.innerHTML=`<div class="av-packet-top"><span>${s.c.operation==='read'?'AXI4 Read Burst':'AXI4 Write Burst'} ${item.id}</span><span>${fmtBytes(item.bytes)}</span></div><div class="av-address">${channel}ADDR ${hex(item.addr)}</div><div class="av-payload-bar"><span style="width:${Math.max(10,Math.min(100,item.bytes/Math.max(1,s.c.hubLimit)*100))}%"></span></div><div class="av-packet-meta"><span>${channel}LEN ${item.len} · ${channel}SIZE ${item.size}</span><span>${item.beats} beats × ${item.beat} B</span></div>`;
+  button.addEventListener('mouseenter',()=>{if(!focused)setInspector(`${item.id} · ${channel}ADDR ${hex(item.addr)} · ${channel}LEN ${item.len} · ${channel}SIZE ${item.size} (${item.beat} bytes/beat) · ${channel}BURST INCR`)});
+  button.addEventListener('click',()=>{focused={kind:'axi',id:item.id,axiId:item.id};renderTransactions(model);renderInspector(model)});return button;
+}
+function renderAxi(s){const wrap=$('#av-axi-packets');wrap.innerHTML='';if(!s.axi.final.length){wrap.innerHTML='<div class="av-empty">No AXI4 bursts</div>';return}s.axi.final.slice(0,MAX_VISIBLE).forEach(item=>wrap.appendChild(makeAxiPacket(item,s)));if(s.axi.final.length>MAX_VISIBLE){const more=document.createElement('div');more.className='av-more';more.textContent=`+ ${s.axi.final.length-MAX_VISIBLE} more AXI4 bursts`;wrap.appendChild(more)}}
+function overlaps(addr,bytes,item){return addr<item.addr+item.bytes&&item.addr<addr+bytes}
+function focusedItems(s,kind){
+  if(!focused)return[];
+  if(kind==='axi')return s.axi.final.filter(item=>focused.kind==='axi'?item.id===focused.id:item.id===focused.axiId);
+  const all=[...s.tlp.requests,...s.tlp.completions];return all.filter(item=>focused.kind==='axi'?item.axiId===focused.id:item.id===focused.id);
+}
+function mapItems(s,kind){
+  if(kind==='axi')return s.axi.final;
+  if(focused?.kind==='tlp'&&s.tlp.completions.some(item=>item.id===focused.id))return s.tlp.completions;
+  return s.tlp.requests;
+}
+function renderLinkedMemory(container,s,kind){
+  const spec=viewSpec(s.c),items=mapItems(s,kind),focus=focusedItems(s,kind);container.innerHTML='';
+  const corner=document.createElement('div');corner.className='av-memory-corner';corner.textContent='address';corner.setAttribute('role','columnheader');container.appendChild(corner);
+  for(let col=COLS-1;col>=0;col--){const header=document.createElement('div');header.className='av-memory-col';header.textContent=String(col);header.setAttribute('role','columnheader');container.appendChild(header)}
+  for(let row=0;row<spec.rows;row++){
+    const rowBase=s.c.base+row*COLS*spec.bytes,label=document.createElement('div');label.className='av-memory-address';label.textContent=hex(rowBase);label.setAttribute('role','rowheader');container.appendChild(label);
+    for(let col=COLS-1;col>=0;col--){
+      const start=(row*COLS+col)*spec.group,count=Math.min(spec.group,CELL_COUNT-start);if(count<=0)continue;const addr=s.c.base+start*s.c.cell,bytes=count*s.c.cell,covered=items.filter(item=>overlaps(addr,bytes,item)),focusedCoverage=focus.filter(item=>overlaps(addr,bytes,item)),cell=document.createElement('div');cell.className='av-map-cell';cell.setAttribute('role','gridcell');
+      if(selectionState(start,count)!=='none')cell.classList.add('is-payload');
+      if(covered.length){const type=kind==='axi'?'axi':covered[0].type.toLowerCase();cell.classList.add(`is-${type}`);const coveredBytes=covered.reduce((sum,item)=>sum+Math.max(0,Math.min(addr+bytes,item.addr+item.bytes)-Math.max(addr,item.addr)),0);if(coveredBytes<bytes)cell.classList.add('is-partial')}
+      if(focusedCoverage.length)cell.classList.add('is-focused');
+      const coverage=covered.map(item=>item.id).join(', ');cell.setAttribute('aria-label',`${hex(addr)}–${hex(addr+bytes-1)}, ${coverage?`${kind==='axi'?'AXI':'TLP'} coverage ${coverage}`:'no transfer coverage'}${focusedCoverage.length?', focused':''}`);container.appendChild(cell);
+    }
+  }
+}
+function renderLinkedMaps(s){
+  renderLinkedMemory($('#av-axi-memory-grid'),s,'axi');renderLinkedMemory($('#av-tlp-memory-grid'),s,'tlp');
+  $('#av-axi-map-label').textContent=focused?focused.kind==='axi'?`focused ${focused.id}`:`parent burst ${focused.axiId}`:'all controller-facing bursts';
+  $('#av-tlp-map-label').textContent=focused?focused.kind==='axi'?`TLPs generated by ${focused.id}`:`focused ${focused.id}`:`all ${s.c.operation==='read'?'MRd':'MWr'} request TLPs`;
+}
+function makeMiniCompletion(item,max){const el=document.createElement('div');el.className='av-mini-cpl';el.style.setProperty('--weight',Math.max(.5,item.bytes/max));el.innerHTML=`<strong>${item.id} · ${fmtBytes(item.bytes)}</strong><span>${item.reason}</span>`;return el}
+function renderBoundaryMap(s){
+  const map=$('#av-boundary-map');map.innerHTML='';const requests=s.tlp.requests;if(!requests.length){map.innerHTML='<div class="av-empty">Select memory cells to create TLPs</div>';return}
+  const regions=new Map();requests.forEach(req=>{const base=Math.floor(req.addr/4096)*4096;if(!regions.has(base))regions.set(base,[]);regions.get(base).push(req)});
+  regions.forEach((items,regionBase)=>{
+    const region=document.createElement('div');region.className='av-boundary-region';
+    const head=document.createElement('div');head.className='av-boundary-region-head';head.innerHTML=`<strong>4 KB address region</strong><span>${hex(regionBase)}–${hex(regionBase+4095)}</span>`;
+    const row=document.createElement('div');row.className='av-limit-row';
+    items.forEach(req=>{
+      const box=document.createElement('div');box.className=`av-limit-box ${s.c.operation==='write'?'av-mps-box':''}`;box.style.setProperty('--weight',Math.max(.5,req.bytes/(s.c.operation==='read'?s.c.mrrs:s.c.mps)));box.innerHTML=`<div class="av-limit-head"><strong>${req.id} · ${fmtBytes(req.bytes)}</strong><span>${hex(req.addr)}</span></div>`;
+      if(s.c.operation==='read'){
+        const cpls=s.tlp.completions.filter(c=>c.requestId===req.id),mini=document.createElement('div');mini.className='av-completion-row';
+        cpls.forEach(c=>mini.appendChild(makeMiniCompletion(c,Math.max(...cpls.map(x=>x.bytes),1))));box.appendChild(mini);
+      }
+      const reason=document.createElement('span');reason.className='av-split-reason';reason.textContent=`ends at ${hex(req.addr+req.bytes)} · ${req.reason}`;box.appendChild(reason);row.appendChild(box);
+    });
+    region.append(head,row);map.appendChild(region);
+  });
+}
+function field(label,value,bits){return{label,value:String(value),bits}}
+function requestDwords(item){
+  const is64=item.addr>0xffffffff,fmt=item.type==='MRd'?(is64?'001':'000'):(is64?'011':'010'),aligned=item.addr-(item.addr%4),dw0=[field('Fmt',fmt,3),field('Type','00000',5),field('TC','000',3),field('Attr','000',3),field('Length',`${item.dw} DW`,10)],dw1=[field('Requester ID',item.requesterId,16),field('Tag',hex(item.tag,2),8),field('Last DW BE',hex(item.lastBE,1),4),field('First DW BE',hex(item.firstBE,1),4)];
+  if(is64){const upper=Math.floor(aligned/4294967296),lower=aligned%4294967296;return[{label:'DW0',fields:dw0},{label:'DW1',fields:dw1},{label:'DW2',fields:[field('Address [63:32]',hex(upper),32)]},{label:'DW3',fields:[field('Address [31:2]',hex(lower),30),field('[1:0]','00',2)]}]}
+  return[{label:'DW0',fields:dw0},{label:'DW1',fields:dw1},{label:'DW2',fields:[field('Address [31:2]',hex(aligned),30),field('[1:0]','00',2)]}];
+}
+function completionDwords(item){return[{label:'DW0',fields:[field('Fmt','010',3),field('Type','01010',5),field('TC','000',3),field('Attr','000',3),field('Length',`${item.dw} DW`,10)]},{label:'DW1',fields:[field('Completer ID',item.completerId,16),field('Status',item.status,3),field('BCM',item.bcm,1),field('Byte Count',item.byteCount,12)]},{label:'DW2',fields:[field('Requester ID',item.requesterId,16),field('Tag',hex(item.tag,2),8),field('Rsvd','0',1),field('Lower Address',hex(item.lowerAddress,2),7)]}]}
+function makeHeader(item){
+  const button=document.createElement('button');button.type='button';button.className=`av-tlp-header ${item.type==='MRd'?'av-mrd':item.type==='MWr'?'av-mwr':'av-cpld'}`;button.setAttribute('aria-pressed',related('tlp',item)?'true':'false');button.setAttribute('aria-label',`${item.type} ${item.id}, address ${hex(item.addr)}, ${item.bytes} bytes, ${item.reason}`);
+  const title=document.createElement('div');title.className='av-tlp-header-title';title.innerHTML=`<strong>${item.type} · ${item.id}</strong><span>${hex(item.addr)} · ${fmtBytes(item.bytes)} · ${item.reason}</span>`;button.appendChild(title);
+  const dwords=item.type==='CplD'?completionDwords(item):requestDwords(item);dwords.forEach(dw=>{const row=document.createElement('div');row.className='av-dword';const label=document.createElement('div');label.className='av-dword-label';label.textContent=dw.label;const fields=document.createElement('div');fields.className='av-fields';dw.fields.forEach(f=>{const el=document.createElement('div');el.className='av-field';el.style.setProperty('--bits',f.bits);el.innerHTML=`<span>${f.label}</span><strong>${f.value}</strong>`;fields.appendChild(el)});row.append(label,fields);button.appendChild(row)});
+  button.addEventListener('click',()=>{focused={kind:'tlp',id:item.id,axiId:item.axiId};renderTransactions(model);renderInspector(model)});return button;
+}
+function renderHeaderSet(container,items,emptyText){container.innerHTML='';if(!items.length){container.innerHTML=`<div class="av-empty">${emptyText}</div>`;return}items.slice(0,MAX_HEADERS).forEach(item=>container.appendChild(makeHeader(item)));if(items.length>MAX_HEADERS){const more=document.createElement('div');more.className='av-more';more.textContent=`+ ${items.length-MAX_HEADERS} more TLP headers`;container.appendChild(more)}const active=container.querySelector('.av-tlp-header[aria-pressed="true"]');if(active)container.scrollTop=Math.max(0,active.offsetTop-container.offsetTop)}
+function renderTransactions(s){
+  $('#av-axi-direction').textContent=s.c.operation==='read'?'AXI4 Read Bursts · AR / R':'AXI4 Write Bursts · AW / W / B';$('#av-axi-count').textContent=`${s.axi.final.length} bursts`;renderAxi(s);renderLinkedMaps(s);renderBoundaryMap(s);renderHeaderSet($('#av-request-headers'),s.tlp.requests,'No Memory Request TLPs');
+  const completionTitle=$('#av-completion-title'),completionHeaders=$('#av-completion-headers');completionTitle.hidden=s.c.operation!=='read';completionHeaders.hidden=s.c.operation!=='read';if(s.c.operation==='read')renderHeaderSet(completionHeaders,s.tlp.completions,'No Completion with Data TLPs');
+  $('#av-pcie-count').textContent=`${s.tlp.requests.length+s.tlp.completions.length} TLPs`;
+}
+function renderInspector(s){
+  if(!focused){setInspector('Select an AXI4 burst or TLP header to trace its one-to-many mapping.');return}const axi=s.axi.final.find(t=>t.id===focused.axiId);if(!axi){focused=null;setInspector('Select an AXI4 burst or TLP header to trace its one-to-many mapping.');return}const req=s.tlp.requests.filter(t=>t.axiId===axi.id),cpl=s.tlp.completions.filter(t=>t.axiId===axi.id);setInspector(`${axi.id} (${fmtBytes(axi.bytes)}) → ${req.map(t=>t.id).join(', ')||'no request TLP'}${cpl.length?` → ${cpl.map(t=>t.id).join(', ')}`:''}`);
+}
+function renderStatus(s){
+  const total=s.tlp.requests.length+s.tlp.completions.length;
+  $('#av-selected-metric').textContent=`${fmtBytes(s.selectedBytes)} · ${s.ranges.length} address range${s.ranges.length===1?'':'s'}`;$('#av-axi-metric').textContent=`${s.axi.source.length} ingress → ${s.axi.final.length} controller-facing`;$('#av-tlp-metric').textContent=s.c.operation==='read'?`${s.tlp.requests.length} MRd + ${s.tlp.completions.length} CplD`:`${s.tlp.requests.length} MWr`;
+  $('#av-route-memory').textContent=`${selected.size} fine cells · ${fmtBytes(s.selectedBytes)}`;$('#av-route-axi').textContent=`${s.axi.source.length} bursts`;$('#av-route-hub').textContent=s.c.hubEnabled?`${s.axi.final.length} bursts`:'bypassed';$('#av-route-pcie').textContent=`${total} TLPs`;$('#av-route-hub-node').classList.toggle('is-bypassed',!s.c.hubEnabled);ui.hubLimit.disabled=!s.c.hubEnabled;ui.mrrs.disabled=s.c.operation!=='read';ui.rcb.disabled=s.c.operation!=='read';
+}
+function animateUpdate(){if(firstRender){firstRender=false;return}root.classList.remove('is-updating');void root.offsetWidth;root.classList.add('is-updating');clearTimeout(animationTimer);animationTimer=setTimeout(()=>root.classList.remove('is-updating'),650)}
+function update(){model=buildModel();renderMemory(model);renderTransactions(model);renderStatus(model);renderInspector(model);animateUpdate()}
+function applyTheme(choice){root.dataset.theme=choice;root.dataset.resolvedTheme=choice==='auto'&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':choice==='light'?'light':'dark';$$('[data-theme-choice]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.themeChoice===choice?'true':'false'))}
+function changeZoom(next){
+  const target=Math.max(0,Math.min(ZOOM_GROUPS.length-1,next));if(target===zoomLevel)return;const oldSpec=viewSpec(config()),first=$('#av-memory-grid .av-cell'),rowHeight=(first?.offsetHeight||18)+2,currentRow=Math.floor(memoryScroll.scrollTop/rowHeight);pendingZoomAnchor=currentRow*COLS*oldSpec.group;zoomLevel=target;focused=null;update();
+}
+function selectBaseGroup(start,count){for(let i=start;i<Math.min(CELL_COUNT,start+count);i++)selected.add(i)}
+function applyPattern(name){
+  selected.clear();const c=config(),spec=viewSpec(c),groups=Math.ceil(CELL_COUNT/spec.group);
+  if(name==='boundary'){
+    const end=c.base+c.space;for(let boundary=Math.ceil(c.base/4096)*4096;boundary<end;boundary+=4096){const lo=boundary-2*spec.bytes,hi=boundary+2*spec.bytes;for(let g=0;g<groups;g++){const start=g*spec.group,addr=c.base+start*c.cell;if(addr<hi&&addr+spec.bytes>lo)selectBaseGroup(start,spec.group)}}
+  }else if(name==='stripes'){for(let g=0;g<groups;g++)if(Math.floor(g/4)%2===0)selectBaseGroup(g*spec.group,spec.group)
+  }else if(name==='random'){let seed=(Math.floor(c.base)^c.space^(zoomLevel+1)*2654435761)>>>0;for(let g=0;g<groups;g++){seed=(seed*1664525+1013904223)>>>0;if(seed%100<24)selectBaseGroup(g*spec.group,spec.group)}}
+  focused=null;update();
+}
+
+const grid=$('#av-memory-grid'),memoryScroll=$('#av-memory-scroll');
+grid.addEventListener('pointerdown',event=>{const cell=event.target.closest('.av-cell');if(!cell||event.button!==0)return;const start=Number(cell.dataset.start),count=Number(cell.dataset.count),state=selectionState(start,count);pointerState={id:event.pointerId,start,count,target:state!=='all',x:event.clientX,y:event.clientY,dragging:false,snapshot:new Set(selected),visited:new Set()};grid.setPointerCapture(event.pointerId);cell.focus();event.preventDefault()});
+grid.addEventListener('pointermove',event=>{if(!pointerState||event.pointerId!==pointerState.id)return;const dx=event.clientX-pointerState.x,dy=event.clientY-pointerState.y;if(!pointerState.dragging&&Math.hypot(dx,dy)>=5){pointerState.dragging=true;setGroupPreview(pointerState.start,pointerState.count,pointerState.target);pointerState.visited.add(pointerState.start)}if(!pointerState.dragging)return;const rect=memoryScroll.getBoundingClientRect();if(event.clientY<rect.top+28)memoryScroll.scrollTop-=12;else if(event.clientY>rect.bottom-28)memoryScroll.scrollTop+=12;const cell=cellAt(event.clientX,event.clientY);if(cell&&grid.contains(cell)){const start=Number(cell.dataset.start),count=Number(cell.dataset.count);if(!pointerState.visited.has(start)){setGroupPreview(start,count,pointerState.target);pointerState.visited.add(start)}}event.preventDefault()});
+grid.addEventListener('pointerup',event=>{if(pointerState&&event.pointerId===pointerState.id)finishPointer(false)});grid.addEventListener('pointercancel',event=>{if(pointerState&&event.pointerId===pointerState.id)finishPointer(true)});
+grid.addEventListener('click',event=>{const cell=event.target.closest('.av-cell');if(!cell||event.detail!==0)return;const start=Number(cell.dataset.start),count=Number(cell.dataset.count);setGroupPreview(start,count,selectionState(start,count)!=='all');focused=null;update()});
+grid.addEventListener('mouseover',event=>{const cell=event.target.closest('.av-cell');if(!cell||focused)return;const c=config(),start=Number(cell.dataset.start),count=Number(cell.dataset.count),state=selectionState(start,count);setInspector(`${hex(c.base+start*c.cell)}–${hex(c.base+(start+count)*c.cell-1)} · ${fmtBytes(count*c.cell)} · ${state==='all'?'selected':state==='mixed'?'partially selected':'available'}`)});
+memoryScroll.addEventListener('wheel',event=>{if(!event.ctrlKey)return;event.preventDefault();changeZoom(zoomLevel+(event.deltaY<0?1:-1))},{passive:false});
+$('#av-zoom').addEventListener('input',event=>changeZoom(Number(event.target.value)));$('#av-zoom-out').addEventListener('click',()=>changeZoom(zoomLevel-1));$('#av-zoom-in').addEventListener('click',()=>changeZoom(zoomLevel+1));
+$('#av-clear').addEventListener('click',()=>applyPattern('clear'));$('#av-pattern-boundary').addEventListener('click',()=>applyPattern('boundary'));$('#av-pattern-stripes').addEventListener('click',()=>applyPattern('stripes'));$('#av-pattern-random').addEventListener('click',()=>applyPattern('random'));
+$$('[data-op]').forEach(button=>button.addEventListener('click',()=>{operation=button.dataset.op;$$('[data-op]').forEach(b=>b.setAttribute('aria-pressed',b===button?'true':'false'));focused=null;update()}));
+$$('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>applyTheme(button.dataset.themeChoice)));
+Object.entries(ui).forEach(([key,control])=>{if(key==='base')return;control.addEventListener('change',()=>{focused=null;update()})});
+ui.base.addEventListener('change',()=>{const parsed=parseAddress(ui.base.value);if(parsed===null){ui.base.value=hex(baseAddress);ui.base.setCustomValidity('Enter a hexadecimal or decimal address');ui.base.reportValidity();ui.base.setCustomValidity('');return}baseAddress=parsed;ui.base.value=hex(baseAddress,baseAddress>0xffffffff?16:8);focused=null;update()});
+const scheme=window.matchMedia('(prefers-color-scheme:light)');if(scheme.addEventListener)scheme.addEventListener('change',()=>{if(root.dataset.theme==='auto')applyTheme('auto')});
+update();
+})();
+</script>
+
+<script>
+(()=>{
+const root=document.getElementById('axi-pcie-packet-studio');if(!root)return;
+const CELL_SIZES=[65536n,16384n,4096n,1024n,256n,64n,16n,4n,1n],VIEW_ROWS=10,MAX_VISIBLE=16,MAX_HEADERS=12,MAX_MODEL_ITEMS=4096,MAX_ADDRESS=0x10000000000000000n;
+let viewportBase=0x10000E00n,zoomLevel=6,operation='read',focused=null,model=null,firstRender=true,animationTimer=null,pointerState=null,overviewDomain=null,splitDrag=null,memoryPan=null,resizeTimer=null,pendingDecision=null,activeExample=null;
+let selections=[{start:0x10000FF0n,end:0x10001020n}];
+const $=q=>root.querySelector(q),$$=q=>Array.from(root.querySelectorAll(q));
+const ui={base:$('#av-base'),bus:$('#av-bus'),beat:$('#av-beat'),maxBeats:$('#av-max-beats'),mps:$('#av-mps'),mrrs:$('#av-mrrs'),rcb:$('#av-rcb')};
+const EXAMPLES={
+  rcb64:{operation:'read',start:0x10000020n,bytes:256n,zoom:6,bus:'32',beat:'32',maxBeats:'16',mps:'128',mrrs:'256',rcb:'64',note:'Unaligned 256 B MRd: CplD ends on 64 B RCB boundaries, producing 96 B + 128 B + 32 B.'},
+  rcb128:{operation:'read',start:0x10000140n,bytes:512n,zoom:6,bus:'64',beat:'64',maxBeats:'16',mps:'256',mrrs:'512',rcb:'128',note:'512 B MRd offset by 64 B: demonstrates 128 B RCB alignment with a 256 B MPS.'},
+  boundary4k:{operation:'read',start:0x10000FC0n,bytes:256n,zoom:6,bus:'64',beat:'64',maxBeats:'16',mps:'128',mrrs:'512',rcb:'64',note:'Read range crosses 0x10001000: AXI and MRd traffic are separated at the mandatory 4 KB boundary.'},
+  mrrs:{operation:'read',start:0x10002000n,bytes:1024n,zoom:5,bus:'128',beat:'128',maxBeats:'16',mps:'128',mrrs:'256',rcb:'128',note:'1 KB AXI read becomes four 256 B MRd requests; each request returns as two 128 B CplD packets.'},
+  mpswrite:{operation:'write',start:0x10003000n,bytes:1024n,zoom:5,bus:'128',beat:'128',maxBeats:'16',mps:'128',mrrs:'256',rcb:'64',note:'1 KB AXI write is packetized into eight 128 B MWr TLPs by MPS.'},
+  unaligned:{operation:'read',start:0x10004003n,bytes:29n,zoom:8,bus:'8',beat:'auto',maxBeats:'64',mps:'128',mrrs:'128',rcb:'64',note:'29 B unaligned read exposes First DW BE, Last DW BE, Length, Lower Address, and Byte Count behavior.'},
+  axi1024:{operation:'read',start:0x10008000n,bytes:4096n,zoom:4,bus:'128',beat:'128',maxBeats:'16',mps:'512',mrrs:'1024',rcb:'128',note:'1024-bit AXI with 128 B beats: 4 KB traffic is decomposed into AXI bursts, 1 KB MRd requests, and 512 B CplD packets.'},
+  combined:{operation:'read',start:0x1000FF80n,bytes:1024n,zoom:5,bus:'64',beat:'64',maxBeats:'64',mps:'128',mrrs:'256',rcb:'64',note:'Combined corner: the range crosses 4 KB, MRd is limited by MRRS, and return packets align non-final CplD endings to RCB.'},
+  largewrite:{operation:'write',start:0x10012000n,bytes:8192n,zoom:3,bus:'128',beat:'128',maxBeats:'256',mps:'512',mrrs:'1024',rcb:'128',note:'8 KB write using 1024-bit AXI: AXI respects each 4 KB boundary and PCIe emits 512 B MWr packets.'}
+};
+const minBig=(a,b)=>a<b?a:b,maxBig=(a,b)=>a>b?a:b;
+const hex=(value,width=8)=>{const n=typeof value==='bigint'?value:BigInt(Math.max(0,Math.floor(value))),digits=n.toString(16).toUpperCase(),w=Math.max(width,digits.length);return`0x${digits.padStart(w,'0')}`};
+const parseAddress=value=>{const text=String(value).trim();if(!/^(0x[0-9a-f]+|[0-9]+)$/i.test(text))return null;try{const n=BigInt(text);return n>=0n&&n<=0xFFFFFFFFFFFFFFFFn?n:null}catch{return null}};
+const fmtBytes=value=>{const n=typeof value==='bigint'?Number(value):value,units=[[1099511627776,'TB'],[1073741824,'GB'],[1048576,'MB'],[1024,'KB']];for(const[unit,label]of units)if(n>=unit){const v=n/unit;return`${Number.isInteger(v)?v:v.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')} ${label}`}return`${n} B`};
+const log2=n=>Math.round(Math.log2(n));
+function cellBytes(){return CELL_SIZES[zoomLevel]}
+function adaptiveCols(container,linked=false){const target=linked?18:21,available=Math.max(180,container.clientWidth-(linked?88:94));return Math.max(8,Math.min(32,Math.floor(available/target)))}
+function viewSpec(container,linked=false){const cols=adaptiveCols(container,linked),bytes=cellBytes(),cells=cols*VIEW_ROWS;return{cols,rows:VIEW_ROWS,cells,bytes,span:BigInt(cells)*bytes}}
+function normalizeSelections(ranges){const sorted=ranges.filter(r=>r.end>r.start).sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:0),out=[];for(const range of sorted){const last=out[out.length-1];if(last&&range.start<=last.end)last.end=maxBig(last.end,range.end);else out.push({start:range.start,end:range.end})}return out}
+function addRange(start,end){selections=normalizeSelections([...selections,{start,end}])}
+function removeRange(start,end){const out=[];for(const range of selections){if(end<=range.start||start>=range.end)out.push(range);else{if(start>range.start)out.push({start:range.start,end:start});if(end<range.end)out.push({start:end,end:range.end})}}selections=out}
+function selectedCoverage(start,end){let total=0n;for(const range of selections){const lo=maxBig(start,range.start),hi=minBig(end,range.end);if(hi>lo)total+=hi-lo}return total}
+function selectionState(start,end){const coverage=selectedCoverage(start,end);return coverage===0n?'none':coverage===end-start?'all':'mixed'}
+function setRange(start,end,value){value?addRange(start,end):removeRange(start,end)}
+function totalSelected(){return selections.reduce((sum,r)=>sum+(r.end-r.start),0n)}
+function config(){const bus=Number(ui.bus.value),wanted=ui.beat.value==='auto'?bus:Number(ui.beat.value),maxBeats=Number(ui.maxBeats.value);return{bus,beat:Math.max(1,Math.min(wanted,bus)),maxBeats,hubEnabled:false,hubLimit:bus*maxBeats,mps:Number(ui.mps.value),mrrs:Number(ui.mrrs.value),rcb:Number(ui.rcb.value),operation}}
+function memoryRanges(){return selections.map((range,index)=>({addr:range.start,bytes:Number(range.end-range.start),rangeIndex:index})).filter(range=>range.bytes>0)}
+function alignedBeat(addr,remaining,preferred){let beat=preferred;while(beat>1&&(beat>remaining||addr%BigInt(beat)!==0n))beat/=2;return Math.max(1,beat)}
+function normalizeAxi(ranges,c){const out=[];let truncated=false;for(const range of ranges){let addr=range.addr,remaining=range.bytes;while(remaining>0){if(out.length>=MAX_MODEL_ITEMS){truncated=true;break}const beat=alignedBeat(addr,remaining,c.beat),boundaryRoom=Number(4096n-(addr%4096n)),room=Math.min(remaining,boundaryRoom,beat*c.maxBeats),beats=Math.max(1,Math.floor(room/beat)),bytes=beats*beat;out.push({id:`A${String(out.length).padStart(3,'0')}`,addr,bytes,beats,beat,len:beats-1,size:log2(beat),stage:'Ingress AXI burst'});addr+=BigInt(bytes);remaining-=bytes}if(truncated)break}return{items:out,truncated}}
+function hubSplit(source,c){if(!c.hubEnabled)return{items:source.items.map(tx=>({...tx})),truncated:source.truncated};const out=[];let truncated=source.truncated;for(const tx of source.items){let addr=tx.addr,remaining=tx.bytes,part=0;while(remaining>0){if(out.length>=MAX_MODEL_ITEMS){truncated=true;break}const limit=Math.max(tx.beat,Math.floor(c.hubLimit/tx.beat)*tx.beat),bytes=Math.min(remaining,limit),beats=bytes/tx.beat;out.push({...tx,id:`H${String(out.length).padStart(3,'0')}`,parentId:tx.id,addr,bytes,beats,len:beats-1,stage:'Hub burst splitter',part});addr+=BigInt(bytes);remaining-=bytes;part++}if(truncated&&out.length>=MAX_MODEL_ITEMS)break}return{items:out,truncated}}
+function runAxiPipeline(ranges,c){const sourceResult=normalizeAxi(ranges,c),finalResult=hubSplit(sourceResult,c);return{source:sourceResult.items,final:finalResult.items,truncated:sourceResult.truncated||finalResult.truncated}}
+function byteEnables(addr,bytes){const offset=Number(addr%4n),dw=Math.ceil((offset+bytes)/4),firstBytes=Math.min(bytes,4-offset),first=((1<<firstBytes)-1)<<offset,lastBytes=(offset+bytes)%4||4,last=dw===1?0:(1<<lastBytes)-1;return{dw,firstBE:first,lastBE:last}}
+function splitReason(after,bytes,boundaryRoom,limit,limitName){if(after<=0)return bytes===boundaryRoom?'4 KB boundary':'range end';const reasons=[];if(bytes===boundaryRoom)reasons.push('4 KB boundary');if(bytes===limit)reasons.push(`${limitName} limit`);return reasons.join(' + ')||'range split'}
+function writeTlps(axi,c){const requests=[];let sequence=0,truncated=false;for(const tx of axi){let addr=tx.addr,remaining=tx.bytes;while(remaining>0){if(requests.length>=MAX_MODEL_ITEMS){truncated=true;break}const before=remaining,boundaryRoom=Number(4096n-(addr%4096n)),bytes=Math.min(before,c.mps,boundaryRoom),be=byteEnables(addr,bytes),after=before-bytes;requests.push({id:`MWr${String(sequence).padStart(2,'0')}`,type:'MWr',axiId:tx.id,addr,bytes,...be,requesterId:'0000',tag:sequence&0xff,reason:splitReason(after,bytes,boundaryRoom,c.mps,'MPS')});addr+=BigInt(bytes);remaining=after;sequence++}if(truncated)break}return{requests,completions:[],truncated}}
+function completionChunk(addr,remaining,mps,rcb){const limit=Math.min(remaining,mps);if(remaining<=limit)return limit;const aligned=limit-Number((addr+BigInt(limit))%BigInt(rcb));return aligned>0?aligned:Math.min(limit,Number(BigInt(rcb)-(addr%BigInt(rcb))))}
+function readTlps(axi,c){const requests=[],completions=[];let requestSequence=0,completionSequence=0,truncated=false;for(const tx of axi){let addr=tx.addr,remaining=tx.bytes;while(remaining>0){if(requests.length+completions.length>=MAX_MODEL_ITEMS){truncated=true;break}const before=remaining,boundaryRoom=Number(4096n-(addr%4096n)),bytes=Math.min(before,c.mrrs,boundaryRoom),be=byteEnables(addr,bytes),after=before-bytes,request={id:`MRd${String(requestSequence).padStart(2,'0')}`,type:'MRd',axiId:tx.id,addr,bytes,...be,requesterId:'0000',tag:requestSequence&0xff,reason:splitReason(after,bytes,boundaryRoom,c.mrrs,'MRRS')};requests.push(request);let ca=addr,cr=bytes;while(cr>0){if(requests.length+completions.length>=MAX_MODEL_ITEMS){truncated=true;break}const chunk=completionChunk(ca,cr,c.mps,c.rcb),left=cr-chunk,reasons=[];if(left<=0)reasons.push('request end');else{if(chunk===c.mps)reasons.push('MPS limit');if((ca+BigInt(chunk))%BigInt(c.rcb)===0n)reasons.push('RCB')}const cbe=byteEnables(ca,chunk);completions.push({id:`CplD${String(completionSequence).padStart(2,'0')}`,type:'CplD',axiId:tx.id,requestId:request.id,addr:ca,bytes:chunk,...cbe,byteCount:cr,lowerAddress:Number(ca&0x7Fn),requesterId:'0000',completerId:'0000',tag:request.tag,status:'SC',bcm:0,reason:reasons.join(' + ')});ca+=BigInt(chunk);cr=left;completionSequence++}addr+=BigInt(bytes);remaining=after;requestSequence++;if(truncated)break}if(truncated)break}return{requests,completions,truncated}}
+function buildModel(){const c=config(),ranges=memoryRanges(),axi=runAxiPipeline(ranges,c),tlp=c.operation==='read'?readTlps(axi.final,c):writeTlps(axi.final,c);return{c,ranges,axi,tlp,selectedBytes:totalSelected(),truncated:axi.truncated||tlp.truncated}}
+function overlaps(addr,bytes,item){return addr<item.addr+BigInt(item.bytes)&&item.addr<addr+bytes}
+function related(kind,item){if(!focused)return false;if(focused.kind==='axi')return kind==='axi'?item.id===focused.id:item.axiId===focused.id;return kind==='axi'?item.id===focused.axiId:item.id===focused.id||item.requestId===focused.id||item.axiId===focused.axiId}
+function setInspector(text){$('#av-inspector-text').textContent=text}
+function hideCellDecision(){pendingDecision=null;$('#av-cell-decision').hidden=true}
+function showCellDecision(cell,start,end){const pop=$('#av-cell-decision'),frame=$('.av-memory-frame'),frameRect=frame.getBoundingClientRect(),cellRect=cell.getBoundingClientRect();pendingDecision={start,end};$('#av-cell-decision-title').textContent=`Partially selected ${fmtBytes(end-start)} cell`;$('#av-cell-decision-range').textContent=`${hex(start)}–${hex(end-1n)}`;pop.hidden=false;const left=Math.max(6,Math.min(frameRect.width-pop.offsetWidth-6,cellRect.left-frameRect.left)),below=cellRect.bottom-frameRect.top+6,top=below+pop.offsetHeight<frameRect.height?below:Math.max(6,cellRect.top-frameRect.top-pop.offsetHeight-6);pop.style.left=`${left}px`;pop.style.top=`${top}px`}
+function appendGridHeaders(grid,cols){const corner=document.createElement('div');corner.className='av-memory-corner';corner.textContent='address';corner.setAttribute('role','columnheader');grid.appendChild(corner);for(let col=cols-1;col>=0;col--){const head=document.createElement('div');head.className='av-memory-col';head.textContent=String(col);head.setAttribute('role','columnheader');grid.appendChild(head)}}
+function renderMemory(s){const grid=$('#av-memory-grid'),scroll=$('#av-memory-scroll'),spec=viewSpec(scroll,false);grid.innerHTML='';grid.style.setProperty('--av-cols',spec.cols);appendGridHeaders(grid,spec.cols);for(let row=0;row<spec.rows;row++){const rowBase=viewportBase+BigInt(row*spec.cols)*spec.bytes,label=document.createElement('div');label.className='av-memory-address';label.textContent=hex(rowBase);label.setAttribute('role','rowheader');grid.appendChild(label);for(let col=spec.cols-1;col>=0;col--){const index=row*spec.cols+col,start=viewportBase+BigInt(index)*spec.bytes,end=start+spec.bytes,state=selectionState(start,end),button=document.createElement('button');button.type='button';button.className='av-cell';button.dataset.start=String(start);button.dataset.end=String(end);button.dataset.row=String(row);button.dataset.visualCol=String(spec.cols-1-col);button.dataset.cols=String(spec.cols);button.dataset.state=state;button.setAttribute('role','gridcell');button.setAttribute('aria-pressed',state==='all'?'true':'false');button.setAttribute('aria-label',`${hex(start)}–${hex(end-1n)}, ${fmtBytes(spec.bytes)}, ${state==='all'?'selected':state==='mixed'?'partially selected':'available'}`);grid.appendChild(button)}}$('#av-granularity').textContent=fmtBytes(spec.bytes);$('#av-visible-span').textContent=fmtBytes(spec.span);$('#av-zoom-label').textContent=`${fmtBytes(spec.bytes)} / cell`;$('#av-zoom').value=String(zoomLevel);$('#av-zoom-out').disabled=zoomLevel===0;$('#av-zoom-in').disabled=zoomLevel===CELL_SIZES.length-1;$('#av-memory-count').textContent=`${selections.length} ranges`;ui.base.value=hex(viewportBase,viewportBase>0xFFFFFFFFn?16:8);const maxBase=MAX_ADDRESS-spec.span,track=maxBase>0n?Number(viewportBase*1000000n/maxBase):0;$('#av-address-scroll').value=String(Math.max(0,Math.min(1000000,track)));$('#av-range-strip').textContent=selections.length?selections.slice(0,6).map(r=>`${hex(r.start)}–${hex(r.end-1n)} · ${fmtBytes(r.end-r.start)}`).join('  |  ')+(selections.length>6?`  |  +${selections.length-6} more`:''):'No memory selected';renderOverview(spec)}
+function renderOverview(spec){const canvas=$('#av-overview'),ctx=canvas.getContext('2d'),viewEnd=viewportBase+spec.span;let min=viewportBase,max=viewEnd;for(const range of selections){min=minBig(min,range.start);max=maxBig(max,range.end)}if(max<=min)max=min+1n;overviewDomain={min,max,span:spec.span};const w=canvas.width,h=canvas.height,css=getComputedStyle(root),bg=css.getPropertyValue('--av-bg').trim(),border=css.getPropertyValue('--av-border').trim(),accent=css.getPropertyValue('--av-accent').trim(),blue=css.getPropertyValue('--av-blue').trim();ctx.clearRect(0,0,w,h);ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);const xFor=value=>Number(value-min)/Number(max-min)*(w-12)+6;ctx.strokeStyle=border;ctx.strokeRect(6,28,w-12,18);ctx.fillStyle=accent;for(const range of selections){const x=xFor(range.start),x2=xFor(range.end);ctx.fillRect(x,32,Math.max(2,x2-x),10)}ctx.strokeStyle=blue;ctx.lineWidth=2;const vx=xFor(viewportBase),vx2=xFor(viewEnd);ctx.strokeRect(Math.max(5,vx),25,Math.max(3,Math.min(w-6,vx2)-Math.max(5,vx)),24);canvas.setAttribute('aria-label',`Global selection overview from ${hex(min)} to ${hex(max)}; current viewport ${hex(viewportBase)} to ${hex(viewEnd-1n)}`)}
+function updateCellVisual(cell){const start=BigInt(cell.dataset.start),end=BigInt(cell.dataset.end),state=selectionState(start,end);cell.dataset.state=state;cell.setAttribute('aria-pressed',state==='all'?'true':'false')}
+function makeAxiPacket(item,s){const button=document.createElement('button');button.type='button';button.className='av-packet av-axi';button.setAttribute('aria-pressed',related('axi',item)?'true':'false');button.setAttribute('aria-label',`${s.c.operation==='read'?'AXI4 read':'AXI4 write'} burst ${item.id}, ${hex(item.addr)}, ${item.bytes} bytes`);const channel=s.c.operation==='read'?'AR':'AW';button.innerHTML=`<div class="av-packet-top"><span>${s.c.operation==='read'?'AXI4 Read Burst':'AXI4 Write Burst'} ${item.id}</span><span>${fmtBytes(item.bytes)}</span></div><div class="av-address">${channel}ADDR ${hex(item.addr)}</div><div class="av-payload-bar"><span style="width:${Math.max(10,Math.min(100,item.bytes/Math.max(1,s.c.hubLimit)*100))}%"></span></div><div class="av-packet-meta"><span>${channel}LEN ${item.len} · ${channel}SIZE ${item.size}</span><span>${item.beats} beats × ${item.beat} B</span></div>`;button.addEventListener('click',()=>{focused={kind:'axi',id:item.id,axiId:item.id};renderTransactions(model);renderInspector(model)});return button}
+function renderAxi(s){const wrap=$('#av-axi-packets');wrap.innerHTML='';if(!s.axi.final.length){wrap.innerHTML='<div class="av-empty">No AXI4 bursts</div>';return}s.axi.final.slice(0,MAX_VISIBLE).forEach(item=>wrap.appendChild(makeAxiPacket(item,s)));if(s.axi.final.length>MAX_VISIBLE){const more=document.createElement('div');more.className='av-more';more.textContent=`+ ${s.axi.final.length-MAX_VISIBLE} more AXI4 bursts`;wrap.appendChild(more)}}
+function mapCandidates(s,kind){return kind==='axi'?s.axi.final:[...s.tlp.requests,...s.tlp.completions]}
+function focusMapItem(kind,candidates){if(!candidates.length)return;const current=candidates.findIndex(item=>focused&&item.id===focused.id),item=candidates[(current+1)%candidates.length];focused=kind==='axi'?{kind:'axi',id:item.id,axiId:item.id}:{kind:'tlp',id:item.id,axiId:item.axiId};renderTransactions(model);renderInspector(model)}
+function renderLinkedMemory(container,s,kind,spec){const items=mapCandidates(s,kind);container.innerHTML='';container.style.setProperty('--av-cols',spec.cols);appendGridHeaders(container,spec.cols);for(let row=0;row<spec.rows;row++){const rowBase=viewportBase+BigInt(row*spec.cols)*spec.bytes,label=document.createElement('div');label.className='av-memory-address';label.textContent=hex(rowBase);label.setAttribute('role','rowheader');container.appendChild(label);for(let col=spec.cols-1;col>=0;col--){const index=row*spec.cols+col,start=viewportBase+BigInt(index)*spec.bytes,end=start+spec.bytes,candidates=items.filter(item=>overlaps(start,spec.bytes,item)),focusMatches=candidates.filter(item=>focused&&(kind==='axi'?(focused.kind==='axi'?item.id===focused.id:item.id===focused.axiId):(focused.kind==='axi'?item.axiId===focused.id:item.id===focused.id))),cell=document.createElement(candidates.length?'button':'div');if(candidates.length)cell.type='button';cell.className='av-map-cell';cell.setAttribute('role','gridcell');if(selectionState(start,end)!=='none')cell.classList.add('is-payload');if(candidates.length){const types=new Set(candidates.map(item=>kind==='axi'?'axi':item.type.toLowerCase()));cell.classList.add(`is-${types.values().next().value}`);if(types.size>1)cell.classList.add('is-partial');cell.addEventListener('click',()=>focusMapItem(kind,candidates))}if(focusMatches.length)cell.classList.add('is-focused');cell.setAttribute('aria-label',`${hex(start)}–${hex(end-1n)}, ${candidates.length?`${candidates.length} ${kind==='axi'?'AXI bursts':'TLPs'}; click to inspect`:'no transfer coverage'}`);container.appendChild(cell)}}}
+function renderLinkedMaps(s){const axiGrid=$('#av-axi-memory-grid'),tlpGrid=$('#av-tlp-memory-grid'),cols=Math.min(adaptiveCols(axiGrid.parentElement,true),adaptiveCols(tlpGrid.parentElement,true)),bytes=cellBytes(),spec={cols,rows:VIEW_ROWS,cells:cols*VIEW_ROWS,bytes,span:BigInt(cols*VIEW_ROWS)*bytes};renderLinkedMemory(axiGrid,s,'axi',spec);renderLinkedMemory(tlpGrid,s,'tlp',spec);$('#av-axi-map-label').textContent=focused?focused.kind==='axi'?`focused ${focused.id}`:`parent burst ${focused.axiId}`:'click a covered cell to inspect a burst';$('#av-tlp-map-label').textContent=focused?focused.kind==='axi'?`TLPs generated by ${focused.id}`:`focused ${focused.id}`:'click a covered cell to cycle MRd/MWr/CplD'}
+function focusTlpItem(item){focused={kind:'tlp',id:item.id,axiId:item.axiId};renderTransactions(model);renderInspector(model)}
+function makeMiniCompletion(item,max){const el=document.createElement('button');el.type='button';el.className='av-mini-cpl';el.style.setProperty('--weight',Math.max(.5,item.bytes/max));el.innerHTML=`<strong>${item.id} · ${fmtBytes(item.bytes)}</strong><span>${item.reason}</span>`;el.setAttribute('aria-label',`Focus ${item.type} ${item.id}, ${hex(item.addr)}, ${fmtBytes(item.bytes)}`);el.setAttribute('aria-pressed',focused?.id===item.id?'true':'false');el.addEventListener('click',event=>{event.stopPropagation();focusTlpItem(item)});return el}
+function renderBoundaryMap(s){
+  const map=$('#av-boundary-map'),oldTop=map.scrollTop;map.innerHTML='';
+  if(!s.tlp.requests.length){map.innerHTML='<div class="av-empty">Select memory cells to create TLPs</div>';return}
+  const visibleRequests=s.tlp.requests.slice(0,80),regions=new Map();
+  visibleRequests.forEach(req=>{const base=req.addr-(req.addr%4096n),key=String(base);if(!regions.has(key))regions.set(key,{base,items:[]});regions.get(key).items.push(req)});
+  regions.forEach(({base,items})=>{
+    const region=document.createElement('div');region.className='av-boundary-region';
+    const head=document.createElement('div');head.className='av-boundary-region-head';head.innerHTML=`<strong>4 KB address region</strong><span>${hex(base)}–${hex(base+4095n)}</span>`;
+    const row=document.createElement('div');row.className='av-limit-row';
+    items.forEach(req=>{
+      const box=document.createElement('div');box.className=`av-limit-box ${s.c.operation==='write'?'av-mps-box':''}`;if(focused?.id===req.id)box.classList.add('is-focused');
+      const hit=document.createElement('button');hit.type='button';hit.className='av-limit-hit';hit.innerHTML=`<div class="av-limit-head"><strong>${req.id} · ${fmtBytes(req.bytes)}</strong><span>${hex(req.addr)}</span></div>`;hit.setAttribute('aria-label',`Focus ${req.type} ${req.id}, ${hex(req.addr)}, ${fmtBytes(req.bytes)}`);hit.setAttribute('aria-pressed',focused?.id===req.id?'true':'false');hit.addEventListener('click',event=>{event.stopPropagation();focusTlpItem(req)});box.appendChild(hit);
+      if(s.c.operation==='read'){const cpls=s.tlp.completions.filter(c=>c.requestId===req.id),mini=document.createElement('div');mini.className='av-completion-row';cpls.forEach(c=>mini.appendChild(makeMiniCompletion(c,Math.max(...cpls.map(x=>x.bytes),1))));box.appendChild(mini)}
+      const reason=document.createElement('span');reason.className='av-split-reason';reason.textContent=`ends at ${hex(req.addr+BigInt(req.bytes))} · ${req.reason}`;box.appendChild(reason);row.appendChild(box);
+    });
+    region.append(head,row);map.appendChild(region);
+  });
+  if(s.tlp.requests.length>visibleRequests.length){const more=document.createElement('div');more.className='av-more';more.textContent=`Showing first ${visibleRequests.length} of ${s.tlp.requests.length}${s.tlp.truncated?'+':''} request TLPs`;map.appendChild(more)}
+  map.scrollTop=oldTop;
+}
+function field(label,value,bits){return{label,value:String(value),bits}}
+function requestDwords(item){const is64=item.addr>0xFFFFFFFFn,fmt=item.type==='MRd'?(is64?'001':'000'):(is64?'011':'010'),aligned=item.addr-(item.addr%4n),dw0=[field('Fmt',fmt,3),field('Type','00000',5),field('TC','000',3),field('Attr','000',3),field('Length',`${item.dw} DW`,10)],dw1=[field('Requester ID',item.requesterId,16),field('Tag',hex(item.tag,2),8),field('Last DW BE',hex(item.lastBE,1),4),field('First DW BE',hex(item.firstBE,1),4)];if(is64)return[{label:'DW0',fields:dw0},{label:'DW1',fields:dw1},{label:'DW2',fields:[field('Address [63:32]',hex(aligned>>32n),32)]},{label:'DW3',fields:[field('Address [31:2]',hex(aligned&0xFFFFFFFFn),30),field('[1:0]','00',2)]}];return[{label:'DW0',fields:dw0},{label:'DW1',fields:dw1},{label:'DW2',fields:[field('Address [31:2]',hex(aligned),30),field('[1:0]','00',2)]}]}
+function completionDwords(item){return[{label:'DW0',fields:[field('Fmt','010',3),field('Type','01010',5),field('TC','000',3),field('Attr','000',3),field('Length',`${item.dw} DW`,10)]},{label:'DW1',fields:[field('Completer ID',item.completerId,16),field('Status',item.status,3),field('BCM',item.bcm,1),field('Byte Count',item.byteCount,12)]},{label:'DW2',fields:[field('Requester ID',item.requesterId,16),field('Tag',hex(item.tag,2),8),field('Rsvd','0',1),field('Lower Address',hex(item.lowerAddress,2),7)]}]}
+function makeHeader(item){const button=document.createElement('button');button.type='button';button.className=`av-tlp-header ${item.type==='MRd'?'av-mrd':item.type==='MWr'?'av-mwr':'av-cpld'}`,pressed=focused&&(focused.kind==='axi'?item.axiId===focused.id:item.id===focused.id);button.setAttribute('aria-pressed',pressed?'true':'false');button.setAttribute('aria-label',`${item.type} ${item.id}, address ${hex(item.addr)}, ${item.bytes} bytes, ${item.reason}`);const title=document.createElement('div');title.className='av-tlp-header-title';title.innerHTML=`<strong>${item.type} · ${item.id}</strong><span>${hex(item.addr)} · ${fmtBytes(item.bytes)} · ${item.reason}</span>`;button.appendChild(title);(item.type==='CplD'?completionDwords(item):requestDwords(item)).forEach(dw=>{const row=document.createElement('div');row.className='av-dword',label=document.createElement('div');label.className='av-dword-label';label.textContent=dw.label;const fields=document.createElement('div');fields.className='av-fields';dw.fields.forEach(f=>{const el=document.createElement('div');el.className='av-field';el.style.setProperty('--bits',f.bits);el.innerHTML=`<span>${f.label}</span><strong>${f.value}</strong>`;fields.appendChild(el)});row.append(label,fields);button.appendChild(row)});button.addEventListener('click',()=>{focused={kind:'tlp',id:item.id,axiId:item.axiId};renderTransactions(model);renderInspector(model)});return button}
+function renderHeaderSet(container,items,emptyText){
+  const oldTop=container.scrollTop;container.innerHTML='';
+  if(!items.length){container.innerHTML=`<div class="av-empty">${emptyText}</div>`;return}
+  items.slice(0,MAX_HEADERS).forEach(item=>container.appendChild(makeHeader(item)));
+  if(items.length>MAX_HEADERS){const more=document.createElement('div');more.className='av-more';more.textContent=`Showing first ${MAX_HEADERS} of ${items.length} TLP headers`;container.appendChild(more)}
+  const active=container.querySelector('.av-tlp-header[aria-pressed="true"]');container.scrollTop=active?Math.max(0,active.offsetTop-container.offsetTop):oldTop;
+}
+function renderTransactions(s){renderLinkedMaps(s);$('#av-axi-direction').textContent=s.c.operation==='read'?'AXI4 Read Bursts · AR / R':'AXI4 Write Bursts · AW / W / B';$('#av-axi-count').textContent=`${s.axi.final.length}${s.axi.truncated?'+' :''} bursts`;renderAxi(s);renderBoundaryMap(s);renderHeaderSet($('#av-request-headers'),s.tlp.requests,'No Memory Request TLPs');const completionTitle=$('#av-completion-title'),completionHeaders=$('#av-completion-headers');completionTitle.hidden=s.c.operation!=='read';completionHeaders.hidden=s.c.operation!=='read';if(s.c.operation==='read')renderHeaderSet(completionHeaders,s.tlp.completions,'No Completion with Data TLPs');$('#av-pcie-count').textContent=`${s.tlp.requests.length+s.tlp.completions.length}${s.tlp.truncated?'+':''} TLPs`}
+function renderInspector(s){if(!focused){setInspector('Click an AXI/TLP map cell, AXI4 burst, or TLP header to trace its mapping.');return}const axi=s.axi.final.find(t=>t.id===focused.axiId);if(!axi){focused=null;setInspector('The focused item is outside the current generated packet set.');return}const req=s.tlp.requests.filter(t=>t.axiId===axi.id),cpl=s.tlp.completions.filter(t=>t.axiId===axi.id);setInspector(`${axi.id} (${fmtBytes(axi.bytes)}) → ${req.map(t=>t.id).join(', ')||'no request TLP'}${cpl.length?` → ${cpl.map(t=>t.id).join(', ')}`:''}`)}
+function renderStatus(s){const total=s.tlp.requests.length+s.tlp.completions.length;$('#av-selected-metric').textContent=`${fmtBytes(s.selectedBytes)} · ${selections.length} address range${selections.length===1?'':'s'}`;$('#av-axi-metric').textContent=`${s.axi.source.length}${s.axi.truncated?'+' :''} ingress → ${s.axi.final.length}${s.axi.truncated?'+' :''} controller-facing`;$('#av-tlp-metric').textContent=s.c.operation==='read'?`${s.tlp.requests.length}${s.tlp.truncated?'+':''} MRd + ${s.tlp.completions.length}${s.tlp.truncated?'+':''} CplD`:`${s.tlp.requests.length}${s.tlp.truncated?'+':''} MWr`;$('#av-route-memory').textContent=`${selections.length} ranges · ${fmtBytes(s.selectedBytes)}`;$('#av-route-axi').textContent=`${s.axi.source.length}${s.axi.truncated?'+':''} bursts`;$('#av-route-pcie').textContent=`${total}${s.tlp.truncated?'+':''} TLPs`;ui.mrrs.disabled=s.c.operation!=='read';ui.rcb.disabled=s.c.operation!=='read'}
+function animateUpdate(){if(firstRender){firstRender=false;return}root.classList.remove('is-updating');void root.offsetWidth;root.classList.add('is-updating');clearTimeout(animationTimer);animationTimer=setTimeout(()=>root.classList.remove('is-updating'),650)}
+function update(){model=buildModel();renderMemory(model);renderTransactions(model);renderStatus(model);renderInspector(model);animateUpdate()}
+function applyTheme(choice){root.dataset.theme=choice;root.dataset.resolvedTheme=choice==='auto'&&window.matchMedia('(prefers-color-scheme:light)').matches?'light':choice==='light'?'light':'dark';$$('[data-theme-choice]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.themeChoice===choice?'true':'false'));if(model)renderOverview(viewSpec($('#av-memory-scroll'),false))}
+function changeZoom(next){const target=Math.max(0,Math.min(CELL_SIZES.length-1,next));if(target===zoomLevel)return;const oldSpec=viewSpec($('#av-memory-scroll'),false),center=viewportBase+oldSpec.span/2n;zoomLevel=target;const newSpec=viewSpec($('#av-memory-scroll'),false);viewportBase=center-newSpec.span/2n;viewportBase=viewportBase-(viewportBase%newSpec.bytes);if(viewportBase<0n)viewportBase=0n;if(viewportBase+newSpec.span>MAX_ADDRESS)viewportBase=MAX_ADDRESS-newSpec.span;focused=null;update()}
+function renderExampleState(note){$$('[data-example]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.example===activeExample?'true':'false'));if(note)$('#av-example-note').textContent=note}
+function markExampleCustom(){if(activeExample===null)return;activeExample=null;renderExampleState('Custom configuration derived from the selected example.')}
+function applyExample(key){const example=EXAMPLES[key];if(!example)return;hideCellDecision();activeExample=key;operation=example.operation;ui.bus.value=example.bus;ui.beat.value=example.beat;ui.maxBeats.value=example.maxBeats;ui.mps.value=example.mps;ui.mrrs.value=example.mrrs;ui.rcb.value=example.rcb;zoomLevel=example.zoom;selections=[{start:example.start,end:example.start+example.bytes}];$$('[data-op]').forEach(button=>button.setAttribute('aria-pressed',button.dataset.op===operation?'true':'false'));const spec=viewSpec($('#av-memory-scroll'),false),center=example.start+example.bytes/2n,maxBase=MAX_ADDRESS-spec.span;viewportBase=center>spec.span/2n?center-spec.span/2n:0n;viewportBase-=viewportBase%spec.bytes;if(viewportBase>maxBase)viewportBase=maxBase;focused=null;renderExampleState(example.note);update()}
+function randomInt(max){return Math.floor(Math.random()*Math.max(1,max))}
+function applyPattern(name){const spec=viewSpec($('#av-memory-scroll'),false);selections=[];if(name==='boundary'){const firstBoundary=((viewportBase/4096n)+1n)*4096n,boundaries=[];for(let b=firstBoundary;b<viewportBase+spec.span;b+=4096n)boundaries.push(b);const boundary=boundaries.length?boundaries[randomInt(boundaries.length)]:firstBoundary;if(!boundaries.length){viewportBase=boundary>spec.span/2n?boundary-spec.span/2n:0n;viewportBase-=viewportBase%spec.bytes}const left=BigInt(2+randomInt(4))*spec.bytes,right=BigInt(2+randomInt(5))*spec.bytes;addRange(maxBig(0n,boundary-left),boundary+right)}else if(name==='stripes'){const length=Math.min(spec.cells,12+randomInt(21)),startIndex=randomInt(Math.max(1,spec.cells-length));for(let i=0;i<length;i++)if(Math.floor(i/3)%2===0){const start=viewportBase+BigInt(startIndex+i)*spec.bytes;addRange(start,start+spec.bytes)}}else if(name==='random'){const length=Math.min(spec.cells,8+randomInt(17)),startIndex=randomInt(Math.max(1,spec.cells-length));for(let i=0;i<length;i++)if(Math.random()<.48){const start=viewportBase+BigInt(startIndex+i)*spec.bytes;addRange(start,start+spec.bytes)}}focused=null;update()}
+const grid=$('#av-memory-grid'),memoryScroll=$('#av-memory-scroll'),memoryViewport=$('.av-memory-viewport'),addressScroll=$('#av-address-scroll'),splitMap=$('#av-boundary-map'),linkedMapScrolls=$$('.av-linked-memory-scroll');
+let linkedMapSync=false;
+linkedMapScrolls.forEach(source=>source.addEventListener('scroll',()=>{if(linkedMapSync)return;linkedMapSync=true;linkedMapScrolls.forEach(target=>{if(target!==source){target.scrollTop=source.scrollTop;target.scrollLeft=source.scrollLeft}});requestAnimationFrame(()=>{linkedMapSync=false})}));
+function applyPhotoSweep(state,current){
+  selections=state.snapshot.map(range=>({...range}));
+  const startRow=Number(state.cell.dataset.row),startCol=Number(state.cell.dataset.visualCol),endRow=Number(current.dataset.row),endCol=Number(current.dataset.visualCol),cells=$$('.av-cell');
+  cells.forEach(cell=>{const row=Number(cell.dataset.row),col=Number(cell.dataset.visualCol);let included=false;if(endRow===startRow)included=row===startRow&&col>=Math.min(startCol,endCol)&&col<=Math.max(startCol,endCol);else if(endRow>startRow)included=(row>=startRow&&row<endRow)||(row===endRow&&col<=endCol);else included=(row<=startRow&&row>endRow)||(row===endRow&&col>=endCol);if(included)setRange(BigInt(cell.dataset.start),BigInt(cell.dataset.end),state.target)});
+  cells.forEach(updateCellVisual);
+}
+grid.addEventListener('mousedown',event=>{const cell=event.target.closest('.av-cell');if(!cell||event.button!==0)return;markExampleCustom();hideCellDecision();const start=BigInt(cell.dataset.start),end=BigInt(cell.dataset.end),state=selectionState(start,end);pointerState={start,end,state,target:state!=='all',cell,lastCell:cell,x:event.clientX,y:event.clientY,dragging:false,snapshot:selections.map(r=>({...r}))};cell.focus();event.preventDefault()});
+window.addEventListener('mousemove',event=>{if(!pointerState)return;const dx=event.clientX-pointerState.x,dy=event.clientY-pointerState.y;if(!pointerState.dragging&&Math.hypot(dx,dy)>=5)pointerState.dragging=true;if(!pointerState.dragging)return;const el=document.elementFromPoint(event.clientX,event.clientY)?.closest?.('.av-cell');if(el&&grid.contains(el))pointerState.lastCell=el;applyPhotoSweep(pointerState,pointerState.lastCell);event.preventDefault()});
+function finishPointer(){if(!pointerState)return;const state=pointerState;pointerState=null;if(state.dragging){focused=null;update();return}if(state.state==='mixed'){showCellDecision(state.cell,state.start,state.end);return}setRange(state.start,state.end,state.target);focused=null;update()}
+window.addEventListener('mouseup',event=>{if(event.button===0&&pointerState)finishPointer()});
+grid.addEventListener('click',event=>{if(event.detail!==0)return;const cell=event.target.closest('.av-cell');if(!cell)return;const start=BigInt(cell.dataset.start),end=BigInt(cell.dataset.end),state=selectionState(start,end);if(state==='mixed'){showCellDecision(cell,start,end);return}setRange(start,end,state!=='all');focused=null;update()});
+$('#av-zoom').addEventListener('input',event=>changeZoom(Number(event.target.value)));$('#av-zoom-out').addEventListener('click',()=>changeZoom(zoomLevel-1));$('#av-zoom-in').addEventListener('click',()=>changeZoom(zoomLevel+1));$('#av-page-prev').addEventListener('click',()=>{const spec=viewSpec(memoryScroll,false);viewportBase=viewportBase>spec.span?viewportBase-spec.span:0n;focused=null;update()});$('#av-page-next').addEventListener('click',()=>{const spec=viewSpec(memoryScroll,false);viewportBase=minBig(viewportBase+spec.span,MAX_ADDRESS-spec.span);focused=null;update()});
+function moveViewportRows(rows){if(!rows)return;const spec=viewSpec(memoryScroll,false),step=BigInt(spec.cols*Math.abs(rows))*spec.bytes,maxBase=MAX_ADDRESS-spec.span;viewportBase=rows>0?minBig(maxBase,viewportBase+step):viewportBase>step?viewportBase-step:0n;viewportBase-=viewportBase%spec.bytes;focused=null;update()}
+memoryViewport.addEventListener('wheel',event=>{event.preventDefault();if(event.ctrlKey){changeZoom(zoomLevel+(event.deltaY<0?1:-1));return}if(event.shiftKey||Math.abs(event.deltaX)>Math.abs(event.deltaY)){memoryScroll.scrollLeft+=event.deltaX||event.deltaY;return}const rows=Math.max(1,Math.min(10,Math.round(Math.abs(event.deltaY)/40)));moveViewportRows(event.deltaY>0?rows:-rows)},{passive:false});
+memoryViewport.addEventListener('pointerdown',event=>{if(event.button!==1)return;hideCellDecision();memoryPan={id:event.pointerId,x:event.clientX,y:event.clientY,base:viewportBase,left:memoryScroll.scrollLeft};memoryViewport.setPointerCapture(event.pointerId);memoryViewport.classList.add('is-panning');event.preventDefault()});
+memoryViewport.addEventListener('pointermove',event=>{if(!memoryPan||event.pointerId!==memoryPan.id)return;const spec=viewSpec(memoryScroll,false),first=grid.querySelector('.av-cell'),rowHeight=(first?.offsetHeight||20)+2,rowDelta=Math.trunc((memoryPan.y-event.clientY)/rowHeight),maxBase=MAX_ADDRESS-spec.span,delta=BigInt(rowDelta*spec.cols)*spec.bytes;let next=memoryPan.base+delta;if(next<0n)next=0n;if(next>maxBase)next=maxBase;next-=next%spec.bytes;memoryScroll.scrollLeft=Math.max(0,memoryPan.left-(event.clientX-memoryPan.x));if(next!==viewportBase){viewportBase=next;focused=null;update()}event.preventDefault()});
+const endMemoryPan=event=>{if(!memoryPan||event.pointerId!==memoryPan.id)return;memoryPan=null;memoryViewport.classList.remove('is-panning')};
+memoryViewport.addEventListener('pointerup',endMemoryPan);memoryViewport.addEventListener('pointercancel',endMemoryPan);memoryViewport.addEventListener('auxclick',event=>{if(event.button===1)event.preventDefault()});
+addressScroll.addEventListener('input',event=>{const spec=viewSpec(memoryScroll,false),maxBase=MAX_ADDRESS-spec.span,track=BigInt(event.target.value);viewportBase=track*maxBase/1000000n;viewportBase-=viewportBase%spec.bytes;focused=null;update()});
+$('#av-cell-select-all').addEventListener('click',()=>{if(!pendingDecision)return;markExampleCustom();const{start,end}=pendingDecision;hideCellDecision();addRange(start,end);focused=null;update()});
+$('#av-cell-refine').addEventListener('click',()=>{if(!pendingDecision)return;markExampleCustom();const{start,end}=pendingDecision,center=(start+end)/2n;hideCellDecision();zoomLevel=Math.min(CELL_SIZES.length-1,zoomLevel+2);const spec=viewSpec(memoryScroll,false);viewportBase=center>spec.span/2n?center-spec.span/2n:0n;viewportBase-=viewportBase%spec.bytes;if(viewportBase+spec.span>MAX_ADDRESS)viewportBase=MAX_ADDRESS-spec.span;focused=null;update()});
+root.addEventListener('pointerdown',event=>{if(pendingDecision&&!event.target.closest('#av-cell-decision')&&!event.target.closest('.av-cell'))hideCellDecision()});
+$('#av-clear').addEventListener('click',()=>{markExampleCustom();applyPattern('clear')});$('#av-pattern-boundary').addEventListener('click',()=>{markExampleCustom();applyPattern('boundary')});$('#av-pattern-stripes').addEventListener('click',()=>{markExampleCustom();applyPattern('stripes')});$('#av-pattern-random').addEventListener('click',()=>{markExampleCustom();applyPattern('random')});
+ui.base.addEventListener('change',()=>{const parsed=parseAddress(ui.base.value);if(parsed===null){ui.base.value=hex(viewportBase);ui.base.setCustomValidity('Enter a 0 to 64-bit hexadecimal or decimal address');ui.base.reportValidity();ui.base.setCustomValidity('');return}const spec=viewSpec(memoryScroll,false);viewportBase=parsed-(parsed%cellBytes());if(viewportBase+spec.span>MAX_ADDRESS)viewportBase=MAX_ADDRESS-spec.span;focused=null;update()});
+$$('[data-example]').forEach(button=>button.addEventListener('click',()=>applyExample(button.dataset.example)));
+$$('[data-op]').forEach(button=>button.addEventListener('click',()=>{markExampleCustom();operation=button.dataset.op;$$('[data-op]').forEach(b=>b.setAttribute('aria-pressed',b===button?'true':'false'));focused=null;update()}));$$('[data-theme-choice]').forEach(button=>button.addEventListener('click',()=>applyTheme(button.dataset.themeChoice)));Object.entries(ui).forEach(([key,control])=>{if(key==='base')return;control.addEventListener('change',()=>{markExampleCustom();focused=null;update()})});
+$('#av-overview').addEventListener('click',event=>{if(!overviewDomain)return;const rect=event.currentTarget.getBoundingClientRect(),fraction=Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width)),target=overviewDomain.min+BigInt(Math.round(Number(overviewDomain.max-overviewDomain.min)*fraction)),spec=viewSpec(memoryScroll,false);viewportBase=target>spec.span/2n?target-spec.span/2n:0n;viewportBase-=viewportBase%spec.bytes;if(viewportBase+spec.span>MAX_ADDRESS)viewportBase=MAX_ADDRESS-spec.span;focused=null;update()});
+splitMap.addEventListener('pointerdown',event=>{if(event.button!==0||event.target.closest('button'))return;splitDrag={id:event.pointerId,y:event.clientY,top:splitMap.scrollTop};splitMap.setPointerCapture(event.pointerId);splitMap.classList.add('is-dragging')});splitMap.addEventListener('pointermove',event=>{if(!splitDrag||event.pointerId!==splitDrag.id)return;splitMap.scrollTop=splitDrag.top-(event.clientY-splitDrag.y)});const endSplitDrag=()=>{splitDrag=null;splitMap.classList.remove('is-dragging')};splitMap.addEventListener('pointerup',endSplitDrag);splitMap.addEventListener('pointercancel',endSplitDrag);
+const scheme=window.matchMedia('(prefers-color-scheme:light)');if(scheme.addEventListener)scheme.addEventListener('change',()=>{if(root.dataset.theme==='auto')applyTheme('auto')});window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>update(),120)});update();
+})();
+</script>
+
+<style id="standalone-fullscreen-overrides">
+#axi-pcie-packet-studio{
+  width:100%;
+  min-height:100vh;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  padding:clamp(20px,2vw,38px);
+  font-size:15px;
+}
+#axi-pcie-packet-studio .av-toolbar{margin-bottom:18px}
+#axi-pcie-packet-studio .av-toolbar-label{font-size:13px}
+#axi-pcie-packet-studio .av-chip{padding:8px 14px;font-size:13px}
+#axi-pcie-packet-studio .av-examples{padding:13px 15px}
+#axi-pcie-packet-studio .av-examples-heading span{font-size:10px}
+#axi-pcie-packet-studio .av-examples-heading strong{font-size:14px}
+#axi-pcie-packet-studio .av-example-button{padding:7px 10px;font-size:11px}
+#axi-pcie-packet-studio .av-example-note{font-size:11px}
+#axi-pcie-packet-studio .av-metrics{gap:14px;margin-bottom:16px}
+#axi-pcie-packet-studio .av-metric{padding:13px 15px}
+#axi-pcie-packet-studio .av-metric span{font-size:12px}
+#axi-pcie-packet-studio .av-metric strong{font-size:16px}
+#axi-pcie-packet-studio .av-route{margin-bottom:18px;padding:13px 16px}
+#axi-pcie-packet-studio .av-route-node span{font-size:12px}
+#axi-pcie-packet-studio .av-route-node strong{font-size:13px}
+#axi-pcie-packet-studio .av-workspace{gap:16px}
+#axi-pcie-packet-studio .av-panel{padding:clamp(15px,1.2vw,22px)}
+#axi-pcie-packet-studio .av-panel h2{font-size:18px}
+#axi-pcie-packet-studio .av-step{font-size:11px;padding:5px}
+#axi-pcie-packet-studio .av-count{font-size:12px}
+#axi-pcie-packet-studio label,
+#axi-pcie-packet-studio .av-readout{font-size:13px;gap:6px}
+#axi-pcie-packet-studio select{padding:9px 30px 9px 10px;font-size:13px}
+#axi-pcie-packet-studio .av-input{padding:9px 10px;font-size:13px}
+#axi-pcie-packet-studio .av-readout{padding:9px 10px}
+#axi-pcie-packet-studio .av-readout strong{font-size:13px}
+#axi-pcie-packet-studio .av-plugin-stage{padding:11px 0 11px 12px}
+#axi-pcie-packet-studio .av-switch b{font-size:13px}
+#axi-pcie-packet-studio .av-plugin-note{font-size:10px}
+#axi-pcie-packet-studio .av-lane-head,
+#axi-pcie-packet-studio .av-lane-title{font-size:11px}
+#axi-pcie-packet-studio .av-packet{padding:9px;flex-basis:150px}
+#axi-pcie-packet-studio .av-packet-top{font-size:12px}
+#axi-pcie-packet-studio .av-address{font-size:11px;margin:7px 0}
+#axi-pcie-packet-studio .av-packet-meta{font-size:10px}
+#axi-pcie-packet-studio .av-memory-corner,
+#axi-pcie-packet-studio .av-memory-col,
+#axi-pcie-packet-studio .av-memory-address{font-size:10px}
+#axi-pcie-packet-studio .av-memory-scale,
+#axi-pcie-packet-studio .av-memory-legend,
+#axi-pcie-packet-studio .av-range-strip{font-size:11px}
+#axi-pcie-packet-studio .av-boundary-note{font-size:11px}
+#axi-pcie-packet-studio .av-section-title{font-size:11px}
+#axi-pcie-packet-studio .av-tlp-header-title{font-size:10px}
+#axi-pcie-packet-studio .av-field span{font-size:8px}
+#axi-pcie-packet-studio .av-field strong{font-size:10px}
+#axi-pcie-packet-studio #av-inspector-text{font-size:12px}
+@media (min-width:1500px){
+  #axi-pcie-packet-studio .av-workspace{grid-template-columns:minmax(360px,.9fr) minmax(440px,1.1fr) minmax(440px,1.1fr)}
+  #axi-pcie-packet-studio .av-memory-grid{gap:2px}
+  #axi-pcie-packet-studio .av-packet{flex-basis:175px}
+}
+</style>
+</body>
+</html>

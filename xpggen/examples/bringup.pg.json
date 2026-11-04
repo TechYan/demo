@@ -1,0 +1,141 @@
+{
+  "format": "xpggen.pg.v2",
+  "flow_id": "demo.register-bringup",
+  "description": "Synthetic RNOC example: configure fields, check them, poll ready, then delay.",
+  "source": "examples/rnoc.sample.json",
+  "steps": [
+    {
+      "index": 1,
+      "op": "read",
+      "target": "register",
+      "comment": "Read the initial control value without comparing.",
+      "reg": "REG__XPG__PCIE__CTRL_000",
+      "source": {
+        "address": "",
+        "offset": "0x0",
+        "macro": "REG__XPG__PCIE__CTRL_000"
+      }
+    },
+    {
+      "index": 2,
+      "op": "write",
+      "target": "register",
+      "comment": "Write the complete control register.",
+      "reg": "REG__XPG__PCIE__CTRL_000",
+      "source": {
+        "address": "",
+        "offset": "0x0",
+        "macro": "REG__XPG__PCIE__CTRL_000"
+      },
+      "value": "0x1"
+    },
+    {
+      "index": 3,
+      "op": "rmw",
+      "target": "fields",
+      "comment": "Set mode and threshold in one read-modify-write.",
+      "reg": "REG__XPG__PCIE__CFG_004",
+      "source": {
+        "address": "",
+        "offset": "0x10",
+        "macro": "REG__XPG__PCIE__CFG_004"
+      },
+      "assignments": [
+        {
+          "field": "mode",
+          "value": "0x3",
+          "bit_range": "[7:4]",
+          "shift": 4,
+          "mask": 240,
+          "access": "RW",
+          "force_access": false
+        },
+        {
+          "field": "threshold",
+          "value": "0x20",
+          "bit_range": "[15:8]",
+          "shift": 8,
+          "mask": 65280,
+          "access": "RW",
+          "force_access": false
+        }
+      ],
+      "resolved": {
+        "mask": "0x0000FFF0",
+        "value": "0x00002030"
+      }
+    },
+    {
+      "index": 4,
+      "op": "read_check",
+      "target": "fields",
+      "comment": "Compare only the two configured fields.",
+      "reg": "REG__XPG__PCIE__CFG_004",
+      "source": {
+        "address": "",
+        "offset": "0x10",
+        "macro": "REG__XPG__PCIE__CFG_004"
+      },
+      "assignments": [
+        {
+          "field": "mode",
+          "value": "0x3",
+          "bit_range": "[7:4]",
+          "shift": 4,
+          "mask": 240,
+          "access": "RW",
+          "force_access": false
+        },
+        {
+          "field": "threshold",
+          "value": "0x20",
+          "bit_range": "[15:8]",
+          "shift": 8,
+          "mask": 65280,
+          "access": "RW",
+          "force_access": false
+        }
+      ],
+      "resolved": {
+        "mask": "0x0000FFF0",
+        "value": "0x00002030"
+      }
+    },
+    {
+      "index": 5,
+      "op": "poll",
+      "target": "fields",
+      "comment": "Poll ready with a 1000 us timeout and a 10 us interval.",
+      "reg": "REG__XPG__PCIE__STATUS_001",
+      "source": {
+        "address": "",
+        "offset": "0x4",
+        "macro": "REG__XPG__PCIE__STATUS_001"
+      },
+      "assignments": [
+        {
+          "field": "ready",
+          "value": "0x1",
+          "bit_range": "[1]",
+          "shift": 1,
+          "mask": 2,
+          "access": "RO",
+          "force_access": false
+        }
+      ],
+      "resolved": {
+        "mask": "0x00000002",
+        "value": "0x00000002"
+      },
+      "timeout_us": 1000,
+      "interval_us": 10
+    },
+    {
+      "index": 6,
+      "op": "delay",
+      "target": "time",
+      "comment": "Wait 25 microseconds.",
+      "delay_us": 25
+    }
+  ]
+}

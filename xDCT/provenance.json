@@ -1,0 +1,62 @@
+{
+  "project": "xDCT",
+  "version": "v0.1.0-prototype",
+  "source_repository": "https://github.com/TechYan/xDCT",
+  "source_commit": "c19ed688797dabf46e8794bd63ae4385981b5785",
+  "source_visibility": "private at capture time",
+  "copied_evidence": [
+    {
+      "source_path": "examples/top_v1.sv",
+      "public_path": "examples/top_v1.sv",
+      "sha256": "253724c374af0576c5b6f2fb3f4c6cbf4cea9b61279c62744765d95bcbb2ffe2"
+    },
+    {
+      "source_path": "examples/top_v2.sv",
+      "public_path": "examples/top_v2.sv",
+      "sha256": "ec0415e76914659d2d313e127a76265a03c4a431a32e672103ba5d78153a0f72"
+    },
+    {
+      "source_path": "demo/baseline_cl123450.json",
+      "public_path": "demo/baseline_cl123450.json",
+      "sha256": "2d721cb3ab6660aade84779efbf895e3ef8b43e621b67a12f1091e7d3223389f"
+    },
+    {
+      "source_path": "demo/current_cl123456.json",
+      "public_path": "demo/current_cl123456.json",
+      "sha256": "7037bb5474df236e76cfbea3b65413b33c284846866b53723069daad9a1a9039"
+    },
+    {
+      "source_path": "demo/diff_cl123450_to_cl123456.json",
+      "public_path": "demo/diff_cl123450_to_cl123456.json",
+      "sha256": "b5f4f0d74c4de16813efc407185f767da0cdd5f69e9c514aaebbc97656ff1881"
+    },
+    {
+      "source_path": "demo/report_cl123450_to_cl123456.txt",
+      "public_path": "demo/report_cl123450_to_cl123456.txt",
+      "sha256": "668406cc917956dd3a59c2ed6e7dbb57db5a7d5ce277fd6c767b569332ccb74d"
+    }
+  ],
+  "scope": "Browser comparison of the repository's existing synthetic chip_top demo; no SystemVerilog parsing in the browser.",
+  "verification": {
+    "implementation": "topif.py",
+    "sha256": "1147256edd03876299db34538126f259ef8d67290bd7cbd3c353cddc1faf3341",
+    "pyslang": "11.0.0",
+    "result": "Both manifests re-extracted and compared against shipped evidence; diff and report reproduced exactly."
+  },
+  "summary": {
+    "old_ports": 9,
+    "new_ports": 9,
+    "changed_names": 10,
+    "breaking": 6,
+    "added": 1,
+    "removed": 1,
+    "modified": 5,
+    "order_only": 3
+  },
+  "limitations": [
+    "Prototype scope: ANSI-style top ports and interface/modport ports.",
+    "Classifications and breaking flags are the existing prototype's policy, including nonbreaking ADDED and ORDER_ONLY.",
+    "Production baseline update policy, project configuration and stronger diagnostics are outside this demo.",
+    "No pyslang binary or third-party runtime is published."
+  ]
+}
