@@ -25,4 +25,4 @@
 - [x] Integrate three independent content deliveries (bus/PG, UVM/SVIP, xpggen/xDCT), reviewing manifests and all artifact paths.
 - [x] Add allowlisted static copy and static-link/package checks. Build and check both deployment bases, including preserved PVKit checksums.
 - [x] Run desktop/mobile browser checks against the built site and representative artifact interactions; fix observed issues.
-- [ ] Update README/deployment instructions, configure GitHub Pages Actions and Cloudflare Pages build, then publish authorized changes. Verify the returned GitHub deployment and public URLs; finish Cloudflare publication when an authenticated account is available.
+- [x] Update README/deployment instructions, configure GitHub Pages Actions and Cloudflare Pages build, then publish authorized changes. Verify the returned GitHub deployment and public URLs; finish Cloudflare publication when an authenticated account is available.
