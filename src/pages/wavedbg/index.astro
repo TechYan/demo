@@ -16,6 +16,7 @@ const efficiency = [
 ---
 <Base title="wavedbg — 从问题到关键几拍 · TechYan Demo" description="通过四个典型波形问题，体验 wavedbg 从全局概览到关键几拍的证据分析，以及可扩展的协议 skills。" projectName="wavedbg">
   <div class="wave-page accent-cyan">
+    <a class="performance-announcement" href={href('wavedbg/performance/')}><span>NEW / v0.3.0</span><strong>从 AXI 波形生成性能报告</strong><span>打开实际 HTML、tracker 与分析日志 →</span></a>
     <div class="detail-back"><a href={href('') + '#projects'} class="text-link"><Icon name="back" size={15}/>返回项目索引</a><span class="wave-version mono">WAVEDBG / v{examples.source.version}</span></div>
     <section class="wave-hero">
       <div class="eyebrow">WAVEFORM INVESTIGATION / WITH AI</div>
@@ -68,3 +69,9 @@ const efficiency = [
 <script>
   import '../../scripts/wavedbg.mjs';
 </script>
+<style>
+  .performance-announcement{display:flex;align-items:center;gap:20px;padding:18px 22px;margin-bottom:28px;border:1px solid #3b7182;border-radius:7px;background:#163440;color:#d9f5ff;font-size:12px}
+  .performance-announcement>span:first-child{font:10px var(--mono);color:#82d9ed;white-space:nowrap}
+  .performance-announcement>span:last-child{margin-left:auto;font-size:11px;color:#b1d1dc}
+  @media(max-width:700px){.performance-announcement{flex-wrap:wrap;gap:10px;padding:16px}.performance-announcement>span:last-child{margin-left:0;width:100%}}
+</style>

@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "title": "wavedbg 0.3.0 / synthetic AXI4 native FSDB demonstration",
+  "run_date": "2026-11-07",
+  "source_kind": "Native FSDB from synthetic AXI stimulus, captured simultaneously by the original xpvkit SV probe",
+  "wavedbg_version": "0.3.0",
+  "xpvkit_version": "0.5.6",
+  "xpvkit_commit": "453527455a9cb23ab24742858196d13ea21baf2d",
+  "sample_count": 600,
+  "capture_window_ps": [
+    100,
+    60100
+  ],
+  "protocol_pass": null,
+  "notes": [
+    "Existing completed run, not re-executed for this publication.",
+    "Metrics, event records and analyzer HTML/JavaScript are unchanged.",
+    "Capture-local seq starts at 1 for waveform capture and 2 for the original probe; comparison uses relative sequence.",
+    "Raw CSV byte/absolute-seq equality is not claimed.",
+    "FSDB, raw sample/query streams, original execution manifest, SDK, license and build logs are not included in this public subset.",
+    "The published files have their own hashes. The original run manifest does not apply to sanitized copies."
+  ],
+  "files": {
+    "native/report.html": {
+      "source_sha256": "40f9cf2bf6bc25128fcc91df026daee8cfdaa7e6d62249b0bb62e00544e824bd",
+      "published_sha256": "f782322ba9d827def7f33f948ef6e3d741801e65112d2ac1d1b90ad6e9308c3d",
+      "bytes": 203711,
+      "changes": [
+        "Local task paths replaced with relative or /synthetic/native/ paths"
+      ]
+    },
+    "native/report.json": {
+      "source_sha256": "a356cdce119b28007f3ba1ba9a9ae8862e767add3aa97544f638f8d4c46e63b2",
+      "published_sha256": "c66790afdd2015b931c33684d9db4df312161a21145e5e33e4756eb1d4794ebd",
+      "bytes": 12659,
+      "changes": [
+        "Local task paths replaced with relative or /synthetic/native/ paths"
+      ]
+    },
+    "native/tracker.log": {
+      "source_sha256": "788db80bb9abca7ba71674c8441a948c7f6d5b21eba58d10e6b5be728d5eedff",
+      "published_sha256": "788db80bb9abca7ba71674c8441a948c7f6d5b21eba58d10e6b5be728d5eedff",
+      "bytes": 461,
+      "changes": []
+    },
+    "native/analyze.log": {
+      "source_sha256": "1a4d315935ec30abab6fa470bd17bb99a9a477337c9700ffd8bf20072f691d85",
+      "published_sha256": "e704409f025cd24906c4eb56236111228de4f99b6db6124fea78ae243e7505d8",
+      "bytes": 5998,
+      "changes": [
+        "Local task paths replaced with relative or /synthetic/native/ paths"
+      ]
+    },
+    "native/capture.csv": {
+      "source_sha256": "2f6f0c4534d0d8016bdb7f5b74a631ebb61b14184b52db933fea52197245f843",
+      "published_sha256": "2f6f0c4534d0d8016bdb7f5b74a631ebb61b14184b52db933fea52197245f843",
+      "bytes": 1172,
+      "changes": []
+    },
+    "native/evidence.json": {
+      "source_sha256": "060a335d71923987dfccd37d9db574413baaa4496fd20038ca9a551d4e2dc783",
+      "published_sha256": "57bdb2a1cebf362a2ed4a74b7f4f3fb83ea08025b2f3acb478fa13d7a647e663",
+      "bytes": 8555,
+      "changes": [
+        "Local task paths replaced with relative or /synthetic/native/ paths",
+        "Host-specific file fingerprint omitted"
+      ]
+    },
+    "native/mapping.json": {
+      "source_sha256": "3e34715bce3a404297471ab65e7a8272beac9cbb9c3b9d4992fb437014d18082",
+      "published_sha256": "8c4f788ac94cce7e2dbb803cf2f57e72db3bcea0d8e62136b16e8fc0d221b970",
+      "bytes": 1104,
+      "changes": [
+        "Local task paths replaced with relative or /synthetic/native/ paths"
+      ]
+    },
+    "probe/report.html": {
+      "source_sha256": "30e37cd596197a281388fdd6b974c08ba1b91b290b6f7759cedb3edf5ea742ce",
+      "published_sha256": "8a26ddfd5e958f1e2a3eb40cff18dec85b4f39ff8dd3c6f28b17cdeec0621d4f",
+      "bytes": 203719,
+      "changes": [
+        "Local task paths replaced with relative or /synthetic/native/ paths"
+      ]
+    },
+    "probe/report.json": {
+      "source_sha256": "3510e10cc6ab1c6b180855d85d630bceb5d5579e6ff8e8b141925762ca04e331",
+      "published_sha256": "8b7f2e11b0d230ed5accd9597e280372459ba3f632f9015cfaa77a41f543b044",
+      "bytes": 12671,
+      "changes": [
+        "Local task paths replaced with relative or /synthetic/native/ paths"
+      ]
+    },
+    "probe/tracker.log": {
+      "source_sha256": "788db80bb9abca7ba71674c8441a948c7f6d5b21eba58d10e6b5be728d5eedff",
+      "published_sha256": "788db80bb9abca7ba71674c8441a948c7f6d5b21eba58d10e6b5be728d5eedff",
+      "bytes": 461,
+      "changes": []
+    },
+    "probe/analyze.log": {
+      "source_sha256": "7f062b61acdb86624415e2da070be0a48130f5fbd3eb9177c0ea8af92db3b6fd",
+      "published_sha256": "b9c44e84db7469e358454a8f8f309a20d52a143c41e0cc36d3a32cf738d7b6ad",
+      "bytes": 5995,
+      "changes": [
+        "Local task paths replaced with relative or /synthetic/native/ paths"
+      ]
+    },
+    "comparison.json": {
+      "source_sha256": "c4f529630304e28f57390f89d0824fb801492d36ca9d47ff35017315b82fa7d7",
+      "published_sha256": "c4f529630304e28f57390f89d0824fb801492d36ca9d47ff35017315b82fa7d7",
+      "bytes": 3294,
+      "changes": []
+    },
+    "probe/capture.csv": {
+      "source_sha256": "5e945b3ab6d3c72ef2180680f149361e00a7656eadb8a27878329b06dbf507cd",
+      "published_sha256": "5e945b3ab6d3c72ef2180680f149361e00a7656eadb8a27878329b06dbf507cd",
+      "bytes": 1653,
+      "changes": []
+    }
+  }
+}

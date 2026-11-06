@@ -1,0 +1,49 @@
+{
+  "schema": 1,
+  "protocol": "axi4",
+  "fsdb": "/synthetic/native/wave.fsdb",
+  "name": "port0",
+  "data_width": 32,
+  "reset_active": 0,
+  "monitor_step_fs": 1000,
+  "context": {
+    "clock": {
+      "path": "tb.aclk"
+    },
+    "begin": "100",
+    "end": "60100",
+    "edge": "rising",
+    "observe": "pre_edge",
+    "race_policy": "strict"
+  },
+  "signals": {
+    "araddr": "tb.araddr",
+    "arburst": "tb.arburst",
+    "arid": "tb.arid",
+    "arlen": "tb.arlen",
+    "arready": "tb.arready",
+    "arsize": "tb.arsize",
+    "arvalid": "tb.arvalid",
+    "awaddr": "tb.awaddr",
+    "awburst": "tb.awburst",
+    "awid": "tb.awid",
+    "awlen": "tb.awlen",
+    "awready": "tb.awready",
+    "awsize": "tb.awsize",
+    "awvalid": "tb.awvalid",
+    "bid": "tb.bid",
+    "bready": "tb.bready",
+    "bresp": "tb.bresp",
+    "bvalid": "tb.bvalid",
+    "reset": "tb.aresetn",
+    "rid": "tb.rid",
+    "rlast": "tb.rlast",
+    "rready": "tb.rready",
+    "rresp": "tb.rresp",
+    "rvalid": "tb.rvalid",
+    "wlast": "tb.wlast",
+    "wready": "tb.wready",
+    "wstrb": "tb.wstrb",
+    "wvalid": "tb.wvalid"
+  }
+}

@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      run_checks:
+        description: 'Run the existing site tests and content checks before deployment'
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -29,11 +34,16 @@ jobs:
       - uses: actions/configure-pages@v5
       - run: npm ci
       - run: npm test
+        if: github.event_name != 'workflow_dispatch' || inputs.run_checks
       - run: npm run build:github
       - run: python scripts/check_site.py dist /demo
+        if: github.event_name != 'workflow_dispatch' || inputs.run_checks
       - run: python scripts/build_uvm_svip.py --check
+        if: github.event_name != 'workflow_dispatch' || inputs.run_checks
       - run: python scripts/build_register_demos.py --check
+        if: github.event_name != 'workflow_dispatch' || inputs.run_checks
       - run: python scripts/build_wavedbg_examples.py --check
+        if: github.event_name != 'workflow_dispatch' || inputs.run_checks
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

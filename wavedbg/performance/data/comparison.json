@@ -1,0 +1,141 @@
+{
+  "source": "native VCS FSDB and simultaneous original xpvkit SV probe",
+  "checks": {
+    "metrics": true,
+    "full_metrics": true,
+    "backpressure": true,
+    "full_backpressure": true,
+    "integrity": true,
+    "measurement_window": true,
+    "window": true,
+    "activity": true,
+    "metric_scopes": true,
+    "event_counts": true,
+    "channel_counts": true,
+    "csv_fields_and_relative_sequence_equal": true,
+    "range_data_with_local_sequence_normalized": true
+  },
+  "sample_count": 600,
+  "queries": 31,
+  "metrics": {
+    "bytes": {
+      "read": 4,
+      "write": 6,
+      "total": 10
+    },
+    "transactions": {
+      "read": 1,
+      "write": 1
+    },
+    "bandwidth_gbps": {
+      "average": 0.16666666666666666,
+      "read_average": 0.06666666666666667,
+      "write_average": 0.1,
+      "peak_window": 5.555556,
+      "read_peak_window": 2.222222,
+      "write_peak_window": 3.333333
+    },
+    "outstanding": {
+      "read_average": 0.0016666666666666668,
+      "write_average": 0.005,
+      "combined_average": 0.006666666666666667,
+      "read_max": 1,
+      "write_max": 1,
+      "combined_max": 2,
+      "read_at_end": 0,
+      "write_at_end": 0
+    },
+    "burst": {
+      "read": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 1.0,
+          "minimum": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "maximum": 1.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 4.0,
+          "minimum": 4.0,
+          "p50": 4.0,
+          "p95": 4.0,
+          "maximum": 4.0
+        },
+        "distribution": [
+          {
+            "beats": 1,
+            "beat_bytes": 4,
+            "burst_bytes": 4,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      },
+      "write": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 2.0,
+          "minimum": 2.0,
+          "p50": 2.0,
+          "p95": 2.0,
+          "maximum": 2.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 8.0,
+          "minimum": 8.0,
+          "p50": 8.0,
+          "p95": 8.0,
+          "maximum": 8.0
+        },
+        "distribution": [
+          {
+            "beats": 2,
+            "beat_bytes": 4,
+            "burst_bytes": 8,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      }
+    },
+    "wstrb": {
+      "total_beats": 2,
+      "known_beats": 2,
+      "full_beats": 1,
+      "partial_beats": 1,
+      "unknown_beats": 0,
+      "partial_ratio": 0.5,
+      "mask_width_bits": 4
+    },
+    "latency_ps": {
+      "read": {
+        "count": 1,
+        "average": 100.0,
+        "minimum": 100,
+        "p50": 100,
+        "p95": 100,
+        "maximum": 100
+      },
+      "write": {
+        "count": 1,
+        "average": 300.0,
+        "minimum": 300,
+        "p50": 300,
+        "p95": 300,
+        "maximum": 300
+      }
+    }
+  },
+  "fsdb_bytes": 11829,
+  "raw_csv_fields_equal": false,
+  "local_sequence_starts": {
+    "wave": 1,
+    "probe": 2
+  },
+  "comparison": "Wire facts/metrics exact; capture-local sequence references compared relative to their start"
+}

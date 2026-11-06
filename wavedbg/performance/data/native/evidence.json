@@ -1,0 +1,399 @@
+{
+  "tool_version": "0.5.6",
+  "csv_schema": "2.0",
+  "measurement_window": {
+    "mode": "explicit",
+    "start_timestamp_ps": 100,
+    "end_timestamp_ps": 60100,
+    "start_cycle": 1,
+    "end_cycle": 601,
+    "duration_ps": 60000
+  },
+  "window": {
+    "mode": "auto-active",
+    "basis": "accepted-data",
+    "start_timestamp_ps": 300,
+    "end_timestamp_ps": 500,
+    "duration_ps": 200,
+    "span_ps": 200,
+    "regions": [
+      [
+        300,
+        500
+      ]
+    ],
+    "idle_gap_ps": 3200,
+    "duration_quality": "KNOWN"
+  },
+  "metric_scopes": {
+    "bandwidth": "data-window",
+    "bytes": "data-window",
+    "transactions": "capture",
+    "latency": "capture",
+    "outstanding": "capture",
+    "backpressure": "capture",
+    "diagnostics": "capture",
+    "burst": "capture",
+    "credit": "capture"
+  },
+  "activity": {
+    "duration_quality": "KNOWN",
+    "regions": [
+      [
+        300,
+        500
+      ]
+    ],
+    "region_count": 1,
+    "duration_ps": 200,
+    "coverage_ratio": 0.0033333333333333335,
+    "idle_gap_ps": 3200,
+    "idle_gap_mode": "auto",
+    "cycle_ps": 100
+  },
+  "metrics": {
+    "bytes": {
+      "read": 4,
+      "write": 6,
+      "total": 10
+    },
+    "transactions": {
+      "read": 1,
+      "write": 1
+    },
+    "bandwidth_gbps": {
+      "average": 50.0,
+      "read_average": 20.0,
+      "write_average": 30.0,
+      "peak_window": 80.0,
+      "read_peak_window": 40.0,
+      "write_peak_window": 40.0,
+      "full_window_average": 0.16666666666666666
+    },
+    "outstanding": {
+      "read_average": 0.0016666666666666668,
+      "write_average": 0.005,
+      "combined_average": 0.006666666666666667,
+      "read_max": 1,
+      "write_max": 1,
+      "combined_max": 2,
+      "read_at_end": 0,
+      "write_at_end": 0
+    },
+    "burst": {
+      "read": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 1.0,
+          "minimum": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "maximum": 1.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 4.0,
+          "minimum": 4.0,
+          "p50": 4.0,
+          "p95": 4.0,
+          "maximum": 4.0
+        },
+        "distribution": [
+          {
+            "beats": 1,
+            "beat_bytes": 4,
+            "burst_bytes": 4,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      },
+      "write": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 2.0,
+          "minimum": 2.0,
+          "p50": 2.0,
+          "p95": 2.0,
+          "maximum": 2.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 8.0,
+          "minimum": 8.0,
+          "p50": 8.0,
+          "p95": 8.0,
+          "maximum": 8.0
+        },
+        "distribution": [
+          {
+            "beats": 2,
+            "beat_bytes": 4,
+            "burst_bytes": 8,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      }
+    },
+    "wstrb": {
+      "total_beats": 2,
+      "known_beats": 2,
+      "full_beats": 1,
+      "partial_beats": 1,
+      "unknown_beats": 0,
+      "partial_ratio": 0.5,
+      "mask_width_bits": 4
+    },
+    "latency_ps": {
+      "read": {
+        "count": 1,
+        "average": 100.0,
+        "minimum": 100,
+        "p50": 100,
+        "p95": 100,
+        "maximum": 100
+      },
+      "write": {
+        "count": 1,
+        "average": 300.0,
+        "minimum": 300,
+        "p50": 300,
+        "p95": 300,
+        "maximum": 300
+      }
+    }
+  },
+  "full_metrics": {
+    "bytes": {
+      "read": 4,
+      "write": 6,
+      "total": 10
+    },
+    "transactions": {
+      "read": 1,
+      "write": 1
+    },
+    "bandwidth_gbps": {
+      "average": 0.16666666666666666,
+      "read_average": 0.06666666666666667,
+      "write_average": 0.1,
+      "peak_window": 5.555556,
+      "read_peak_window": 2.222222,
+      "write_peak_window": 3.333333
+    },
+    "outstanding": {
+      "read_average": 0.0016666666666666668,
+      "write_average": 0.005,
+      "combined_average": 0.006666666666666667,
+      "read_max": 1,
+      "write_max": 1,
+      "combined_max": 2,
+      "read_at_end": 0,
+      "write_at_end": 0
+    },
+    "burst": {
+      "read": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 1.0,
+          "minimum": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "maximum": 1.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 4.0,
+          "minimum": 4.0,
+          "p50": 4.0,
+          "p95": 4.0,
+          "maximum": 4.0
+        },
+        "distribution": [
+          {
+            "beats": 1,
+            "beat_bytes": 4,
+            "burst_bytes": 4,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      },
+      "write": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 2.0,
+          "minimum": 2.0,
+          "p50": 2.0,
+          "p95": 2.0,
+          "maximum": 2.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 8.0,
+          "minimum": 8.0,
+          "p50": 8.0,
+          "p95": 8.0,
+          "maximum": 8.0
+        },
+        "distribution": [
+          {
+            "beats": 2,
+            "beat_bytes": 4,
+            "burst_bytes": 8,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      }
+    },
+    "wstrb": {
+      "total_beats": 2,
+      "known_beats": 2,
+      "full_beats": 1,
+      "partial_beats": 1,
+      "unknown_beats": 0,
+      "partial_ratio": 0.5,
+      "mask_width_bits": 4
+    },
+    "latency_ps": {
+      "read": {
+        "count": 1,
+        "average": 100.0,
+        "minimum": 100,
+        "p50": 100,
+        "p95": 100,
+        "maximum": 100
+      },
+      "write": {
+        "count": 1,
+        "average": 300.0,
+        "minimum": 300,
+        "p50": 300,
+        "p95": 300,
+        "maximum": 300
+      }
+    }
+  },
+  "backpressure": {
+    "AW": {
+      "observed_cycles": 599,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "W": {
+      "observed_cycles": 598,
+      "valid_cycles": 2,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "B": {
+      "observed_cycles": 596,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "AR": {
+      "observed_cycles": 599,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "R": {
+      "observed_cycles": 598,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    }
+  },
+  "full_backpressure": {
+    "AW": {
+      "observed_cycles": 599,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "W": {
+      "observed_cycles": 598,
+      "valid_cycles": 2,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "B": {
+      "observed_cycles": 596,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "AR": {
+      "observed_cycles": 599,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "R": {
+      "observed_cycles": 598,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    }
+  },
+  "integrity": {
+    "ok": true,
+    "issues": []
+  },
+  "event_counts": {
+    "XPV_EVENT_WINDOW_START": 1,
+    "XPV_EVENT_RESET_ASSERT": 1,
+    "XPV_EVENT_RESET_DEASSERT": 1,
+    "XPV_EVENT_STATE": 10,
+    "XPV_EVENT_HANDSHAKE": 6,
+    "XPV_EVENT_WINDOW_END": 1
+  },
+  "channel_counts": {
+    "CONTROL": 2,
+    "RESET": 2,
+    "AW": 3,
+    "AR": 3,
+    "W": 4,
+    "R": 3,
+    "B": 3
+  },
+  "artifacts": {
+    "html_report": "./report.html",
+    "tracker_log": "./tracker.log",
+    "analyze_log": "./analyze.log"
+  },
+  "waveform_capture": {
+    "sample_count": 600,
+    "file_identity": {
+      "canonical_path": "/synthetic/native/wave.fsdb",
+      "file_state": "static",
+      "published_size_bytes": 11829,
+      "publication_note": "Host-specific device/inode/mtime/fingerprint omitted; original evidence retained privately."
+    },
+    "timebase": {
+      "display_unit": "ns",
+      "native_timescale": "1ps",
+      "tick_unit_fs": "1000"
+    },
+    "boundary_change_cycles": 0,
+    "recording_completeness": "not_established_by_query"
+  }
+}

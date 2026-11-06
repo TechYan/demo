@@ -1,0 +1,157 @@
+---
+import '../../../styles/axi-performance.css';
+import data from '../../../../wavedbg/performance/data/native/report.json';
+import tracker from '../../../../wavedbg/performance/data/native/tracker.log?raw';
+import analysis from '../../../../wavedbg/performance/data/native/analyze.log?raw';
+import { sitePath } from '../../../lib/catalog.mjs';
+const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
+const base = 'wavedbg/performance/';
+const asset = (path: string) => href(base + path);
+const repo = 'https://github.com/TechYan/wavedbg';
+const guide = repo + '/blob/main/docs/axi-performance.md';
+const release = repo + '/releases/tag/v0.3.0';
+const prompt = '使用 wavedbg-axi-performance，分析 /PROJECT/run/wave.fsdb 中 tb.dut.m_axi 接口在 10–20 us 的 AXI4 读写性能。请确认真实信号、时钟、复位和采样精度，生成 xpvkit HTML report、tracker.log、analyze.log，并分别解释有效数据窗口和完整采样窗口的带宽、延迟、outstanding 与背压。';
+const command = 'wavedbg axi-pv --config /WORK/axi-port0.json --output /WORK/pv-port0-run1';
+const install = 'wavedbg setup --enable xwave,xtrace\nwavedbg doctor\nwavedbg config --host opencode --enable xwave,xtrace\nwavedbg skill install --directory "$HOME/.config/opencode/skills"';
+const downloads = [
+  ['report.json', '全部指标与事务数据', 'native/report.json'],
+  ['capture.csv', '20 条 probe 契约事件', 'native/capture.csv'],
+  ['evidence.json', '指标口径与采样摘要', 'native/evidence.json'],
+  ['mapping.json', '28 个 alias 与时钟配置', 'native/mapping.json'],
+  ['comparison.json', '与原始 probe 的 13 项对照', 'comparison.json'],
+  ['publication.json', '发布来源、变更与文件哈希', 'publication.json'],
+];
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="description" content="wavedbg 0.3.0：让 OpenCode 定位 AXI4 接口，从 FSDB 波形生成 xpvkit 原生性能报告、事务日志与可复核证据。打开真实运行示例。"/>
+    <meta name="theme-color" content="#0b111b"/>
+    <title>wavedbg · AXI Performance — 从波形到性能报告</title>
+    <link rel="icon" href={href('favicon.svg')} type="image/svg+xml"/>
+    <link rel="canonical" href="https://techyan.github.io/demo/wavedbg/performance/"/>
+    <meta property="og:title" content="wavedbg · 从 AXI 波形，读出性能。"/>
+    <meta property="og:description" content="OpenCode + wavedbg + xpvkit。查看真实生成的交互报告、事务日志和指标证据。"/>
+    <meta property="og:image" content="https://techyan.github.io/demo/wavedbg/performance/assets/report-performance.png"/>
+  </head>
+  <body>
+    <a class="skip" href="#main">跳到内容</a>
+    <header class="nav-shell">
+      <nav class="nav wrap" aria-label="主导航">
+        <a class="wordmark" href={href('wavedbg/')} aria-label="wavedbg 首页"><svg width="30" height="25" viewBox="0 0 30 25" fill="none" aria-hidden="true"><path d="M1 14h5V4h6v17h6V9h11" stroke="currentColor" stroke-width="2.5"/></svg>wavedbg<span> / performance</span></a>
+        <div class="nav-links"><a href="#workflow">工作流程</a><a href="#report">在线报告</a><a href="#logs">日志与证据</a><a href="#start">开始使用</a></div>
+        <a class="nav-github" href={repo}>GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero wrap">
+        <div class="hero-copy">
+          <a class="release-pill" href={release}><span></span>NEW IN 0.3.0 <b>AXI PERFORMANCE</b> <span aria-hidden="true">↗</span></a>
+          <h1>从 AXI 波形，<br/><em>读出性能。</em></h1>
+          <p class="lead">告诉 Agent 你关心的接口与时间范围。<br/>让 wavedbg 找到信号、读取 FSDB，再由 xpvkit<br class="desktop"/> 生成可交互、可追溯的性能报告。</p>
+          <div class="hero-actions"><a class="button primary" href={asset('data/native/report.html')}>打开实际 HTML 报告 <span aria-hidden="true">↗</span></a><a class="button quiet" href="#start">在 OpenCode 中使用 <span aria-hidden="true">→</span></a></div>
+          <p class="hero-foot"><span class="dot"></span>本地分析 · xpvkit 0.5.6 原生输出 · 8 个随包 skills</p>
+        </div>
+        <div class="hero-visual">
+          <div class="window-label"><span><i></i><i></i><i></i></span><span>report.html / NATIVE FSDB EXAMPLE</span><span>↗</span></div>
+          <a href={asset('data/native/report.html')} aria-label="打开截图对应的真实报告"><img src={asset('assets/report-performance.png')} width="1600" height="1060" alt="实际 xpvkit 报告：带宽趋势、outstanding、握手状态与事务详情"/></a>
+          <div class="visual-caption"><span><b>600</b> 个真实 FSDB 采样点</span><span>自建 AXI 激励 / 交互报告实拍</span></div>
+        </div>
+      </section>
+      <div class="proof-strip"><div class="wrap"><span class="micro">ONE INTERFACE. TRACEABLE RESULTS.</span><span><b>FSDB</b> 原生读取</span><span><b>AXI4</b> memory-mapped</span><span><b>HTML + LOG</b> 原生报告</span><span><b>JSON + CSV</b> 复核证据</span></div></div>
+
+      <section class="section wrap" id="workflow">
+        <div class="section-heading"><div><span class="eyebrow">01 / THE WORKFLOW</span><h2>一句请求，走完分析链路。</h2></div><p>Agent 负责发现接口与解释证据。<br/>采集命令与固定版本分析器负责计算。</p></div>
+        <div class="flow">
+          <article><span class="step-number">01</span><span class="step-tag">OPENCODE / SKILL</span><h3>明确分析对象</h3><p>给出 FSDB、AXI 接口与时间范围，按需结合 KDB 或设计代码定位。</p><code>tb.dut.m_axi · 10–20 us</code></article>
+          <article><span class="step-number">02</span><span class="step-tag">WAVEDBG / MCP</span><h3>匹配真实信号</h3><p>查询 dump 路径，确认时钟、复位、位宽和沿前采样精度，保存映射。</p><code>mapping.json</code></article>
+          <article><span class="step-number">03</span><span class="step-tag">AXI-PV / XPVKIT</span><h3>采样并计算</h3><p>完整分批读取波形，按 probe 契约导出事件，由 xpvkit 计算性能。</p><code>FSDB → CSV → PV</code></article>
+          <article><span class="step-number">04</span><span class="step-tag">REPORT / EVIDENCE</span><h3>交付可核对结论</h3><p>同时给出带宽、延迟、在途事务、背压，以及报告、日志和证据文件。</p><code>report.html + *.log</code></article>
+        </div>
+      </section>
+
+      <section class="report-section section" id="report">
+        <div class="wrap">
+          <div class="section-heading"><div><span class="eyebrow">02 / OPEN THE REAL OUTPUT</span><h2>报告就在这里。可以直接操作。</h2></div><a class="button outline" href={asset('data/native/report.html')}>独立窗口打开 <span aria-hidden="true">↗</span></a></div>
+          <p class="section-intro">缩放时间窗口，切换 Performance / Debug view，查看单笔事务详情。下方嵌入的是实际生成的自包含 HTML，网页无需连接 EDA 环境。</p>
+          <div class="source-note"><span class="source-badge">SYNTHETIC STIMULUS · REAL FSDB</span><p>示例来自自建 AXI4 激励的真实 FSDB，同时接入未经改动的 xpvkit SV probe。它说明完整使用流程；数值不代表用户 DUT 性能。</p></div>
+          <div class="report-frame"><div class="frame-toolbar"><span><span class="dot"></span>native/report.html</span><span>XPVKIT 0.5.6 · INTERACTIVE</span></div><iframe src={asset('data/native/report.html')} title="wavedbg 从真实 FSDB 生成的 xpvkit AXI4 性能报告" loading="lazy"></iframe></div>
+          <p class="frame-note">报告 UI 使用相对时间轴；本例 0 ns 对应 capture 的 100 ps。网页按钮和坐标是原始 xpvkit 报告的一部分。</p>
+          <div class="metric-grid">
+            <article><span>完成事务 / READ · WRITE</span><strong>{data.metrics.transactions.read}<i> / </i>{data.metrics.transactions.write}</strong><small>读 {data.metrics.bytes.read} B · 写 {data.metrics.bytes.write} B</small></article>
+            <article><span>读延迟 / AR → LAST R</span><strong>{data.metrics.latency_ps.read.average}<i> ps</i></strong><small>以最后一个被接受的 R beat 为终点</small></article>
+            <article><span>写延迟 / AW → B</span><strong>{data.metrics.latency_ps.write.average}<i> ps</i></strong><small>含写数据阶段与响应等待</small></article>
+            <article><span>最大在途 / READ + WRITE</span><strong>{data.metrics.outstanding.combined_max}</strong><small>窗口结束：读 0 / 写 0</small></article>
+          </div>
+          <div class="window-explainer">
+            <div><span class="eyebrow">READ THE DENOMINATOR</span><h3>50 GB/s 和 0.1667 GB/s，<br/>为什么同时成立？</h3><p>都来自相同的 10 字节传输。窗口长度不同，回答的问题也不同。报告和 Agent 结论都应保留这个区别。</p></div>
+            <div class="window-comparison">
+              <article><span class="window-kind">有效数据窗口 / auto</span><strong>50 <small>GB/s</small></strong><p>10 B ÷ 200 ps</p><code>[300, 500) ps</code><span class="window-description">回答：有数据传输时的速率。</span></article>
+              <article><span class="window-kind">完整采样窗口 / full</span><strong>0.1667 <small>GB/s</small></strong><p>10 B ÷ 60,000 ps</p><code>[100, 60,100) ps</code><span class="window-description">回答：包括空闲时间的平均吞吐。</span></article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section wrap" id="logs">
+        <div class="section-heading"><div><span class="eyebrow">03 / FOLLOW THE EVIDENCE</span><h2>从结论，回到每一笔传输。</h2></div><a class="button outline" href={asset('wavedbg-axi-native-demo.zip')} download>下载完整示例包 <span aria-hidden="true">↓</span></a></div>
+        <div class="artifact-layout">
+          <div class="log-viewer">
+            <div class="log-tabs" role="tablist" aria-label="选择日志"><button id="tracker-tab" role="tab" aria-controls="tracker-panel" aria-selected="true" data-log="tracker">tracker.log</button><button id="analysis-tab" role="tab" aria-controls="analysis-panel" aria-selected="false" tabindex="-1" data-log="analysis">analyze.log</button><span>ACTUAL GENERATED OUTPUT</span></div>
+            <div id="tracker-panel" role="tabpanel" aria-labelledby="tracker-tab"><div class="log-description"><p>按时间排列的 AW / AR / W / R / B 事件，包含事务引用、WSTRB 和完成延迟。</p><a href={asset('data/native/tracker.log')} download>下载原文 ↓</a></div><pre tabindex="0">{tracker}</pre></div>
+            <div id="analysis-panel" role="tabpanel" aria-labelledby="analysis-tab" hidden><div class="log-description"><p>xpvkit 生成的 PV 汇总：流量、延迟、趋势、背压和完整性诊断。</p><a href={asset('data/native/analyze.log')} download>下载原文 ↓</a></div><pre tabindex="0">{analysis}</pre></div>
+            <noscript><p class="log-description">切换日志需要 JavaScript。<a href={asset('data/native/analyze.log')}>直接下载 analyze.log</a></p></noscript>
+          </div>
+          <aside class="evidence-card"><span class="eyebrow">INSPECTABLE BY DESIGN</span><h3>报告之外，证据也齐全。</h3><p>从事件流到分析口径，再到发布文件的哈希，都有对应入口。</p><div class="evidence-links">{downloads.map(([name, description, path]) => <a href={asset('data/' + path)}><span><code>{name}</code><small>{description}</small></span><span aria-hidden="true">↗</span></a>)}</div></aside>
+        </div>
+        <details class="provenance"><summary><span>与原始 xpvkit probe 的结果如何对齐？</span><span aria-hidden="true">＋</span></summary><div><p>同一总线同时记录 FSDB 和原生 probe CSV。已有验收中，600 个采样点对应 20 条事件，13 项语义比较通过，覆盖主要指标、窗口、背压、事件字段与相对顺序。</p><p>本地 seq 起点分别为 1 和 2，因此原始 CSV 并非逐字节相同。性能结果保持一致；对照时对本地序号作归一化。公开副本仅处理本地路径和主机文件指纹，指标及报告程序未改动。</p><div class="inline-links"><a href={asset('data/probe/report.html')}>打开原始 probe 的报告 ↗</a><a href={asset('data/comparison.json')}>查看 13 项对照记录 ↗</a><a href={asset('data/publication.json')}>查看公开副本处理与哈希 ↗</a></div></div></details>
+      </section>
+
+      <section class="start-section section" id="start">
+        <div class="wrap">
+          <div class="section-heading"><div><span class="eyebrow">04 / TAKE IT TO YOUR DESIGN</span><h2>在 OpenCode 中开始。</h2></div><a class="button outline" href={release}>下载 v0.3.0 <span aria-hidden="true">↗</span></a></div>
+          <div class="start-grid">
+            <article class="start-card"><span class="step-tag">STEP 1 / INSTALL</span><h3>升级产品包与随包 skills</h3><p>Linux x86_64、Python 3.11 / 3.12，以及现场授权的 Verdi 环境。离线安装包包含 xpvkit runtime 和固定 Python 依赖。</p><pre><code>{install}</code></pre><p class="small">先按安装指南安装产品；将 config 输出合并到 opencode.json。覆盖旧 skills 前保留自定义修改，再加 --force。</p><a href={repo + '/blob/main/docs/install.md'}>查看离线安装 / module / csh 指南 ↗</a></article>
+            <article class="start-card"><span class="step-tag">STEP 2 / ASK</span><h3>给出接口、范围与交付物</h3><blockquote id="example-prompt">{prompt}</blockquote><div class="copy-row"><button class="button quiet" id="copy-prompt">复制请求 <span aria-hidden="true">⧉</span></button><span id="copy-status" role="status"></span></div><p class="small">Agent 会先查询真实信号并确认采样契约，再保存配置。请用工程实际路径替换示例。</p></article>
+          </div>
+          <div class="command-card"><div><span class="step-tag">STEP 3 / GENERATE</span><h3>配置确认后，一条命令生成完整结果。</h3></div><pre><code>{command}</code></pre><p>输出目录使用新目录。命令在可访问 FSDB 的本机运行；大量采样值直接进入文件，模型读取报告与必要证据。</p></div>
+          <div class="scope-card"><h3>使用前，先明确这些口径。</h3><div><p><b>协议范围</b>当前性能链路支持 AXI4 memory-mapped。AXI-Lite、Stream、ACE 不在这条分析路径内。</p><p><b>采样一致性</b>使用 rising / pre-edge，FSDB tick 必须与确认过的仿真全局 #1step 相同。未知关键值或不完整采样会阻止确定性报告。</p><p><b>字节与数据</b>写字节按 WSTRB，读字节按 ARSIZE。WDATA / RDATA 不采集、不校验；保留上游早到 W、复位背压等语义边界。</p><p><b>结果含义</b>integrity OK 表示已执行的重构检查无异常。protocol_pass 保持 null；报告成功生成并不等于 DUT 协议签核通过。</p></div><a href={guide}>完整使用指南与分析限制 ↗</a></div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer wrap"><div><a class="wordmark" href={href('wavedbg/')}>wavedbg<span> / performance</span></a><p>From waveform to evidence.</p></div><div><a href={repo}>源码仓库 ↗</a><a href={guide}>使用文档 ↗</a><a href={href('wavedbg/')}>波形调试导览 ↗</a><a href={href('')}>TechYan Demo ↗</a></div><p class="footer-note">v0.3.0 · xpvkit 0.5.6 · 2026-11-07<br/>本站公开合成示例；源码与发行包需仓库访问权限。</p></footer>
+    <script>
+      const tabs = [...document.querySelectorAll<HTMLButtonElement>('[data-log]')];
+      function selectLog(name: string, focus = false) {
+        for (const tab of tabs) {
+          const selected = tab.dataset.log === name;
+          tab.setAttribute('aria-selected', String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+          const panel = document.getElementById(tab.getAttribute('aria-controls')!);
+          if (panel) panel.hidden = !selected;
+          if (focus && selected) tab.focus();
+        }
+      }
+      for (const tab of tabs) {
+        tab.addEventListener('click', () => selectLog(tab.dataset.log!));
+        tab.addEventListener('keydown', event => {
+          if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+            event.preventDefault();
+            const next = event.key === 'Home' ? 'tracker' : event.key === 'End' ? 'analysis' : tab.dataset.log === 'tracker' ? 'analysis' : 'tracker';
+            selectLog(next, true);
+          }
+        });
+      }
+      if (new URLSearchParams(location.search).get('log') === 'analysis') selectLog('analysis');
+      document.getElementById('copy-prompt')?.addEventListener('click', async () => {
+        const status = document.getElementById('copy-status')!;
+        try {
+          await navigator.clipboard.writeText(document.getElementById('example-prompt')!.textContent!.trim());
+          status.textContent = '已复制';
+        } catch { status.textContent = '请选中上方文字复制'; }
+      });
+    </script>
+  </body>
+</html>

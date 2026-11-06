@@ -1,0 +1,722 @@
+{
+  "tool_version": "0.5.6",
+  "csv_schema": "2.0",
+  "path": "./capture.csv",
+  "source": "capture",
+  "rows": 20,
+  "analysis_rows": 11,
+  "measurement_window": {
+    "mode": "explicit",
+    "start_timestamp_ps": 100,
+    "end_timestamp_ps": 60100,
+    "start_cycle": 1,
+    "end_cycle": 601,
+    "duration_ps": 60000
+  },
+  "window": {
+    "mode": "auto-active",
+    "basis": "accepted-data",
+    "start_timestamp_ps": 300,
+    "end_timestamp_ps": 500,
+    "duration_ps": 200,
+    "span_ps": 200,
+    "regions": [
+      [
+        300,
+        500
+      ]
+    ],
+    "idle_gap_ps": 3200,
+    "duration_quality": "KNOWN"
+  },
+  "metric_scopes": {
+    "bandwidth": "data-window",
+    "bytes": "data-window",
+    "transactions": "capture",
+    "latency": "capture",
+    "outstanding": "capture",
+    "backpressure": "capture",
+    "diagnostics": "capture",
+    "burst": "capture",
+    "credit": "capture"
+  },
+  "activity": {
+    "duration_quality": "KNOWN",
+    "regions": [
+      [
+        300,
+        500
+      ]
+    ],
+    "region_count": 1,
+    "duration_ps": 200,
+    "coverage_ratio": 0.0033333333333333335,
+    "idle_gap_ps": 3200,
+    "idle_gap_mode": "auto",
+    "cycle_ps": 100
+  },
+  "metrics": {
+    "bytes": {
+      "read": 4,
+      "write": 6,
+      "total": 10
+    },
+    "transactions": {
+      "read": 1,
+      "write": 1
+    },
+    "bandwidth_gbps": {
+      "average": 50.0,
+      "read_average": 20.0,
+      "write_average": 30.0,
+      "peak_window": 80.0,
+      "read_peak_window": 40.0,
+      "write_peak_window": 40.0,
+      "full_window_average": 0.16666666666666666
+    },
+    "outstanding": {
+      "read_average": 0.0016666666666666668,
+      "write_average": 0.005,
+      "combined_average": 0.006666666666666667,
+      "read_max": 1,
+      "write_max": 1,
+      "combined_max": 2,
+      "read_at_end": 0,
+      "write_at_end": 0
+    },
+    "burst": {
+      "read": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 1.0,
+          "minimum": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "maximum": 1.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 4.0,
+          "minimum": 4.0,
+          "p50": 4.0,
+          "p95": 4.0,
+          "maximum": 4.0
+        },
+        "distribution": [
+          {
+            "beats": 1,
+            "beat_bytes": 4,
+            "burst_bytes": 4,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      },
+      "write": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 2.0,
+          "minimum": 2.0,
+          "p50": 2.0,
+          "p95": 2.0,
+          "maximum": 2.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 8.0,
+          "minimum": 8.0,
+          "p50": 8.0,
+          "p95": 8.0,
+          "maximum": 8.0
+        },
+        "distribution": [
+          {
+            "beats": 2,
+            "beat_bytes": 4,
+            "burst_bytes": 8,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      }
+    },
+    "wstrb": {
+      "total_beats": 2,
+      "known_beats": 2,
+      "full_beats": 1,
+      "partial_beats": 1,
+      "unknown_beats": 0,
+      "partial_ratio": 0.5,
+      "mask_width_bits": 4
+    },
+    "latency_ps": {
+      "read": {
+        "count": 1,
+        "average": 100.0,
+        "minimum": 100,
+        "p50": 100,
+        "p95": 100,
+        "maximum": 100
+      },
+      "write": {
+        "count": 1,
+        "average": 300.0,
+        "minimum": 300,
+        "p50": 300,
+        "p95": 300,
+        "maximum": 300
+      }
+    }
+  },
+  "full_metrics": {
+    "bytes": {
+      "read": 4,
+      "write": 6,
+      "total": 10
+    },
+    "transactions": {
+      "read": 1,
+      "write": 1
+    },
+    "bandwidth_gbps": {
+      "average": 0.16666666666666666,
+      "read_average": 0.06666666666666667,
+      "write_average": 0.1,
+      "peak_window": 5.555556,
+      "read_peak_window": 2.222222,
+      "write_peak_window": 3.333333
+    },
+    "outstanding": {
+      "read_average": 0.0016666666666666668,
+      "write_average": 0.005,
+      "combined_average": 0.006666666666666667,
+      "read_max": 1,
+      "write_max": 1,
+      "combined_max": 2,
+      "read_at_end": 0,
+      "write_at_end": 0
+    },
+    "burst": {
+      "read": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 1.0,
+          "minimum": 1.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "maximum": 1.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 4.0,
+          "minimum": 4.0,
+          "p50": 4.0,
+          "p95": 4.0,
+          "maximum": 4.0
+        },
+        "distribution": [
+          {
+            "beats": 1,
+            "beat_bytes": 4,
+            "burst_bytes": 4,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      },
+      "write": {
+        "count": 1,
+        "beats": {
+          "count": 1,
+          "average": 2.0,
+          "minimum": 2.0,
+          "p50": 2.0,
+          "p95": 2.0,
+          "maximum": 2.0
+        },
+        "bytes": {
+          "count": 1,
+          "average": 8.0,
+          "minimum": 8.0,
+          "p50": 8.0,
+          "p95": 8.0,
+          "maximum": 8.0
+        },
+        "distribution": [
+          {
+            "beats": 2,
+            "beat_bytes": 4,
+            "burst_bytes": 8,
+            "count": 1,
+            "ratio": 1.0
+          }
+        ]
+      }
+    },
+    "wstrb": {
+      "total_beats": 2,
+      "known_beats": 2,
+      "full_beats": 1,
+      "partial_beats": 1,
+      "unknown_beats": 0,
+      "partial_ratio": 0.5,
+      "mask_width_bits": 4
+    },
+    "latency_ps": {
+      "read": {
+        "count": 1,
+        "average": 100.0,
+        "minimum": 100,
+        "p50": 100,
+        "p95": 100,
+        "maximum": 100
+      },
+      "write": {
+        "count": 1,
+        "average": 300.0,
+        "minimum": 300,
+        "p50": 300,
+        "p95": 300,
+        "maximum": 300
+      }
+    }
+  },
+  "backpressure": {
+    "AW": {
+      "observed_cycles": 599,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "W": {
+      "observed_cycles": 598,
+      "valid_cycles": 2,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "B": {
+      "observed_cycles": 596,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "AR": {
+      "observed_cycles": 599,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "R": {
+      "observed_cycles": 598,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    }
+  },
+  "full_backpressure": {
+    "AW": {
+      "observed_cycles": 599,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "W": {
+      "observed_cycles": 598,
+      "valid_cycles": 2,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "B": {
+      "observed_cycles": 596,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "AR": {
+      "observed_cycles": 599,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    },
+    "R": {
+      "observed_cycles": 598,
+      "valid_cycles": 1,
+      "blocked_cycles": 0,
+      "blocked_time_ps": 0,
+      "stall_ratio": 0.0
+    }
+  },
+  "integrity": {
+    "ok": true,
+    "issues": []
+  },
+  "event_counts": {
+    "XPV_EVENT_WINDOW_START": 1,
+    "XPV_EVENT_RESET_ASSERT": 1,
+    "XPV_EVENT_RESET_DEASSERT": 1,
+    "XPV_EVENT_STATE": 10,
+    "XPV_EVENT_HANDSHAKE": 6,
+    "XPV_EVENT_WINDOW_END": 1
+  },
+  "channel_counts": {
+    "CONTROL": 2,
+    "RESET": 2,
+    "AW": 3,
+    "AR": 3,
+    "W": 4,
+    "R": 3,
+    "B": 3
+  },
+  "timeline": [
+    {
+      "time_ns": 0.35,
+      "bandwidth_gbps": 80.0,
+      "read_bandwidth_gbps": 40.0,
+      "write_bandwidth_gbps": 40.0,
+      "read_outstanding": 0,
+      "write_outstanding": 1
+    },
+    {
+      "time_ns": 0.45,
+      "bandwidth_gbps": 20.0,
+      "read_bandwidth_gbps": 0.0,
+      "write_bandwidth_gbps": 20.0,
+      "read_outstanding": 0,
+      "write_outstanding": 0
+    }
+  ],
+  "range_data": {
+    "byte_events": [
+      [
+        300,
+        0,
+        4
+      ],
+      [
+        300,
+        4,
+        0
+      ],
+      [
+        400,
+        0,
+        2
+      ]
+    ],
+    "outstanding_events": [
+      [
+        100,
+        0,
+        0
+      ],
+      [
+        200,
+        0,
+        1
+      ],
+      [
+        200,
+        1,
+        1
+      ],
+      [
+        300,
+        0,
+        1
+      ],
+      [
+        500,
+        0,
+        0
+      ]
+    ],
+    "burst_events": {
+      "read": [
+        [
+          200,
+          1,
+          4,
+          4
+        ]
+      ],
+      "write": [
+        [
+          200,
+          2,
+          4,
+          8
+        ]
+      ]
+    },
+    "wstrb_events": [
+      [
+        300,
+        1,
+        4
+      ],
+      [
+        400,
+        0,
+        2
+      ]
+    ],
+    "wstrb_width_bits": 4,
+    "latency_events": {
+      "read": [
+        [
+          300,
+          100
+        ]
+      ],
+      "write": [
+        [
+          500,
+          300
+        ]
+      ]
+    },
+    "channel_events": [
+      [
+        200,
+        0,
+        6,
+        7,
+        2,
+        "0x1",
+        4096,
+        2,
+        2,
+        1
+      ],
+      [
+        200,
+        3,
+        7,
+        8,
+        2,
+        "0x2",
+        8192,
+        1,
+        2,
+        1
+      ],
+      [
+        300,
+        1,
+        12,
+        13,
+        3,
+        4,
+        0
+      ],
+      [
+        300,
+        4,
+        13,
+        14,
+        3,
+        "0x2",
+        1,
+        0
+      ],
+      [
+        400,
+        1,
+        15,
+        16,
+        4,
+        2,
+        1
+      ],
+      [
+        500,
+        2,
+        18,
+        19,
+        5,
+        "0x1",
+        0
+      ]
+    ],
+    "channel_details": [
+      {
+        "id": "0x1",
+        "address": "0x1000",
+        "length": "1",
+        "size": "2",
+        "burst": "0x1"
+      },
+      {
+        "id": "0x2",
+        "address": "0x2000",
+        "length": "0",
+        "size": "2",
+        "burst": "0x1"
+      },
+      {
+        "strobe": "0b1111",
+        "last": "0"
+      },
+      {
+        "id": "0x2",
+        "last": "1",
+        "response": "0x0"
+      },
+      {
+        "strobe": "0b0011",
+        "last": "1"
+      },
+      {
+        "id": "0x1",
+        "response": "0x0"
+      }
+    ],
+    "transactions": [
+      {
+        "d": "r",
+        "id": "0x2",
+        "addr": 8192,
+        "beats": 1,
+        "size": 2,
+        "burst": 1,
+        "req": 1,
+        "data": [
+          3
+        ],
+        "resp": 3,
+        "rv": 0,
+        "lat": 100,
+        "done": true
+      },
+      {
+        "d": "w",
+        "id": "0x1",
+        "addr": 4096,
+        "beats": 2,
+        "size": 2,
+        "burst": 1,
+        "req": 0,
+        "data": [
+          2,
+          4
+        ],
+        "resp": 5,
+        "rv": 0,
+        "lat": 300,
+        "done": true
+      }
+    ],
+    "backpressure_segments": {
+      "AW": [
+        [
+          200,
+          300,
+          1,
+          1,
+          1
+        ],
+        [
+          300,
+          60100,
+          598,
+          0,
+          1
+        ]
+      ],
+      "W": [
+        [
+          300,
+          400,
+          1,
+          1,
+          1
+        ],
+        [
+          400,
+          500,
+          1,
+          1,
+          1
+        ],
+        [
+          500,
+          60100,
+          596,
+          0,
+          1
+        ]
+      ],
+      "B": [
+        [
+          500,
+          600,
+          1,
+          1,
+          1
+        ],
+        [
+          600,
+          60100,
+          595,
+          0,
+          1
+        ]
+      ],
+      "AR": [
+        [
+          200,
+          300,
+          1,
+          1,
+          1
+        ],
+        [
+          300,
+          60100,
+          598,
+          0,
+          1
+        ]
+      ],
+      "R": [
+        [
+          300,
+          400,
+          1,
+          1,
+          1
+        ],
+        [
+          400,
+          60100,
+          597,
+          0,
+          1
+        ]
+      ]
+    },
+    "active_regions": [
+      [
+        300,
+        500
+      ]
+    ]
+  },
+  "artifacts": {
+    "html_report": "./report.html",
+    "tracker_log": "./tracker.log",
+    "analyze_log": "./analyze.log"
+  }
+}

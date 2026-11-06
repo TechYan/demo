@@ -1,0 +1,7 @@
+TIME(ns) CHANNEL REF CONTENT
+       0.200 AW           #0001:   ID=0x1 ADDR=0x1000 INCR 2x4B
+       0.200 AR           #0002:   ID=0x2 ADDR=0x2000 INCR 1x4B
+       0.300 W            ->#0001  BEAT=1/2 WSTRB=0b1111 DATA=NOT_CAPTURED
+       0.300 R            ->#0002  BEAT=1/1 RESP=OKAY DATA=NOT_CAPTURED DONE LAT=0.1ns
+       0.400 W            ->#0001  BEAT=2/2 WSTRB=0b0011 DATA=NOT_CAPTURED
+       0.500 B            ->#0001  ID=0x1 RESP=OKAY DONE LAT=0.3ns
