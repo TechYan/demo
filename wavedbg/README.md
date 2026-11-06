@@ -1,5 +1,7 @@
 # wavedbg 合成导览数据
 
+> **最新能力：** v0.3.0 已新增 AXI4 性能分析。请访问[公开图文演示站](https://techyan.github.io/demo/wavedbg/performance/)或[性能示例说明](performance/README.md)，查看实际 HTML report、tracker 和分析日志。下文保留 v0.2.1 四个波形导览的来源记录。
+
 此目录为 `/wavedbg/` 页面提供可核对的教学内容。wavedbg 是供 AI Agent 使用的本地波形与设计查询服务；浏览器中的波形是预制导览回放。页面不启动 native 引擎，也不代表产品自带 GUI 波形查看器。
 
 内容依据 `TechYan/wavedbg` 的 v0.2.1 源码，固定到提交 `9bf7b333dce94c73f64877bd7e676524b35b033e`。`provenance.json` 记录已核对源文件和发布数据的 SHA-256。源仓库可见性与本站独立；本目录不依赖访问源仓库才能播放或检查。
