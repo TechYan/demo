@@ -1,0 +1,8 @@
+{
+  "kind": "authored-user-guide",
+  "source_repository": "TechYan/sflow",
+  "source_commit": "0906cbc27d8bbeb3a633b74ff288f787029a654f",
+  "generated_simulation_results": false,
+  "scope": "Architecture and usage guide; static directory examples and commands; no EDA execution in the browser.",
+  "page_source": "src/pages/sflow/index.astro"
+}

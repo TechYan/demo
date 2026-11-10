@@ -1,0 +1,7 @@
+---
+const { code, title = 'Terminal', copy = true, tree = false } = Astro.props;
+---
+<div class:list={['sf-terminal', { 'sf-tree': tree }]}>
+  <div class="sf-terminal-bar"><span class="sf-lights" aria-hidden="true"><i></i><i></i><i></i></span><span>{title}</span>{copy && <button class="sf-copy" type="button" aria-label={`复制 ${title}`}>复制</button>}</div>
+  <pre tabindex="0" aria-label={title}><code>{code}</code></pre>
+</div>

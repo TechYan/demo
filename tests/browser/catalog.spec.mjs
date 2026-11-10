@@ -4,7 +4,7 @@ test('catalog filters and search compose, empty state resets, keyboard shortcut 
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.goto('./');
-  await expect(page.locator('[data-project]:visible')).toHaveCount(8);
+  await expect(page.locator('[data-project]:visible')).toHaveCount(9);
   await page.getByRole('button', { name: '寄存器与配置' }).click();
   await expect(page.locator('[data-project]:visible')).toHaveCount(2);
   const search = page.getByRole('searchbox', { name: '搜索项目、协议或技术' });
@@ -14,7 +14,7 @@ test('catalog filters and search compose, empty state resets, keyboard shortcut 
   await search.fill('missing-result');
   await expect(page.locator('#empty-state')).toBeVisible();
   await page.getByRole('button', { name: '清除搜索与筛选' }).click();
-  await expect(page.locator('[data-project]:visible')).toHaveCount(8);
+  await expect(page.locator('[data-project]:visible')).toHaveCount(9);
   await page.locator('h1').click();
   await page.keyboard.press('/');
   await expect(search).toBeFocused();
@@ -26,7 +26,7 @@ test('catalog filters and search compose, empty state resets, keyboard shortcut 
 
 test('theme is accessible and persists, and a category URL opens the right selection', async ({ page }) => {
   await page.goto('./?category=verification#projects');
-  await expect(page.locator('[data-project]:visible')).toHaveCount(2);
+  await expect(page.locator('[data-project]:visible')).toHaveCount(3);
   await page.getByRole('button', { name: '切换浅色主题' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.reload();
@@ -34,8 +34,8 @@ test('theme is accessible and persists, and a category URL opens the right selec
   await page.getByRole('button', { name: '切换深色主题' }).click();
 });
 
-test('all eight project routes expose actual demo and artifact links', async ({ page }) => {
-  const projects = [ ['pvkit', 'PVKit'], ['wavedbg', 'wavedbg'], ['bus-protocol-lab', 'Bus Protocol Lab'], ['pg_gen', 'PG Builder'], ['uvm_wiki', 'UVM Wiki'], ['svip', 'SVIP'], ['xpggen', 'xpggen'], ['xDCT', 'xDCT'] ];
+test('all project routes expose actual demo and artifact links', async ({ page }) => {
+  const projects = [ ['pvkit', 'PVKit'], ['wavedbg', 'wavedbg'], ['bus-protocol-lab', 'Bus Protocol Lab'], ['pg_gen', 'PG Builder'], ['uvm_wiki', 'UVM Wiki'], ['svip', 'SVIP'], ['xpggen', 'xpggen'], ['xDCT', 'xDCT'], ['sflow', 'Sflow'] ];
   for (const [id, name] of projects) {
     const response = await page.goto(`projects/${id}/`);
     expect(response.status()).toBe(200);
@@ -61,3 +61,4 @@ test('desktop and mobile catalog remain readable without horizontal overflow', a
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: 'test-results/project-mobile.png', fullPage: true });
 });
+

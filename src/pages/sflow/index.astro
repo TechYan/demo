@@ -1,0 +1,128 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import SflowCode from '../../components/SflowCode.astro';
+import SflowTopology from '../../components/SflowTopology.astro';
+import { sitePath } from '../../lib/catalog.mjs';
+import { sections, socTree, outputTree, platformTree, createCommand, startCommand, phases } from '../../data/sflow-guide.mjs';
+import '../../styles/sflow-guide.css';
+const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
+---
+<Base title="Sflow User Guide — 从独立 tree 到 SoC 构建" projectName="sflow / user guide" description="用完整 SoC 目录树、集成关系与构建阶段图，理解 sflow、SiliconCompiler、variant、BIA 和独立开发仓库的协作方式。">
+  <div class="detail-back"><a class="text-link" href={href('')}><Icon name="back" size={15}/> 返回项目索引</a></div>
+  <header class="sf-hero">
+    <div class="eyebrow">SFLOW / USER GUIDE</div>
+    <h1>独立开发。<br/><span>在同一个 flow 中集成。</span></h1>
+    <p>从一个 SoC 的开发目录出发，看清平台、IP 与公共库如何组合，<br class="sf-wide-break"/>再沿着发布物，走到 BIA 顶层、编译和仿真。</p>
+    <div class="detail-actions"><a class="primary-button" href="#start">跑通第一个构建 <Icon name="arrow" size={15}/></a><a class="secondary-button" href="#tree"><Icon name="terminal" size={15}/> 先看 SoC tree</a></div>
+    <div class="sf-hero-map" aria-label="独立仓库经 sflow 和 SiliconCompiler 构建成为 DUT 与运行产物">
+      <div><small>01 / SOURCES</small><strong>独立开发 tree</strong><span>IP · subsystem · SoC · library</span></div><span class="sf-map-arrow" aria-hidden="true">→</span>
+      <div class="sf-map-engine"><small>02 / BUILD PLATFORM</small><strong>sflow <span>+ SiliconCompiler</span></strong><span>publish → BIA → assembly</span></div><span class="sf-map-arrow" aria-hidden="true">→</span>
+      <div><small>03 / ARTIFACTS</small><strong>可追溯的构建结果</strong><span>DUT · filelist · image · case log</span></div>
+    </div>
+    <div class="sf-guide-meta"><span>8 个阅读章节</span><span>6 个示例 IP</span><span>可复制的本地命令</span><span>基于 meta platform</span></div>
+  </header>
+  <div class="sf-guide-layout">
+    <nav class="sf-toc" aria-label="Sflow 使用指南目录"><div class="small-heading">ON THIS PAGE</div>{sections.map(([id,title],i)=><a href={`#${id}`}><span>{String(i+1).padStart(2,'0')}</span>{title}</a>)}<a class="sf-toc-source" href={href('sflow/README.md')}>版本与来源说明 ↗</a></nav>
+    <div class="sf-guide-body">
+      <section id="start" class="sf-section">
+        <div class="section-kicker"><span>01</span> GET STARTED</div><h2>先建立一个能运行的环境</h2>
+        <p class="sf-lead">浏览本指南无需安装工具。要实际执行 flow，在本地准备 sflow checkout，再用它生成独立仓库和工作环境。</p>
+        <div class="sf-prerequisites"><span>Git</span><span>Python ≥ 3.11</span><span>uv</span><span>Icarus / vvp</span></div>
+        <SflowCode title="01 · 从平台创建 demo" code={createCommand}/>
+        <div class="sf-callout"><strong>生成器建立了什么？</strong><p><code>repos/sflow</code> 保存独立的平台源仓库；<code>repos/</code> 下还有六个 IP、<code>io_subsys</code>、<code>soc</code> 和公共库。<code>workspaces/</code> 提供 PCIe、子系统和 SoC 的开发 checkout。</p></div>
+        <SflowCode title="02 · 在 SoC 构建根执行" code={startCommand}/>
+        <div class="sf-outcome"><span class="status-dot"></span><p><strong>到达这里，你应看到：</strong>独立 build 目录、BIA 生成的 <code>.sv</code>、编译 image 与 case 结果。用 <code>status</code> 和 <code>out/&lt;os&gt;/latest.json</code> 找到实际结果。</p></div>
+        <p class="sf-caption">页面上的命令与目录是指南示例，不是现场运行日志。随包 RTL 用于启动检查；没有在浏览器执行 EDA 工具，也不代表 PCIe / DMA 功能验证。</p>
+      </section>
+      <section id="tree" class="sf-section">
+        <div class="section-kicker"><span>02</span> INSIDE THE TREE</div><h2>一个 SoC tree，四个清晰的区域</h2>
+        <p class="sf-lead">每个 IP 和 subsystem 也拥有相同的骨架。下面展开 demo 的 SoC：<code>import/</code> 在同步后出现，<code>out/</code> 在构建后填充。</p>
+        <div class="sf-ownership"><div><code>env/</code><span>锁版本、定义环境</span></div><div><code>import/</code><span>独立依赖 checkout</span></div><div><code>src/</code><span>项目自己维护</span></div><div><code>out/</code><span>flow 生成的结果</span></div></div>
+        <SflowCode title="$ tree soc/  ·  主干结构，省略辅助文件" code={socTree} tree/>
+        <p class="sf-caption">这是整理后的目录说明，保留真实路径。当前 feature 默认值在 <code>src/meta/build.py</code>，fileset/config 在 <code>manifest/project.hjson</code>；不能仅凭分类目录名称推断配置入口。</p>
+        <details class="sf-details"><summary>平台仓库 sflow 自己是什么结构？</summary><p>平台维护脚本、模板、reference 与维护 agent；实际 IP / SoC 内容由生成后的独立 repo 管理。</p><SflowCode title="平台目录" code={platformTree} tree/></details>
+      </section>
+      <section id="integration" class="sf-section">
+        <div class="section-kicker"><span>03</span> COMPOSE INDEPENDENT TREES</div><h2>先导入版本，再决定硬件怎么连接</h2>
+        <p class="sf-lead">导入回答“取哪份源码”，BIA 回答“实例化什么”。SoC 可以直接集成六个 IP，也可以把 PCIe、DMA、DNoC 作为子系统再次集成。</p>
+        <div class="sf-locks"><div><small>PLATFORM LOCK</small><h3>SoC 选择一个 sflow</h3><p><code>platform.lock.json</code> 固定 runtime。所有导入设计由这个平台构建，IP 独立环境的平台锁不参与本次选择。</p></div><div><small>DESIGN LOCK</small><h3>每个设计独立锁 commit</h3><p><code>imports.lock.json</code> 固定设计闭包。同名公共库必须是同一来源和 commit，冲突直接报错。</p></div></div>
+        <div class="sf-figure">
+          <div class="sf-figure-header"><span>HARDWARE COMPOSITION</span><div class="sf-toggle" role="group" aria-label="选择集成方式"><button type="button" data-topology="flat" aria-pressed="true">直接集成</button><button type="button" data-topology="hier" aria-pressed="false">子系统集成</button></div></div>
+          <div data-topology-panel="flat"><SflowTopology/><div class="sf-figure-caption"><code>--target flat</code><p>SoC 的 BIA 直接实例化六个 IP。六个源码 repo 仍分别维护。</p></div></div>
+          <div data-topology-panel="hier" hidden><SflowTopology hierarchical/><div class="sf-figure-caption"><code>--target hier</code><p><code>io_subsys</code> 拥有自己的顶层和 public bundle，可独立验证，也可继续交付给 SoC。</p></div></div>
+        </div>
+        <SflowCode title="比较同一个 SoC 的两种集成方式" code={`python run.py build --target flat\npython run.py build --target hier`}/>
+        <div class="sf-callout"><strong>共享库也是真正独立的 tree。</strong><p><code>sharedlib</code> 提供 FIFO、同步器等 RTL，<code>common_info</code> 提供公共格式与 bundle 定义。VIP 可作为独立设计库；flow runtime 已从旧 toolkit 中独立出来。</p></div>
+      </section>
+      <section id="variants" class="sf-section">
+        <div class="section-kicker"><span>04</span> ONE REPO / MULTIPLE IMPLEMENTATIONS</div><h2>两个 PCIe，为什么不会覆盖彼此？</h2>
+        <p class="sf-lead">需要区分三层身份：源码 repo、构建单元 <code>design_variant</code>、硬件 instance。发布目录以构建单元命名，而不是以实例名命名。</p>
+        <div class="sf-variant-map"><div class="sf-variant-source"><span>ONE SOURCE REPOSITORY</span><strong>pcie/</strong><code>src/meta/build.py → VARIANTS</code></div><div class="sf-variant-branches">{[['rc_x16','rc0 + rc1','16','1'],['ep_x16','ep','16','2'],['dm_x8','dm','8','3']].map(([v,inst,lanes,role])=><div><small>BUILD UNIT</small><h3>pcie_{v}</h3><code>LANES = {lanes} / ROLE = {role}</code><span class="sf-variant-arrow" aria-hidden="true">↓</span><strong>{inst}</strong><span>硬件实例</span></div>)}</div></div>
+        <p>示例共有四个 PCIe 实例，但只有三份 PCIe 发布物。两个 <code>rc_x16</code> 实例复用同一个模块实现；不同 variant 的生成模块使用独立名称。</p>
+        <SflowCode title="全局 feature 的命名空间" code={`PCIE_RC_X16_LANES = 16\nPCIE_EP_X16_LANES = 16\nPCIE_DM_X8_LANES  = 8\n\nlibrary/pcie_rc_x16/\nlibrary/pcie_ep_x16/\nlibrary/pcie_dm_x8/`}/>
+        <div class="sf-feature-chain"><span>声明类型与默认值</span><b>→</b><span>解析 config override</span><b>→</b><span>冻结 feature digest</span><b>→</b><span>生成与编译共同使用</span></div>
+        <p class="sf-caption">上方是 feature 值说明，不是 SystemVerilog 宏源码。实际宏由 <code>features.svh</code> 生成，使用带构建单元前缀的名称。</p>
+      </section>
+      <section id="build" class="sf-section">
+        <div class="section-kicker"><span>05</span> BUILD / CONNECT / ASSEMBLE</div><h2>Flow 的骨架，由 SC 负责调度</h2>
+        <p class="sf-lead">sflow 负责解析元数据、建立任务图和整理产物，SiliconCompiler 负责执行任务。点击阶段，查看它消费什么、产出什么，以及文件在哪里。</p>
+        <figure class="sf-dag"><div class="sf-figure-header"><span>SC TASK GRAPH / 示意</span><span>依赖满足后调度</span></div><svg viewBox="0 0 920 280" role="img" aria-label="Snapshot 后两个 publish 单元并行，等待发布完成执行 BIA 和 assembly，再选择 compile 到 run，或 lint 分支。地址及其他辅助任务省略。"><defs><marker id="sf-dag-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="var(--accent)" stroke-width="1.5"/></marker></defs><g class="sf-svg-wire" marker-end="url(#sf-dag-arrow)"><path d="M143 140H167V65H198M143 140H167V215H198M324 65H348V140H377M324 215H348V140H377M490 140H534M647 140H672V65H705M647 140H672V215H705M792 89V116"/></g><g class="sf-svg-block"><rect x="20" y="115" width="123" height="50" rx="5"/><rect x="198" y="40" width="126" height="50" rx="5"/><rect x="198" y="190" width="126" height="50" rx="5"/><rect x="377" y="115" width="113" height="50" rx="5"/><rect x="534" y="115" width="113" height="50" rx="5"/><rect x="705" y="40" width="175" height="49" rx="5"/><rect x="705" y="116" width="175" height="49" rx="5"/><rect x="705" y="190" width="175" height="50" rx="5"/></g><g class="sf-svg-title" text-anchor="middle"><text x="81" y="146">snapshot</text><text x="261" y="71">publish A</text><text x="261" y="221">publish B</text><text x="434" y="146">BIA</text><text x="590" y="146">assembly</text><text x="792" y="70">compile</text><text x="792" y="146">case / seed run</text><text x="792" y="221">lint</text></g><text class="sf-svg-small" x="261" y="144" text-anchor="middle">可并行</text></svg><figcaption>为便于阅读省略地址、公共库等辅助节点。实际边由当前设计依赖生成；compile / run 与 lint 按命令选择。</figcaption></figure>
+        <div class="sf-stages" role="group" aria-label="选择构建阶段">{phases.map((p,i)=><button type="button" data-phase={p.id} aria-pressed={i===1 ? 'true' : 'false'}><span>0{i+1}</span><strong>{p.name}</strong><small>{p.label}</small></button>)}</div>
+        {phases.map((p,i)=><article class="sf-stage-detail" data-phase-panel={p.id} hidden={i!==1}><span class="eyebrow">{p.name.toUpperCase()}</span><h3>{p.title}</h3><p>{p.text}</p><dl><div><dt>INPUT</dt><dd>{p.input}</dd></div><div><dt>OUTPUT</dt><dd>{p.output}</dd></div></dl><div class="sf-path"><Icon name="terminal" size={15}/><code>{p.path}</code></div><p class="sf-caption">{p.hint}</p></article>)}
+        <div class="sf-dependency-note"><strong>并行不等于所有阶段同时启动</strong><p>publish 按显式 build 依赖并行；BIA 需要对应单元和子组件的发布结果；assembly 等待选中闭包的发布与连线结果。上面的阶段条是阅读顺序，实际执行的是有分支的 DAG。</p></div>
+        <div class="sf-table-wrap"><table><thead><tr><th>四种图</th><th>定义位置</th><th>它回答的问题</th></tr></thead><tbody><tr><td>Import</td><td><code>env/imports.*</code></td><td>取哪些源码、什么版本？</td></tr><tr><td>Build</td><td><code>build.dependencies</code></td><td>生成器要等待哪些输入？</td></tr><tr><td>Hardware</td><td>BIA assembly</td><td>哪些实例、怎样连线？</td></tr><tr><td>Fileset</td><td>project filesets / deps</td><td>哪些文件参与、编译顺序如何？</td></tr></tbody></table></div>
+      </section>
+      <section id="bia" class="sf-section">
+        <div class="section-kicker"><span>06</span> BUNDLE INTERCONNECT AUTOMATION</div><h2>从 bundle 描述到顶层 SystemVerilog</h2>
+        <p class="sf-lead">不必在 SoC 中逐根手连信号。BIA 结合公共 bundle 定义、模块 sidecar 和 assembly，把端点展开成连接代码。</p>
+        <div class="sf-bia-inputs"><div><small>PROTOCOL</small><strong>common_info</strong><span>字段 / 位宽 / 方向</span></div><div><small>INTERFACE</small><strong>IP sidecar</strong><span>模块端口 / bundle 角色</span></div><div><small>COMPOSITION</small><strong>SoC assembly</strong><span>实例 / 连接 / tile 分组</span></div></div>
+        <div class="sf-bia-engine"><span>↓</span><strong>BIA</strong><p>检查类型、角色、位宽与端点</p><span>↓</span><code>connectivity/&lt;design_variant&gt;/&lt;view&gt;/*.sv</code></div>
+        <div class="sf-two-cols"><div><h3>Bundle 连接</h3><p>例如 <code>pcie.mem → dnoc.in0</code>：请求字段按 master 方向展开，响应字段反向返回。仲裁和协议转换仍由 IP RTL 完成。</p></div><div><h3>Tile 层次</h3><p><code>multi_pcie</code> 显式声明 rc0、rc1、ep、dm 的 tile 分组；选择 tile view 后生成对应层次顶层。BIA 不自动做物理布局分区。</p></div></div>
+        <SflowCode title="选择已有的多 PCIe / tile 配置" code={`# multi_pcie config 选择 target=multi_pcie、view=tile、suite=smoke\npython run.py sim --config multi_pcie`}/>
+        <p class="sf-caption">最终地址由 SoC 的 <code>register/addresses.hjson</code> 分配；IP 管相对寄存器布局，common_info 管公共格式与定义。</p>
+      </section>
+      <section id="outputs" class="sf-section">
+        <div class="section-kicker"><span>07</span> FOLLOW THE ARTIFACTS</div><h2>构建结束后，到哪里找结果？</h2>
+        <p class="sf-lead">每次构建都有独立 ID。先看 <code>latest.json</code>，再进入它指向的 build 目录，沿着发布物、filelist 和 case 日志定位问题。</p>
+        <SflowCode title="$ tree out/<os>/builds/<id>/  ·  汇总示意" code={outputTree} tree/>
+        <div class="sf-callout"><strong>开发源码与消费产物有明确边界。</strong><p><code>library/</code> 等浏览路径链接到本次 SC 输出，不链接回开发源码。发布后核对文件摘要；外部工艺库和 SRAM 输入也有摘要记录。</p></div>
+        <div class="sf-table-wrap"><table><thead><tr><th>你想知道</th><th>先查看</th></tr></thead><tbody><tr><td>这次实际用了什么版本？</td><td><code>provenance.json</code></td></tr><tr><td>Feature 是否按预期生效？</td><td><code>features.json</code> + 发布 manifest 的 digest</td></tr><tr><td>究竟编译了哪些文件？</td><td><code>compile/metadata.json</code> 与前端 include 审计</td></tr><tr><td>哪个 case 失败？</td><td><code>result.json</code> → 对应 case / seed 日志</td></tr></tbody></table></div>
+        <p class="sf-caption">目录汇总了 sim 与 lint 的产物位置；二者是独立可选构建，单次执行不一定同时出现全部文件。</p>
+      </section>
+      <section id="daily" class="sf-section">
+        <div class="section-kicker"><span>08</span> EVERYDAY WORK</div><h2>日常只需要记住几个入口</h2>
+        <SflowCode title="在独立开发 tree 中" code={`python env/sync.py                          # 只同步锁定版本\npython run.py list                          # 查看 target / config\npython run.py build --config multi_pcie      # 发布 → 连线 → 编译\npython run.py sim --config multi_pcie        # 编译 + suite 运行\npython run.py lint --config multi_pcie       # 基础 RTL 诊断\npython run.py status                        # 最近结果\n\n# 用实际的、已执行 sim 的 build 路径替换 <build-dir>\npython run.py run --build <build-dir> --suite smoke`}/>
+        <details class="sf-details"><summary>升级 sflow，会不会改动 IP 的源码？</summary><p>兼容升级只由构建根切换平台版本。模板 / schema 迁移另走显式迁移流程，先预览差异，保留项目 RTL、BIA、feature 等自定义内容。</p><SflowCode title="切换构建根的平台版本" code={`python run.py platform update --ref <new-platform-commit>\npython env/sync.py\npython run.py platform status`}/></details>
+        <details class="sf-details"><summary>SoC 集成时需要临时调试一个 IP？</summary><p>通过 <code>env/overrides.local.hjson</code> 显式覆盖到开发者 checkout；修复后提交 IP，再更新上层设计锁。平台开发覆盖使用 <code>env/platform.local.json</code>。两者均记录在 provenance，且不提交本地覆盖文件。</p><SflowCode title="显式更新设计依赖（与平台升级分开）" code={`python env/sync.py update pcie`}/></details>
+        <details class="sf-details"><summary>创建新的 IP / 公共库从哪里开始？</summary><p><code>sflow new</code> 支持 ip、subsystem、soc、library、common。同一模板派生，入口一致。IP starter 需要准备 sharedlib / common_info 来源与可用的 bundle 定义。</p><SflowCode title="在平台 checkout 中创建一个独立 tree" code={`uv run --locked sflow new --type ip --name my_ip --dest /path/to/my_ip \\\n  --imports /path/to/sources.hjson \\\n  --platform-source /path/to/sflow --platform-ref <available-commit>`}/></details>
+        <details class="sf-details"><summary>想验证整个 demo，而不只是一个 SoC 配置？</summary><p>以下检查覆盖 PCIe 独立环境、io_subsys、SoC flat / hier / multi_pcie，执行 BIA、编译和仿真启动检查。</p><SflowCode title="在平台 checkout 中检查完整 fixture" code={`uv run --locked python scripts/check_demo.py /tmp/sflow-tour`}/></details>
+        <div class="sf-next"><span class="eyebrow">CONTINUE EXPLORING</span><h3>从目录出发，沿产物验证每一步。</h3><p>回到 SoC tree，把你要修改的输入与下一次构建产物对应起来。</p><a class="primary-button" href="#tree">回到 SoC 目录 <Icon name="arrow" size={15}/></a><a class="text-link" href={href('sflow/README.md')}>来源与维护说明 ↗</a></div>
+        <p class="sf-caption">阅读组织参考 <a href="https://docs.siliconcompiler.com/en/stable/user_guide/index.html">SiliconCompiler User Guide</a> 与 <a href="https://fusesoc.readthedocs.io/en/stable/user/index.html">FuseSoC User Guide</a> 的入门、概念、操作分层。页面布局和主题沿用 TechYan demo；sflow 行为依据本项目实现。</p>
+      </section>
+    </div>
+  </div>
+  <span id="sf-copy-status" class="sf-sr-only" role="status" aria-live="polite"></span>
+  <script>
+    document.querySelectorAll<HTMLButtonElement>('[data-topology]').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll<HTMLElement>('[data-topology-panel]').forEach(panel => panel.hidden = panel.dataset.topologyPanel !== button.dataset.topology);
+      document.querySelectorAll('[data-topology]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    }));
+    document.querySelectorAll<HTMLButtonElement>('[data-phase]').forEach(button => button.addEventListener('click', () => {
+      document.querySelectorAll<HTMLElement>('[data-phase-panel]').forEach(panel => panel.hidden = panel.dataset.phasePanel !== button.dataset.phase);
+      document.querySelectorAll('[data-phase]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    }));
+    document.querySelectorAll<HTMLButtonElement>('.sf-copy').forEach(button => button.addEventListener('click', async () => {
+      const code = button.closest('.sf-terminal')?.querySelector('code')?.textContent;
+      const status = document.getElementById('sf-copy-status');
+      try { if (!code) return; await navigator.clipboard.writeText(code); button.textContent = '已复制'; if(status) status.textContent = '已复制到剪贴板'; }
+      catch { button.textContent = '请手动选择'; if(status) status.textContent = '无法访问剪贴板，请在代码区手动选择复制。'; }
+      setTimeout(() => button.textContent = '复制', 2200);
+    }));
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('.sf-toc a[href^="#"]')];
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => { for(const entry of entries) if(entry.isIntersecting) links.forEach(link => { const active = link.hash === '#' + entry.target.id; link.classList.toggle('current',active); if(active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current'); }); }, {rootMargin:'-10% 0px -70% 0px'});
+      document.querySelectorAll('.sf-section').forEach(section => observer.observe(section));
+    }
+  </script>
+</Base>

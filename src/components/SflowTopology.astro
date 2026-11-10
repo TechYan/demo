@@ -1,0 +1,16 @@
+---
+const { hierarchical = false } = Astro.props;
+const marker = hierarchical ? 'sf-arrow-hier' : 'sf-arrow-flat';
+---
+<svg class="sf-topology" viewBox="0 0 960 425" role="img" aria-label={hierarchical ? 'SoC 通过 io_subsys 集成 PCIe、DMA 和 DNoC，再连接 ATU 与 MC，RNoC 提供控制通路。' : 'SoC 直接集成 PCIe、DMA、DNoC、ATU、MC 和 RNoC。'}>
+  <defs><marker id={marker} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke="var(--accent)" stroke-width="1.5"/></marker></defs>
+  <rect class="sf-svg-boundary" x="16" y="14" width="928" height="397" rx="10"/>
+  <text class="sf-svg-small" x="36" y="41">SOC / {hierarchical ? 'HIER TARGET' : 'FLAT TARGET'}</text>
+  {hierarchical && <><rect class="sf-svg-group" x="36" y="62" width="446" height="272" rx="8"/><text class="sf-svg-accent" x="56" y="85">io_subsys</text><text class="sf-svg-small" x="280" y="85">public bundle: mem →</text></>}
+  <g class="sf-svg-wire" marker-end={`url(#${marker})`}><path d="M222 141 H258 V202 H302"/><path d="M222 277 H258 V230 H302"/><path d="M458 216 H548"/><path d="M704 216 H764"/></g>
+  <g class="sf-svg-block"><rect x="62" y="110" width="160" height="62" rx="6"/><rect x="62" y="246" width="160" height="62" rx="6"/><rect x="302" y="185" width="156" height="62" rx="6"/><rect x="548" y="185" width="156" height="62" rx="6"/><rect x="764" y="185" width="150" height="62" rx="6"/><rect x="548" y="310" width="156" height="62" rx="6"/></g>
+  <g class="sf-svg-title" text-anchor="middle"><text x="142" y="136">PCIe</text><text x="142" y="272">DMA</text><text x="380" y="212">DNoC</text><text x="626" y="212">ATU</text><text x="839" y="212">MC</text><text x="626" y="337">RNoC</text></g>
+  <g class="sf-svg-small" text-anchor="middle"><text x="142" y="157">mem</text><text x="142" y="293">mem</text><text x="380" y="233">in0 / in1 → out</text><text x="626" y="233">in → out</text><text x="839" y="233">mem</text><text x="626" y="357">配置 DMA / ATU</text></g>
+  <text class="sf-svg-small" x="500" y="201" text-anchor="middle">{hierarchical ? 'mem' : 'bundle'}</text>
+  <text class="sf-svg-small" x="36" y="387">数据通路示意 · 控制连线省略 · 仲裁 / 译码 / 协议行为由 RTL 实现</text>
+</svg>

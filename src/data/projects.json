@@ -85,27 +85,79 @@
     "category": "analysis",
     "label": "WAVEFORM INVESTIGATION / WITH AI",
     "color": "cyan",
-      "description": "从关键波形到 AXI 性能报告，让 AI 沿证据分析。",
-      "lead": "体验 v0.3.0 的 AXI 性能分析：从指定接口读取 FSDB，生成 xpvkit 原生报告与日志；也可通过四个经典波形问题探索渐进调试流程。",
-    "tags": ["Waveform", "AI", "AXI4", "Protocol Skills"],
-    "keywords": ["波形", "缩放", "时钟", "reset", "FIFO", "credit", "X", "APB", "AHB", "FSDB", "KDB", "MCP"],
+    "description": "从关键波形到 AXI 性能报告，让 AI 沿证据分析。",
+    "lead": "体验 v0.3.0 的 AXI 性能分析：从指定接口读取 FSDB，生成 xpvkit 原生报告与日志；也可通过四个经典波形问题探索渐进调试流程。",
+    "tags": [
+      "Waveform",
+      "AI",
+      "AXI4",
+      "Protocol Skills"
+    ],
+    "keywords": [
+      "波形",
+      "缩放",
+      "时钟",
+      "reset",
+      "FIFO",
+      "credit",
+      "X",
+      "APB",
+      "AHB",
+      "FSDB",
+      "KDB",
+      "MCP"
+    ],
     "format": "交互波形 / 分析导览",
     "metric": "04",
     "metricLabel": "guided waveform cases",
     "primary": "wavedbg/index.html",
     "actions": [
-        { "title": "AXI 性能报告 · v0.3.0", "description": "打开真实 FSDB 生成的 HTML、事务日志与性能证据", "path": "wavedbg/performance/index.html", "type": "INTERACTIVE" },
-      { "title": "探索典型波形", "description": "在四个问题中切换全局、关注区间与关键几拍", "path": "wavedbg/index.html", "type": "INTERACTIVE" },
-      { "title": "效率与渐进分析", "description": "先看概览，再按信号和时间范围逐步补证", "path": "wavedbg/index.html#efficiency", "type": "GUIDE" },
-      { "title": "协议 skills 与扩展", "description": "七个随包工作流，以及自定义协议的扩展方法", "path": "wavedbg/index.html#skills", "type": "GUIDE" },
-      { "title": "案例与来源说明", "description": "合成回放、原始假后端输出及固定版本校验", "path": "wavedbg/README.md", "type": "GUIDE" }
+      {
+        "title": "AXI 性能报告 · v0.3.0",
+        "description": "打开真实 FSDB 生成的 HTML、事务日志与性能证据",
+        "path": "wavedbg/performance/index.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "探索典型波形",
+        "description": "在四个问题中切换全局、关注区间与关键几拍",
+        "path": "wavedbg/index.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "效率与渐进分析",
+        "description": "先看概览，再按信号和时间范围逐步补证",
+        "path": "wavedbg/index.html#efficiency",
+        "type": "GUIDE"
+      },
+      {
+        "title": "协议 skills 与扩展",
+        "description": "七个随包工作流，以及自定义协议的扩展方法",
+        "path": "wavedbg/index.html#skills",
+        "type": "GUIDE"
+      },
+      {
+        "title": "案例与来源说明",
+        "description": "合成回放、原始假后端输出及固定版本校验",
+        "path": "wavedbg/README.md",
+        "type": "GUIDE"
+      }
     ],
     "highlights": [
-      { "title": "从问题到时间证据", "detail": "用自然语言描述现象，沿波形、连接与代码逐步验证解释。" },
-      { "title": "视野越小，证据越具体", "detail": "先从变化概览找方向，再缩小到相关信号和精确时间，减少无关信息。" },
-      { "title": "协议经验可以继续积累", "detail": "AXI、APB、AHB、时钟复位、FIFO 与 credit skills 提供工作流，也支持补充自己的接口约定。" }
+      {
+        "title": "从问题到时间证据",
+        "detail": "用自然语言描述现象，沿波形、连接与代码逐步验证解释。"
+      },
+      {
+        "title": "视野越小，证据越具体",
+        "detail": "先从变化概览找方向，再缩小到相关信号和精确时间，减少无关信息。"
+      },
+      {
+        "title": "协议经验可以继续积累",
+        "detail": "AXI、APB、AHB、时钟复位、FIFO 与 credit skills 提供工作流，也支持补充自己的接口约定。"
+      }
     ],
-      "scope": "四个波形导览基于 v0.2.1 合成数据；v0.3.0 性能页展示自建激励的真实 FSDB 报告。均不代表用户 DUT 性能；本地 native 查询需要授权的 Verdi 环境。"
+    "scope": "四个波形导览基于 v0.2.1 合成数据；v0.3.0 性能页展示自建激励的真实 FSDB 报告。均不代表用户 DUT 性能；本地 native 查询需要授权的 Verdi 环境。"
   },
   {
     "id": "bus-protocol-lab",
@@ -463,5 +515,77 @@
       }
     ],
     "scope": "演示使用 v0.1.0-prototype 的已有合成案例。浏览器展示已生成的语义差异，不在前端执行 SystemVerilog elaboration。"
+  },
+  {
+    "id": "sflow",
+    "name": "Sflow",
+    "category": "verification",
+    "label": "INDEPENDENT TREES / ONE BUILD FLOW",
+    "color": "lime",
+    "description": "从独立 IP 到 SoC，沿目录、连接和构建产物读懂集成 flow。",
+    "lead": "一份从 SoC tree 出发的使用指南：平台与设计锁、公共库导入、多 variant 发布、BIA 层次连接，以及 SiliconCompiler 调度的构建与仿真。",
+    "tags": [
+      "SiliconCompiler",
+      "SoC",
+      "BIA",
+      "Build Flow"
+    ],
+    "keywords": [
+      "构建",
+      "集成",
+      "目录",
+      "tree",
+      "variant",
+      "feature",
+      "IP",
+      "flow",
+      "公共库",
+      "lint"
+    ],
+    "format": "图形指南 / Terminal 目录",
+    "metric": "08",
+    "metricLabel": "guide chapters",
+    "primary": "sflow/index.html",
+    "actions": [
+      {
+        "title": "Sflow 使用指南",
+        "description": "先跑示例，再理解独立 tree 的集成与构建",
+        "path": "sflow/index.html",
+        "type": "GUIDE"
+      },
+      {
+        "title": "完整 SoC tree",
+        "description": "从 env、import、src 一直读到 out",
+        "path": "sflow/index.html#tree",
+        "type": "TERMINAL"
+      },
+      {
+        "title": "构建阶段图解",
+        "description": "点击阶段，追踪输入、输出和实际目录",
+        "path": "sflow/index.html#build",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "来源与维护说明",
+        "description": "版本基线、展示边界与复现方式",
+        "path": "sflow/README.md",
+        "type": "GUIDE"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "平台与设计各自锁版本",
+        "detail": "构建根选择 sflow，设计仓库按 commit 独立导入；平台升级与 tree 迁移分开。"
+      },
+      {
+        "title": "从仓库到硬件实例",
+        "detail": "比较直接集成和 subsystem 集成，区分 repo、design_variant 与 instance。"
+      },
+      {
+        "title": "沿产物读懂 flow",
+        "detail": "从 publish、BIA、assembly 到编译与 case 目录，把每个阶段落到文件。"
+      }
+    ],
+    "scope": "基于 sflow meta platform 的使用指南，命令与目录是说明示例。浏览器不执行 EDA 工具；随包 RTL 检查 flow 启动，不代表 PCIe / DMA 功能验证。"
   }
 ]
