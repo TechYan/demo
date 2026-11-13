@@ -2,6 +2,16 @@
 
 Open [the complete guide index](index.html), [reusable examples](examples.html), or [the source browser](sources.html).
 
+## 2026-11 update (repository-side highlights)
+
+The source repository has evolved past the frozen guide revision below. Current highlights:
+
+- **regif VIP** (new): the RSC reg slave custom register channel — master/slave/passive, a table-driven register-file model (RW/RO/WO/W1C/RC, PF/VF banks), and a UVM RAL adapter.
+- **AI-native observation outputs**: every protocol tracker now emits a `SVIP_TRK` index tag into the simulation log (file/rows/kinds), stable per-row `trk=<n>` references and an `# EOF` completeness receipt in tracker files, a machine-checkable `svip-trk/1` manifest (`+svip_trk_manifest=`), and a `trk_report.py` cross-validation tool — so debug agents can hop from a run log straight to the evidence rows.
+- **svip-debug skill** (new, shipped with the protected delivery): an operating skill for verification/debug agents covering API lookup from docs and plaintext contract files (works with the encrypted delivery), integration recipes (including mounting a passive monitor with tracker logging), and the simulation-log → tracker → manifest debugging workflow.
+
+The guide pages in this demo remain frozen at the source revision recorded below; see the source repository README and `common/trk/README.md` for the latest.
+
 ## Source and scope
 
 - Source repository: `TechYan/svip`; its visibility remains private.
