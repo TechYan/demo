@@ -522,8 +522,8 @@
     "category": "verification",
     "label": "INDEPENDENT TREES / ONE BUILD FLOW",
     "color": "lime",
-    "description": "从独立 IP 到 SoC，沿目录、连接和构建产物读懂集成 flow。",
-    "lead": "一份从 SoC tree 出发的使用指南：平台与设计锁、公共库导入、多 variant 发布、BIA 层次连接，以及 SiliconCompiler 调度的构建与仿真。",
+    "description": "选择 IP 组合、连接 block、重分区 tile，用 view/config 组织 SoC 构建。",
+    "lead": "通过交互组件库、BIA 端点连线和 tile repartition，生成 imports、assembly、view/config 声明，并沿目录与产物理解整个开发 tree。",
     "tags": [
       "SiliconCompiler",
       "SoC",
@@ -540,18 +540,25 @@
       "IP",
       "flow",
       "公共库",
-      "lint"
+      "lint",
+      "tile",
+      "repartition",
+      "view",
+      "config",
+      "组合",
+      "连线",
+      "workspace"
     ],
-    "format": "图形指南 / Terminal 目录",
-    "metric": "08",
+    "format": "交互组合 / 开发 tree 手册",
+    "metric": "09",
     "metricLabel": "guide chapters",
     "primary": "sflow/index.html",
     "actions": [
       {
-        "title": "Sflow 使用指南",
-        "description": "先跑示例，再理解独立 tree 的集成与构建",
-        "path": "sflow/index.html",
-        "type": "GUIDE"
+        "title": "操作 IP / tile / config 组合",
+        "description": "选择组件、连接 bundle、重分区 tile，并查看 view / config 声明。",
+        "path": "sflow/index.html#composition",
+        "type": "INTERACTIVE"
       },
       {
         "title": "完整 SoC tree",
@@ -569,6 +576,12 @@
         "title": "来源与维护说明",
         "description": "版本基线、展示边界与复现方式",
         "path": "sflow/README.md",
+        "type": "GUIDE"
+      },
+      {
+        "title": "完整开发 tree 手册",
+        "description": "交互目录、文件放置、命令案例、失败节点重跑与打印。",
+        "path": "sflow/development-tree-guide.html",
         "type": "GUIDE"
       }
     ],

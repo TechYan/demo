@@ -1,0 +1,390 @@
+<style is:global>
+.cp-lab { --cp-ink:#182b36; --cp-muted:#526570; --cp-line:#d9e1dc; --cp-surface:#fff; --cp-soft:#f0f5ef; --cp-accent:#08786c; --cp-cross:#3977b1; color:var(--cp-ink); font:14px/1.8 "Inter","Microsoft YaHei",system-ui,sans-serif; min-width:0; }
+:root:not([data-theme="light"])[data-theme] .cp-lab { --cp-ink:#e7eae5; --cp-muted:#a8b6ab; --cp-line:#3c4940; --cp-surface:#171f1b; --cp-soft:#222d25; --cp-accent:#b4de80; --cp-cross:#8fbdf0; }
+.cp-lab * { box-sizing:border-box; }
+.cp-lab h3,.cp-lab h4,.cp-lab p { margin:0; }
+.cp-lab h3 { font-size:18px; line-height:1.55; }
+.cp-lab h4 { font-size:13px; margin-bottom:10px; }
+.cp-lab code,.cp-lab pre { font-family:"IBM Plex Mono",Consolas,monospace; }
+.cp-lab code { overflow-wrap:anywhere; }
+.cp-lab button,.cp-lab select,.cp-lab input { font:inherit; color:var(--cp-ink); }
+.cp-lab button { background:var(--cp-surface); border:1px solid var(--cp-line); border-radius:6px; padding:7px 11px; font-size:12px; cursor:pointer; }
+.cp-lab button:hover { border-color:var(--cp-accent); }
+.cp-lab button:disabled { opacity:.55; cursor:default; }
+.cp-lab button:focus-visible,.cp-lab select:focus-visible,.cp-lab input:focus-visible { outline:3px solid #d69a43; outline-offset:3px; }
+.cp-lab select,.cp-lab input[type=text],.cp-new-tile input { border:1px solid var(--cp-line); border-radius:5px; background:var(--cp-surface); padding:7px 8px; min-width:0; font-size:12px; }
+.cp-intro { color:var(--cp-muted); margin-bottom:18px!important; }
+.cp-presets { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding-bottom:18px; }
+.cp-presets > span { font-size:12px; color:var(--cp-muted); margin-right:5px; }
+.cp-step { background:var(--cp-surface); border:1px solid var(--cp-line); border-radius:11px; padding:23px; margin-top:15px; min-width:0; }
+.cp-heading { display:flex; justify-content:space-between; align-items:start; gap:20px; margin-bottom:18px; }
+.cp-heading p { font-size:12px; color:var(--cp-muted); margin-top:8px; max-width:720px; }
+.cp-small-actions { display:flex; flex-wrap:wrap; gap:6px; flex-shrink:0; }
+.cp-catalog { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; }
+.cp-component { border:1px solid var(--cp-line); border-radius:7px; padding:12px 9px; cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+.cp-component:has(input:checked) { background:var(--cp-soft); border-color:var(--cp-accent); }
+.cp-component input { accent-color:var(--cp-accent); margin:0 0 4px; }
+.cp-component strong { font-size:13px; }
+.cp-component span { color:var(--cp-muted); font-size:10px; }
+.cp-options { display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; }
+.cp-options label { display:flex; align-items:center; gap:10px; font-size:12px; color:var(--cp-muted); }
+.cp-import-map { display:grid; grid-template-columns:1fr 28px 1.15fr; gap:14px; margin-top:20px; border-top:1px solid var(--cp-line); padding-top:18px; }
+.cp-import-map > div { min-width:0; }
+.cp-import-map pre { background:var(--cp-soft); border-radius:6px; margin:0; padding:13px; font-size:11px; line-height:1.7; overflow-x:auto; }
+.cp-arrow { align-self:center; color:var(--cp-accent); font-size:23px; text-align:center; }
+.cp-units { display:flex; flex-wrap:wrap; align-content:start; gap:7px; }
+.cp-unit { color:var(--cp-accent); background:var(--cp-soft); border:1px solid var(--cp-line); border-radius:5px; padding:6px 9px; font:11px/1.6 "IBM Plex Mono",Consolas,monospace; }
+.cp-caption { color:var(--cp-muted); font-size:11px; line-height:1.85; margin-top:13px!important; }
+.cp-topology-summary { color:var(--cp-muted); font-size:12px; margin-bottom:14px; }
+.cp-topology-summary strong { color:var(--cp-accent); font-weight:600; }
+.cp-board { position:relative; padding:15px 23px; border:1px solid var(--cp-line); border-radius:9px; background:var(--cp-soft); isolation:isolate; }
+#cp-wires { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2; }
+.cp-tiles { position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:30px; }
+.cp-tile { min-width:0; border:1px dashed var(--cp-line); border-radius:7px; padding:11px 13px 15px; background:color-mix(in srgb,var(--cp-surface) 55%,transparent); }
+.cp-tile h4 { font-size:11px; font-weight:500; color:var(--cp-muted); }
+.cp-block { position:relative; background:var(--cp-surface); border:1px solid var(--cp-line); border-radius:6px; margin-top:11px; padding:11px 10px; z-index:3; }
+.cp-block > strong { font-size:12px; display:block; }
+.cp-block > code { color:var(--cp-accent); font-size:9px; display:block; margin:2px 0 9px; }
+.cp-port { position:relative; display:flex; justify-content:space-between; gap:5px; font-size:10px; color:var(--cp-muted); padding:3px 0; }
+.cp-port small { font-size:8px; color:var(--cp-muted); }
+.cp-pin { position:absolute; top:9px; width:6px; height:6px; border-radius:50%; background:var(--cp-accent); }
+.cp-port[data-role=master] .cp-pin { right:-14px; }
+.cp-port[data-role=slave] .cp-pin { left:-14px; }
+.cp-port[data-used=false] .cp-pin { background:var(--cp-surface); border:1px solid var(--cp-muted); }
+.cp-port[data-used=false] small { opacity:.75; }
+.cp-legend { display:flex; gap:14px; flex-wrap:wrap; font-size:10px; color:var(--cp-muted); margin-top:11px; }
+.cp-legend span { display:flex; align-items:center; gap:6px; }
+.cp-line { display:inline-block; width:21px; border-top:2px solid var(--cp-accent); }
+.cp-line.cp-cross { border-top:2px dashed var(--cp-cross); }
+.cp-editors { display:grid; grid-template-columns:.8fr 1.2fr; gap:22px; margin-top:22px; }
+.cp-editors > div { min-width:0; }
+.cp-assignments { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.cp-assignment { display:flex; gap:8px; align-items:center; justify-content:space-between; font-size:11px; }
+.cp-assignment select { max-width:116px; }
+.cp-new-tile { display:flex; gap:7px; margin-top:12px; }
+.cp-new-tile input { width:100%; }
+.cp-new-tile button { flex-shrink:0; }
+.cp-endpoints { display:grid; grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr) auto; align-items:end; gap:7px; }
+.cp-endpoints label { font-size:10px; color:var(--cp-muted); }
+.cp-endpoints select { display:block; width:100%; margin-top:4px; font-size:11px; }
+.cp-endpoints > span { align-self:end; margin-bottom:7px; color:var(--cp-accent); }
+.cp-links { display:grid; gap:6px; margin-top:11px; }
+.cp-link { display:flex; align-items:center; gap:8px; padding:7px 8px; border:1px solid var(--cp-line); border-radius:5px; font-size:10px; }
+.cp-link code { flex:1; }
+.cp-link > span { color:var(--cp-cross); font-size:9px; white-space:nowrap; }
+.cp-link button { padding:2px 6px; font-size:10px; }
+.cp-message { font-size:12px; color:var(--cp-accent); min-height:1.5em; margin-top:12px!important; }
+.cp-configs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.cp-configs button { display:flex; flex-direction:column; text-align:left; padding:15px; gap:7px; min-width:0; }
+.cp-configs button[aria-pressed=true] { border-color:var(--cp-accent); background:var(--cp-soft); }
+.cp-configs strong { font:600 12px "IBM Plex Mono",Consolas,monospace; overflow-wrap:anywhere; }
+.cp-configs code { color:var(--cp-accent); font-size:10px; }
+.cp-configs span { color:var(--cp-muted); font-size:11px; }
+.cp-config-result { margin-top:16px; border-left:3px solid var(--cp-accent); background:var(--cp-soft); border-radius:0 5px 5px 0; padding:12px 15px; font-size:12px; }
+.cp-config-result p + p { margin-top:6px; }
+.cp-code-tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.cp-code-tabs button[aria-pressed=true] { border-color:var(--cp-accent); color:var(--cp-accent); background:var(--cp-soft); }
+.cp-code-panel { background:var(--cp-soft); border:1px solid var(--cp-line); border-radius:7px; overflow:hidden; }
+.cp-code-head { display:flex; justify-content:space-between; align-items:center; gap:15px; padding:9px 12px; border-bottom:1px solid var(--cp-line); font-size:10px; color:var(--cp-muted); }
+.cp-code-head button { font-size:10px; padding:3px 8px; }
+.cp-code-panel pre { font-size:11px; line-height:1.7; margin:0; padding:16px; max-height:440px; overflow:auto; white-space:pre; color:var(--cp-ink); }
+.cp-code-panel pre code { font:inherit; white-space:inherit; overflow-wrap:inherit; }
+.cp-sr-only { position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); }
+@layer base { @media print { #composition-lab .cp-code-panel[hidden] { display:block!important; } } }
+@media print { #cp-wires { z-index:0; } .cp-tiles { z-index:1; } .cp-tile { background:transparent; } }
+@media(max-width:1150px) { .cp-catalog { grid-template-columns:repeat(3,minmax(0,1fr)); } .cp-heading { flex-direction:column; } .cp-assignments { grid-template-columns:1fr; } .cp-editors { grid-template-columns:1fr; } }
+@media(max-width:700px) { .cp-step { padding:17px; } .cp-import-map { grid-template-columns:1fr; } .cp-arrow { transform:rotate(90deg); } .cp-tiles { grid-template-columns:1fr; gap:16px; } .cp-board { padding:16px 23px; } .cp-configs { grid-template-columns:1fr; } .cp-configs button { gap:4px; } .cp-endpoints { grid-template-columns:minmax(0,1fr) 10px minmax(0,1fr); } .cp-endpoints button { grid-column:1/-1; } .cp-assignments { grid-template-columns:1fr 1fr; } .cp-assignment { flex-wrap:wrap; } .cp-assignment select { width:100%; max-width:none; } }
+@media print { .cp-lab { --cp-ink:#182b36; --cp-muted:#526570; --cp-line:#d9e1dc; --cp-surface:#fff; --cp-soft:#f0f5ef; --cp-accent:#08786c; --cp-cross:#3977b1; font-size:8pt; } .cp-presets,.cp-options,.cp-editors,.cp-small-actions,.cp-code-tabs,.cp-heading > button,.cp-code-head button { display:none!important; } .cp-step { padding:4mm; border-radius:3px; } .cp-heading p,.cp-caption { font-size:7.5pt; } .cp-heading h3 { font-size:11pt; } .cp-catalog { grid-template-columns:repeat(6,minmax(0,1fr)); } .cp-component { padding:8px; } .cp-component input { display:none; } .cp-component:not(:has(input:checked)) { display:none; } .cp-import-map { grid-template-columns:1fr 20px 1fr; } .cp-arrow { transform:none; } .cp-tiles { grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; } .cp-board { break-inside:avoid; } .cp-block,.cp-tile { break-inside:avoid; } .cp-configs { grid-template-columns:repeat(3,minmax(0,1fr)); } .cp-configs button { padding:10px; } .cp-code-panel[hidden] { display:block!important; } .cp-code-panel { margin-top:4mm; } .cp-code-panel pre { max-height:none; overflow:visible; white-space:pre-wrap; overflow-wrap:anywhere; font-size:7pt; } .cp-code-head { break-after:avoid; } }
+
+</style>
+<div class="cp-lab" id="composition-lab">
+  <p class="cp-intro">从组件库选择 IP，查看 workspace 与 publication；编辑 bundle 连接和 tile 归属，再用 view 组织结构与 fileset，形成可供 SoC 构建的 config。下方实时生成对应声明，来源与版本占位符按实际仓库填写。</p>
+  <p class="cp-caption">这里用六个样例 IP 展示组合。实际组件库通过 imports 扩展为项目的独立 IP、subsystem 和公共库，各组件按自身的清单、variant 与接口契约接入。</p>
+  <div class="cp-presets" role="group" aria-label="选择组件组合示例">
+    <span>组合示例</span><button type="button" data-cp-preset="io">PCIe + DMA + DNoC</button><button type="button" data-cp-preset="full">六 IP 组合</button><button type="button" data-cp-preset="dual">双 PCIe，共用 variant</button>
+  </div>
+  <section class="cp-step" aria-labelledby="cp-components-title">
+    <div class="cp-heading"><div><h3 id="cp-components-title">组件库 → 当前 workspace → build unit</h3><p>imports 声明并锁定来源，sync 获取 checkout；build 根据所选 config、硬件与 fileset 依赖解析闭包，按 build.dependencies 调度发布。</p></div></div>
+    <div class="cp-catalog" id="cp-catalog"></div>
+    <div class="cp-options"><label>PCIe variant <select id="cp-variant"><option value="default">default</option><option value="rc_x16" selected>rc_x16</option><option value="ep_x16">ep_x16</option><option value="dm_x8">dm_x8</option></select></label><label>PCIe 实例数 <select id="cp-count"><option value="1">1</option><option value="2">2</option></select></label></div>
+    <div class="cp-import-map"><div><h4>取入独立仓库</h4><pre id="cp-workspace"></pre></div><span class="cp-arrow" aria-hidden="true">→</span><div><h4>按 design_variant 发布</h4><div class="cp-units" id="cp-units"></div><p class="cp-caption" id="cp-unit-note"></p></div></div>
+    <p class="cp-caption">组件在各自仓库维护，SoC 根的平台锁选择本次执行 runtime。闭包内同名设计使用一致的来源和 commit。</p>
+  </section>
+  <section class="cp-step" aria-labelledby="cp-connectivity-title">
+    <div class="cp-heading"><div><h3 id="cp-connectivity-title">BIA connectivity → block 互联与 tile repartition</h3><p>实线表示同 tile 连线，虚线表示跨 tile 连线。改变实例的 tile，观察连线分类、层次模块与 assembly 一起更新。</p></div><div class="cp-small-actions"><button type="button" id="cp-one-tile">合并为单 tile</button><button type="button" id="cp-reset-tiles">按功能重新分区</button></div></div>
+    <div class="cp-topology-summary" id="cp-topology-summary" role="status" aria-live="polite"></div>
+    <div class="cp-board" id="cp-board"><canvas id="cp-wires" aria-hidden="true"></canvas><div class="cp-tiles" id="cp-tiles"></div></div>
+    <div class="cp-legend"><span><i class="cp-line"></i>同 tile / tile 内部 wire</span><span><i class="cp-line cp-cross"></i>跨 tile / 顶层 wire 与 tile 端口</span><span>M master → S slave · sflow_rw</span></div>
+    <div class="cp-editors">
+      <div><h4>调整实例归属</h4><p class="cp-caption">编辑下方归属对应 partitioned 分区；从 flat 编辑时切换到该 view。</p><div id="cp-tile-assignments" class="cp-assignments"></div><div class="cp-new-tile"><label class="cp-sr-only" for="cp-new-tile">新 tile 名称</label><input id="cp-new-tile" placeholder="新 tile 名称，例如 compute"><button type="button" id="cp-add-tile">添加 tile</button></div></div>
+      <div><h4>连接兼容的 bundle 端点</h4><div class="cp-endpoints"><label>源 master<select id="cp-source"></select></label><span aria-hidden="true">→</span><label>目标 slave<select id="cp-sink"></select></label><button type="button" id="cp-add-link">添加连接</button></div><div class="cp-links" id="cp-links"></div><p class="cp-caption" id="cp-export-note"></p></div>
+    </div>
+    <p class="cp-message" id="cp-message" role="status" aria-live="polite"></p>
+    <p class="cp-caption">重分区通过 assembly 的 tiles 与 instances[].tile 声明。BIA 按接口契约生成结构 RTL，跨 tile 传递 bundle 字段；仲裁、译码、协议转换由对应 IP 或适配 block 实现。</p>
+  </section>
+  <section class="cp-step" aria-labelledby="cp-config-title">
+    <div class="cp-heading"><div><h3 id="cp-config-title">view → config → SoC 使用</h3><p>同一组组件和逻辑连线可以使用不同 assembly 分区或 fileset 选择。点击 config，查看当前结构、构建命令和产物路径。</p></div></div>
+    <div class="cp-configs" role="group" aria-label="选择 SoC config">
+      <button type="button" data-cp-config="soc_flat" aria-pressed="false"><strong>soc_flat</strong><code>view = flat</code><span>所有实例放进一个 tile，选 rtl fileset。</span></button>
+      <button type="button" data-cp-config="soc_partitioned" aria-pressed="true"><strong>soc_partitioned</strong><code>view = partitioned</code><span>使用当前自定义 tile 归属，选 rtl fileset。</span></button>
+      <button type="button" data-cp-config="soc_debug" aria-pressed="false"><strong>soc_debug</strong><code>view = debug</code><span>复用自定义分区，选择 rtl + debug 和调试宏。</span></button>
+    </div>
+    <div class="cp-config-result" id="cp-config-result"></div>
+    <p class="cp-caption">父 view 在此绑定根 assembly / filesets；子实例显式选 view=tile。相同 design_variant 在同一次构建内使用一致的 target/view。debug fileset 在此留作项目扩展入口。</p>
+  </section>
+  <section class="cp-step" aria-labelledby="cp-files-title">
+    <div class="cp-heading"><div><h3 id="cp-files-title">把组合落实到开发 tree</h3><p>对应文件实时更新。复制声明后填写实际 Git 来源与 ref，按标题路径放入现有 SoC tree，再通过同步和 build 命令执行。</p></div><button type="button" id="cp-download">下载声明 JSON</button></div>
+    <div class="cp-code-tabs" role="group" aria-label="选择组合声明文件"><button type="button" data-cp-code="imports" aria-pressed="false">imports</button><button type="button" data-cp-code="project" aria-pressed="false">project / configs</button><button type="button" data-cp-code="flat" aria-pressed="false">flat assembly</button><button type="button" data-cp-code="partitioned" aria-pressed="true">partitioned assembly</button><button type="button" data-cp-code="commands" aria-pressed="false">命令与输出路径</button></div>
+    <div class="cp-code-panel" data-cp-panel="imports" hidden><div class="cp-code-head"><span>env/imports.hjson · 来源与 ref 需填写</span><button type="button" data-cp-copy="cp-imports-code">复制</button></div><pre><code id="cp-imports-code"></code></pre></div>
+    <div class="cp-code-panel" data-cp-panel="project" hidden><div class="cp-code-head"><span>src/meta/manifest/project.hjson</span><button type="button" data-cp-copy="cp-project-code">复制</button></div><pre><code id="cp-project-code"></code></pre></div>
+    <div class="cp-code-panel" data-cp-panel="flat" hidden><div class="cp-code-head"><span>src/meta/connectivity/flat.hjson</span><button type="button" data-cp-copy="cp-flat-code">复制</button></div><pre><code id="cp-flat-code"></code></pre></div>
+    <div class="cp-code-panel" data-cp-panel="partitioned"><div class="cp-code-head"><span>src/meta/connectivity/partitioned.hjson</span><button type="button" data-cp-copy="cp-partitioned-code">复制</button></div><pre><code id="cp-partitioned-code"></code></pre></div>
+    <div class="cp-code-panel" data-cp-panel="commands" hidden><div class="cp-code-head"><span>在 SoC tree 中执行 · 路径中的 build-id 由实际结果给出</span><button type="button" data-cp-copy="cp-commands-code">复制</button></div><pre><code id="cp-commands-code"></code></pre></div>
+    <p class="cp-caption">下载文件是以目标路径为键的声明集合，使用时将各项分别写入对应文件。这里在浏览器中编辑和展示配置，真实构建由本地 sflow 与 SC 执行。</p>
+  </section>
+</div>
+
+<script is:inline>
+(() => {
+  "use strict";
+  const root = document.getElementById("composition-lab");
+  if (!root) return;
+  const byId = id => root.querySelector(`#${id}`);
+  const escape = value => String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  const catalog = [
+    {name:"pcie",label:"PCIe",purpose:"主机 / 内存 / 配置",tile:"io",ports:{host:"slave",mem:"master",cfg:"master"}},
+    {name:"dma",label:"DMA",purpose:"搬运 / 配置",tile:"io",ports:{cfg:"slave",mem:"master"}},
+    {name:"dnoc",label:"DNoC",purpose:"数据互联",tile:"fabric",ports:{in0:"slave",in1:"slave",out:"master"}},
+    {name:"rnoc",label:"RNoC",purpose:"寄存器互联",tile:"fabric",ports:{in:"slave",dma:"master",atu:"master"}},
+    {name:"atu",label:"ATU",purpose:"地址转换",tile:"fabric",ports:{in:"slave",out:"master",cfg:"slave"}},
+    {name:"mc",label:"MC",purpose:"内存接口",tile:"memory",ports:{mem:"slave"}}
+  ];
+  const defaultLinks = [
+    ["pcie.mem","dnoc.in0"], ["dma.mem","dnoc.in1"], ["dnoc.out","atu.in"],
+    ["atu.out","mc.mem"], ["pcie.cfg","rnoc.in"], ["rnoc.dma","dma.cfg"], ["rnoc.atu","atu.cfg"]
+  ];
+  const state = {selected:new Set(["pcie","dma","dnoc"]),variant:"rc_x16",count:1,config:"soc_partitioned",tiles:{},tileNames:["io","fabric","memory"],links:[],code:"partitioned"};
+  catalog.forEach(component => { state.tiles[component.name] = component.tile; });
+  const serialize = value => JSON.stringify(value, null, 2);
+
+  function instances() {
+    const values = catalog.filter(component => state.selected.has(component.name)).map(component => ({...component,id:component.name,variant:component.name === "pcie" ? state.variant : "default"}));
+    if (state.selected.has("pcie") && state.count === 2) values.splice(1,0,{...catalog[0],id:"pcie_1",variant:state.variant});
+    return values;
+  }
+  function endpointOwner(endpoint) { return endpoint.split(".")[0]; }
+  function activeLinks(nodes) {
+    const ids = new Set(nodes.map(node => node.id));
+    return state.links.filter(([from,to]) => ids.has(endpointOwner(from)) && ids.has(endpointOwner(to)));
+  }
+  function currentTile(node) { return state.config === "soc_flat" ? "all" : state.tiles[node.id] || node.tile; }
+  function makeAssembly(nodes, flat) {
+    const links = activeLinks(nodes);
+    const used = new Set(links.flat());
+    const tileFor = node => flat ? "all" : state.tiles[node.id] || node.tile;
+    return {
+      name:"soc_combo",
+      tiles:[...new Set(nodes.map(tileFor))].map(name => ({name})),
+      instances:nodes.map(node => ({name:node.id,design:node.name,variant:node.variant,view:"tile",tile:tileFor(node)})),
+      connections:links.map(([from,to],index) => ({name:`link_${index}`,from,to})),
+      top_ports:{bundles:nodes.flatMap(node => Object.keys(node.ports).filter(port => !used.has(`${node.id}.${port}`)).map(port => ({name:`${node.id}_${port}`,bundle:`${node.id}.${port}`})))}
+    };
+  }
+  function declarations(nodes) {
+    const names = [...state.selected,"common_info","sharedlib"];
+    const imports = {schema:2,dependencies:Object.fromEntries(names.map(name => [name,{source:`ssh://git.example/${name}.git`,ref:`<${name}-commit>`}]))};
+    const project = {
+      schema:1,name:"soc",kind:"soc",build:{script:"src/meta/build.py"},
+      filesets:{rtl:{files:[]},debug:{files:[]}},
+      targets:{compose:{views:{
+        flat:{assembly:"src/meta/connectivity/flat.hjson",filesets:["rtl"]},
+        partitioned:{assembly:"src/meta/connectivity/partitioned.hjson",filesets:["rtl"]},
+        debug:{assembly:"src/meta/connectivity/partitioned.hjson",filesets:["rtl","debug"],defines:["SFLOW_VIEW_DEBUG=1"]}
+      }}},
+      default_target:"compose",default_config:state.config,
+      configs:{soc_flat:{target:"compose",view:"flat"},soc_partitioned:{target:"compose",view:"partitioned"},soc_debug:{target:"compose",view:"debug"}},
+      suites:{smoke:{cases:[{name:"startup",seeds:[1,2]}]}}
+    };
+    return {"env/imports.hjson":imports,"src/meta/manifest/project.hjson":project,"src/meta/connectivity/flat.hjson":makeAssembly(nodes,true),"src/meta/connectivity/partitioned.hjson":makeAssembly(nodes,false)};
+  }
+  function renderCatalog() {
+    if (!byId("cp-catalog").children.length) byId("cp-catalog").innerHTML = catalog.map(component => `<label class="cp-component"><input type="checkbox" data-cp-component="${component.name}"><strong>${component.label}</strong><span>${component.purpose}</span></label>`).join("");
+    root.querySelectorAll("[data-cp-component]").forEach(input => { input.checked = state.selected.has(input.dataset.cpComponent); });
+  }
+  function renderWorkspace(nodes) {
+    byId("cp-workspace").textContent = "soc/\n  env/imports.*\n  import/\n    sflow/\n" + [...state.selected,"common_info","sharedlib"].map(name => `    ${name}/`).join("\n") + "\n  src/meta/\n  run.py";
+    const units = [...new Set(nodes.map(node => `${node.name}_${node.variant}`)),"common_info_default","sharedlib_default","soc_default"];
+    byId("cp-units").innerHTML = units.map(unit => `<span class="cp-unit">${unit}</span>`).join("");
+    byId("cp-unit-note").textContent = `${state.selected.size} 个设计组件，${nodes.length} 个硬件实例，${units.length} 份 publication（含根与公共库）。相同 variant 的多个实例复用一个 build unit。`;
+  }
+  function renderGraph(nodes) {
+    const links = activeLinks(nodes);
+    const used = new Set(links.flat());
+    const tiles = [...new Set(nodes.map(currentTile))];
+    const cross = links.filter(([from,to]) => currentTile(nodes.find(node => node.id === endpointOwner(from))) !== currentTile(nodes.find(node => node.id === endpointOwner(to)))).length;
+    byId("cp-topology-summary").innerHTML = `<strong>${nodes.length}</strong> 个 block · <strong>${tiles.length}</strong> 个 tile · <strong>${links.length}</strong> 条 bundle 连接 · <strong>${cross}</strong> 条跨 tile 连接`;
+    byId("cp-tiles").innerHTML = tiles.length ? tiles.map(tile => `<div class="cp-tile"><h4>tile / ${escape(tile)}</h4>${nodes.filter(node => currentTile(node) === tile).map(node => `<div class="cp-block" data-cp-node="${node.id}"><strong>${node.id}</strong><code>${node.name}_${node.variant}</code>${Object.entries(node.ports).map(([port,role]) => `<div class="cp-port" data-cp-port="${node.id}.${port}" data-role="${role}" data-used="${used.has(`${node.id}.${port}`)}"><span class="cp-pin"></span><span>${role === "master" ? "M" : "S"} ${port}</span><small>${used.has(`${node.id}.${port}`) ? "已连接" : "导出到顶层"}</small></div>`).join("")}</div>`).join("")}</div>`).join("") : '<p class="cp-caption">选择组件后在这里显示实例、tile 与连接。</p>';
+    byId("cp-tile-assignments").innerHTML = nodes.map(node => `<label class="cp-assignment"><span>${node.id}</span><select data-cp-tile="${node.id}" aria-label="${node.id} 的 tile">${state.tileNames.map(tile => `<option value="${escape(tile)}" ${tile === (state.tiles[node.id] || node.tile) ? "selected" : ""}>${escape(tile)}</option>`).join("")}</select></label>`).join("");
+    byId("cp-links").innerHTML = links.map(([from,to],index) => {
+      const source = nodes.find(node => node.id === endpointOwner(from));
+      const sink = nodes.find(node => node.id === endpointOwner(to));
+      return `<div class="cp-link"><code>${from} → ${to}</code><span>${currentTile(source) === currentTile(sink) ? "同 tile" : "跨 tile"}</span><button type="button" data-cp-remove="${index}" aria-label="删除连接 ${from} 到 ${to}">删除</button></div>`;
+    }).join("");
+    const available = role => nodes.flatMap(node => Object.entries(node.ports).filter(([port,type]) => type === role && !used.has(`${node.id}.${port}`)).map(([port]) => `${node.id}.${port}`));
+    const populate = (id,values) => { byId(id).innerHTML = values.length ? values.map(value => `<option value="${value}">${value}</option>`).join("") : '<option value="">无空闲端点</option>'; };
+    populate("cp-source",available("master"));
+    populate("cp-sink",available("slave"));
+    byId("cp-add-link").disabled = !available("master").length || !available("slave").length;
+    const exported = nodes.reduce((count,node) => count + Object.keys(node.ports).filter(port => !used.has(`${node.id}.${port}`)).length,0);
+    byId("cp-export-note").textContent = `当前 ${exported} 个未连接 bundle 显式导出为顶层端口，生成 top_ports。一个端点在连接或顶层导出中使用一次。`;
+    requestAnimationFrame(drawWires);
+  }
+  function drawWires() {
+    const board = byId("cp-board");
+    const canvas = byId("cp-wires");
+    const bounds = board.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return;
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.ceil(bounds.width * ratio);
+    canvas.height = Math.ceil(bounds.height * ratio);
+    const context = canvas.getContext("2d");
+    context.scale(ratio,ratio);
+    const nodes = instances();
+    const colors = getComputedStyle(root);
+    activeLinks(nodes).forEach(([from,to]) => {
+      const start = root.querySelector(`[data-cp-port="${from}"] .cp-pin`)?.getBoundingClientRect();
+      const end = root.querySelector(`[data-cp-port="${to}"] .cp-pin`)?.getBoundingClientRect();
+      if (!start || !end) return;
+      const x1 = start.x + start.width / 2 - bounds.x;
+      const y1 = start.y + start.height / 2 - bounds.y;
+      const x2 = end.x + end.width / 2 - bounds.x;
+      const y2 = end.y + end.height / 2 - bounds.y;
+      const cross = currentTile(nodes.find(node => node.id === endpointOwner(from))) !== currentTile(nodes.find(node => node.id === endpointOwner(to)));
+      context.strokeStyle = colors.getPropertyValue(cross ? "--cp-cross" : "--cp-accent");
+      context.fillStyle = context.strokeStyle;
+      context.lineWidth = 1.7;
+      context.setLineDash(cross ? [5,4] : []);
+      const bend = Math.max(25,Math.min(85,Math.abs(x2-x1) / 2));
+      context.beginPath();
+      context.moveTo(x1,y1);
+      context.bezierCurveTo(x1+bend,y1,x2-bend,y2,x2,y2);
+      context.stroke();
+      context.setLineDash([]);
+      context.beginPath(); context.moveTo(x2,y2); context.lineTo(x2-5,y2-3); context.lineTo(x2-5,y2+3); context.closePath(); context.fill();
+    });
+  }
+  function renderDeclarations(nodes) {
+    const value = declarations(nodes);
+    const view = state.config === "soc_flat" ? "flat" : state.config === "soc_debug" ? "debug" : "partitioned";
+    byId("cp-imports-code").textContent = serialize(value["env/imports.hjson"]);
+    byId("cp-project-code").textContent = serialize(value["src/meta/manifest/project.hjson"]);
+    byId("cp-flat-code").textContent = serialize(value["src/meta/connectivity/flat.hjson"]);
+    byId("cp-partitioned-code").textContent = serialize(value["src/meta/connectivity/partitioned.hjson"]);
+    byId("cp-config-result").innerHTML = `<p><strong>${state.config}</strong> 选择 target=compose / view=${view} / filesets=${view === "debug" ? "rtl + debug" : "rtl"}</p><p><code>connectivity/soc_default/${view}/</code> → <code>config/${state.config}/${view}/compile/</code></p>`;
+    byId("cp-commands-code").textContent = `# 在现有 SoC tree 中写入各项声明，并填写真实来源/ref\npython env/sync.py update\npython env/sync.py\npython run.py build --config ${state.config}\npython run.py sim --config ${state.config} --suite smoke\n\n# 在本次 out/<os>/builds/<build-id>/ 中查看\n# connectivity/soc_default/${view}/soc_combo_top.sv\n# config/${state.config}/${view}/compile/compile.f\n# run/smoke/<execution-id>/<case>/<seed>/\n# 通过 python run.py status 获取实际 build 路径`;
+    root.querySelectorAll("[data-cp-config]").forEach(button => button.setAttribute("aria-pressed",String(button.dataset.cpConfig === state.config)));
+  }
+  function showCode(name) {
+    state.code = name;
+    root.querySelectorAll("[data-cp-code]").forEach(button => button.setAttribute("aria-pressed",String(button.dataset.cpCode === name)));
+    root.querySelectorAll("[data-cp-panel]").forEach(panel => { panel.hidden = panel.dataset.cpPanel !== name; });
+  }
+  function render() {
+    const focusedTile = document.activeElement?.dataset.cpTile;
+    const nodes = instances();
+    state.links = activeLinks(nodes);
+    renderCatalog();
+    byId("cp-variant").disabled = !state.selected.has("pcie");
+    byId("cp-count").disabled = !state.selected.has("pcie");
+    byId("cp-variant").value = state.variant;
+    byId("cp-count").value = String(state.count);
+    renderWorkspace(nodes);
+    renderGraph(nodes);
+    renderDeclarations(nodes);
+    if (focusedTile) root.querySelector(`[data-cp-tile="${focusedTile}"]`)?.focus({preventScroll:true});
+  }
+  function preset(name) {
+    state.selected = new Set(name === "full" ? catalog.map(component => component.name) : ["pcie","dma","dnoc"]);
+    state.count = name === "dual" ? 2 : 1;
+    state.variant = "rc_x16";
+    state.config = "soc_partitioned";
+    catalog.forEach(component => { state.tiles[component.name] = component.tile; });
+    state.tiles.pcie_1 = "io";
+    state.links = defaultLinks.filter(([from,to]) => state.selected.has(endpointOwner(from)) && state.selected.has(endpointOwner(to)));
+    render();
+  }
+  async function copy(id) {
+    const text = byId(id).textContent;
+    try { await navigator.clipboard.writeText(text); }
+    catch (error) {
+      const area = document.createElement("textarea"); area.value = text; area.style.position = "fixed"; area.style.opacity = "0"; document.body.append(area); area.select();
+      const copied = document.execCommand("copy"); area.remove();
+      if (!copied) { byId("cp-message").textContent = "请选中代码后使用系统复制快捷键。"; return; }
+    }
+    byId("cp-message").textContent = "声明已复制，按代码标题的路径放入开发 tree。";
+  }
+  root.addEventListener("change",event => {
+    const target = event.target;
+    if (target.matches("[data-cp-component]")) {
+      if (target.checked) state.selected.add(target.dataset.cpComponent);
+      else state.selected.delete(target.dataset.cpComponent);
+      render();
+    }
+    if (target.id === "cp-variant") { state.variant = target.value; render(); }
+    if (target.id === "cp-count") { state.count = Number(target.value); state.tiles.pcie_1 ||= "io"; render(); }
+    if (target.matches("[data-cp-tile]")) {
+      state.tiles[target.dataset.cpTile] = target.value;
+      if (state.config === "soc_flat") state.config = "soc_partitioned";
+      render();
+    }
+  });
+  root.addEventListener("click",event => {
+    const button = event.target.closest("button");
+    if (!button) return;
+    byId("cp-message").textContent = "";
+    if (button.dataset.cpPreset) preset(button.dataset.cpPreset);
+    if (button.dataset.cpConfig) {
+      state.config = button.dataset.cpConfig;
+      showCode(state.config === "soc_flat" ? "flat" : "partitioned");
+      render();
+    }
+    if (button.dataset.cpCode) showCode(button.dataset.cpCode);
+    if (button.dataset.cpCopy) copy(button.dataset.cpCopy);
+    if (button.dataset.cpRemove !== undefined) { state.links.splice(Number(button.dataset.cpRemove),1); render(); }
+    if (button.id === "cp-add-link") {
+      const from = byId("cp-source").value;
+      const to = byId("cp-sink").value;
+      if (from && to) { state.links.push([from,to]); render(); }
+    }
+    if (button.id === "cp-add-tile") {
+      const name = byId("cp-new-tile").value.trim();
+      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) { byId("cp-message").textContent = "tile 名称使用字母或下划线开头，其后可用字母、数字、下划线。"; return; }
+      if (!state.tileNames.includes(name)) state.tileNames.push(name);
+      byId("cp-new-tile").value = "";
+      render();
+      byId("cp-message").textContent = `已添加 ${name}，在实例归属中选择它即可。`;
+    }
+    if (button.id === "cp-one-tile") {
+      if (!state.tileNames.includes("all")) state.tileNames.push("all");
+      instances().forEach(node => { state.tiles[node.id] = "all"; });
+      state.config = "soc_partitioned"; render();
+    }
+    if (button.id === "cp-reset-tiles") {
+      instances().forEach(node => { state.tiles[node.id] = node.tile; });
+      state.config = "soc_partitioned"; render();
+    }
+    if (button.id === "cp-download") {
+      const blob = new Blob([serialize(declarations(instances()))+"\n"],{type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a"); link.href = url; link.download = "sflow-composition-files.json"; link.click();
+      setTimeout(() => URL.revokeObjectURL(url),1000);
+    }
+  });
+  new ResizeObserver(() => requestAnimationFrame(drawWires)).observe(byId("cp-board"));
+  new MutationObserver(() => requestAnimationFrame(drawWires)).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+  window.addEventListener("beforeprint",drawWires);
+  window.addEventListener("afterprint",drawWires);
+  preset("io");
+})();
+
+</script>

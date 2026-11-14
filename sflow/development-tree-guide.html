@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="从设计开发者视角理解 Sflow 开发 tree。交互目录、文件放置、BIA 与地址流程、构建案例、节点调试与打印手册。">
+  <title>Sflow 开发 tree 使用手册</title>
+  <style>
+    :root {
+      --paper: #f6f7f4;
+      --white: #fff;
+      --ink: #182b36;
+      --muted: #526570;
+      --line: #d9e1dc;
+      --nav: #152c33;
+      --teal: #08786c;
+      --teal-soft: #e6f3ed;
+      --amber: #8d5513;
+      --amber-soft: #fff3de;
+      --blue: #275f96;
+      --blue-soft: #edf3fa;
+      --code: #142b32;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 30px; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 15px/1.85 "Inter", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif; }
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { cursor: pointer; }
+    a { color: var(--teal); text-underline-offset: 3px; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #d69a43; outline-offset: 4px; }
+    code, pre, .mono { font-family: "IBM Plex Mono", "Cascadia Code", Consolas, monospace; }
+    code { font-size: .88em; overflow-wrap: anywhere; }
+    p code, li code, td code, dd code { background: #edf1ee; padding: 2px 5px; border-radius: 4px; }
+    h1, h2, h3, h4, p, figure { margin: 0; }
+    h1 { font-size: clamp(32px, 3.7vw, 54px); line-height: 1.35; font-weight: 700; letter-spacing: -.04em; }
+    h2 { font-size: 28px; line-height: 1.4; letter-spacing: -.025em; }
+    h3 { font-size: 18px; line-height: 1.55; }
+    h4 { font-size: 15px; }
+    p + p { margin-top: 12px; }
+    ul, ol { padding-left: 22px; margin: 12px 0 0; }
+    li + li { margin-top: 7px; }
+    .sidebar { width: 244px; position: fixed; inset: 0 auto 0 0; padding: 30px 20px 22px; background: var(--nav); color: #eaf4ee; overflow-y: auto; display: flex; flex-direction: column; z-index: 10; }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 23px; font-weight: 700; letter-spacing: -.04em; }
+    .brand-mark { width: 29px; height: 29px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; }
+    .brand-mark i { background: #79c7a9; border-radius: 3px; }
+    .brand-mark i:last-child { background: #e6b66f; }
+    .sidebar-subtitle { color: #a8c3bd; font-size: 12px; margin: 8px 0 30px; }
+    .sidebar nav { display: grid; gap: 5px; }
+    .sidebar nav a { display: block; padding: 10px 12px; border-radius: 7px; color: #bed1cd; text-decoration: none; font-size: 13px; line-height: 1.5; }
+    .sidebar nav a:hover, .sidebar nav a[aria-current="location"] { color: #fff; background: #2c464b; }
+    .sidebar-foot { margin-top: auto; padding-top: 28px; font-size: 11px; line-height: 1.9; color: #a3bcb7; }
+    .sidebar-foot a { color: #c5e5d6; }
+    .main { margin-left: 244px; padding: 42px clamp(24px, 4vw, 70px) 70px; max-width: 1540px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 34px; color: var(--muted); font-size: 12px; }
+    .topbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .button { border: 1px solid var(--line); border-radius: 7px; padding: 8px 14px; color: var(--ink); background: #fff; font-size: 12px; text-decoration: none; line-height: 1.6; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+    .button.primary { background: var(--teal); color: #fff; border-color: var(--teal); }
+    .eyebrow { color: var(--teal); font-size: 12px; font-weight: 700; letter-spacing: .09em; margin-bottom: 13px; }
+    .hero { padding-bottom: 37px; border-bottom: 1px solid var(--line); }
+    .hero .intro { margin-top: 20px; color: var(--muted); max-width: 780px; font-size: 16px; line-height: 1.95; }
+    .hero-links { display: flex; gap: 22px; margin-top: 23px; flex-wrap: wrap; font-size: 13px; }
+    .section { padding-top: 46px; }
+    .section-header { display: flex; gap: 20px; justify-content: space-between; align-items: start; margin-bottom: 20px; }
+    .section-header p { margin-top: 9px; color: var(--muted); max-width: 780px; }
+    .section-title { display: flex; gap: 12px; align-items: center; }
+    .section-title::before { content: ""; width: 4px; height: 24px; border-radius: 2px; background: var(--teal); flex-shrink: 0; }
+    .card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--white); padding: 24px; min-width: 0; }
+    .root-map { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 11px; margin-top: 25px; }
+    .root-node { text-align: left; border: 1px solid var(--line); border-radius: 9px; padding: 18px 15px; background: #fff; color: var(--ink); min-width: 0; }
+    .root-node:hover { border-color: var(--teal); background: var(--teal-soft); }
+    .root-node code { font-size: 17px; font-weight: 600; }
+    .root-node span { display: block; font-size: 12px; color: var(--muted); margin-top: 7px; line-height: 1.7; }
+    .root-node small { display: block; margin-top: 15px; color: var(--teal); font-size: 10px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .three-col { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .two-col > *, .three-col > *, .case-grid > * { min-width: 0; }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    .note { padding: 15px 18px; border-left: 3px solid var(--teal); background: var(--teal-soft); border-radius: 0 7px 7px 0; font-size: 13px; margin-top: 18px; }
+    .note.amber { border-color: #b87821; background: var(--amber-soft); color: #674518; }
+    .note.blue { border-color: var(--blue); background: var(--blue-soft); }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px; font-size: 12px; color: var(--muted); margin-top: 18px; }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .dot { width: 8px; height: 8px; background: var(--teal); display: inline-block; border-radius: 50%; flex-shrink: 0; }
+    .dot.blue { background: var(--blue); }
+    .dot.amber { background: #b87821; }
+    .tree-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 16px; }
+    .search { width: min(100%, 360px); position: relative; }
+    .search label { display: block; color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+    .search input { width: 100%; padding: 9px 13px; border: 1px solid #c3d0c8; border-radius: 7px; background: #fff; font-size: 13px; color: var(--ink); }
+    .segmented { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--line); background: #eef1ed; border-radius: 8px; flex-wrap: wrap; }
+    .segmented button { border: 0; border-radius: 5px; color: var(--muted); background: transparent; padding: 7px 10px; font-size: 12px; white-space: nowrap; }
+    .segmented button[aria-pressed="true"], .segmented button[aria-selected="true"] { color: var(--ink); background: #fff; box-shadow: 0 1px 3px #173b2314; }
+    .tree-explorer { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: grid; grid-template-columns: minmax(290px, .95fr) minmax(0, 1.4fr); background: #fff; }
+    .tree-pane { background: #f0f4f0; padding: 18px 10px 16px; border-right: 1px solid var(--line); }
+    .tree-root { margin: 0 12px 13px; font-size: 13px; color: #244b40; }
+    .tree-list { max-height: 628px; overflow-y: auto; list-style: none; padding: 0; margin: 0; scrollbar-width: thin; }
+    .tree-list li { margin: 0; }
+    .tree-file { display: flex; align-items: center; gap: 9px; width: 100%; padding: 7px 10px 7px calc(12px + var(--depth) * 14px); border: 0; border-radius: 5px; background: transparent; color: #355148; text-align: left; font-size: 12px; line-height: 1.7; }
+    .tree-file:hover { background: #e1e9e1; }
+    .tree-file[aria-pressed="true"] { background: #d2e9de; color: #075b4b; font-weight: 600; }
+    .tree-file .mono { min-width: 0; overflow-wrap: anywhere; }
+    .file-glyph { height: 12px; width: 10px; border: 1px solid currentColor; border-radius: 2px; opacity: .6; flex-shrink: 0; }
+    .file-glyph.folder { width: 13px; height: 10px; background: currentColor; opacity: .45; border: 0; border-radius: 1px 2px 2px; }
+    .tree-detail { padding: 28px; min-width: 0; }
+    .detail-path { font-size: 12px; color: var(--teal); margin-bottom: 12px; overflow-wrap: anywhere; }
+    .detail-desc { margin-top: 12px; color: var(--muted); font-size: 14px; }
+    .file-facts { display: grid; grid-template-columns: 65px minmax(0, 1fr); gap: 10px 16px; font-size: 12px; margin: 22px 0; }
+    .file-facts dt { color: var(--muted); }
+    .file-facts dd { margin: 0; }
+    .detail-example { border-top: 1px solid var(--line); padding-top: 18px; }
+    .detail-example > p { margin: 7px 0 12px; font-size: 12px; color: var(--muted); }
+    .empty { padding: 20px; font-size: 13px; color: var(--muted); }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+    th { padding: 13px 17px; background: #eaf0eb; color: #3c5850; font-weight: 600; font-size: 11px; letter-spacing: .025em; }
+    td { padding: 14px 17px; border-top: 1px solid #e3e9e4; vertical-align: top; }
+    td:first-child { min-width: 122px; }
+    .path-link { border: 0; background: transparent; color: var(--teal); padding: 0; font: inherit; text-align: left; text-decoration: underline; text-decoration-color: #afcfc2; text-underline-offset: 4px; }
+    .code-box { margin-top: 13px; border-radius: 9px; background: var(--code); overflow: hidden; color: #dceee4; }
+    .code-head { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 9px 14px; background: #203b42; border-bottom: 1px solid #355057; font-size: 10px; color: #b1d0c2; }
+    .copy-button { padding: 3px 8px; border: 1px solid #59706f; border-radius: 4px; color: #d5e7dd; background: transparent; font-size: 10px; white-space: nowrap; }
+    pre { padding: 16px; margin: 0; overflow-x: auto; font-size: 11px; line-height: 1.85; tab-size: 4; }
+    pre code { font-size: inherit; overflow-wrap: normal; }
+    .code-box.output { background: #f0f5f0; color: #315044; border: 1px solid #d8e2d7; }
+    .code-box.output .code-head { background: #e6eee4; border-color: #d2ddd0; color: #496447; }
+    .code-box.output .copy-button { color: #315044; border-color: #b1c2ae; }
+    .identity { margin-top: 18px; display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 12px; align-items: center; }
+    .identity-card { border: 1px solid var(--line); background: #f4f7f3; border-radius: 8px; padding: 18px; min-width: 0; }
+    .identity-card p { font-size: 12px; color: var(--muted); margin-top: 7px; }
+    .identity-card code { color: var(--teal); }
+    .diagram-arrow { color: #7b9c8b; text-align: center; font-size: 22px; }
+    .pipeline { display: flex; align-items: stretch; gap: 18px; overflow-x: auto; padding: 6px 0 18px; }
+    .stage { position: relative; flex: 1 0 104px; border: 1px solid var(--line); border-radius: 9px; background: #f7faf7; padding: 14px 9px; text-align: left; color: var(--ink); }
+    .stage::after { content: "→"; position: absolute; left: calc(100% + 3px); top: 26px; color: #7c9b8b; }
+    .stage:last-child::after { display: none; }
+    .stage strong { display: block; font-size: 12px; font-weight: 600; }
+    .stage span { display: block; font-size: 10px; color: var(--muted); margin-top: 8px; line-height: 1.7; }
+    .stage[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-soft); }
+    .stage-detail { padding: 21px 23px; border-radius: 9px; background: #f1f5f0; margin-top: 3px; font-size: 13px; }
+    .stage-detail p { margin-top: 9px; }
+    .stage-detail .file-facts { margin-bottom: 0; }
+    .flow-caption { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+    .flow-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 18px; flex-wrap: wrap; }
+    .diagram-stack { display: grid; gap: 9px; margin-top: 17px; }
+    .diagram-step { background: #f1f6f0; border: 1px solid #d7e2d8; padding: 13px 15px; border-radius: 6px; font-size: 12px; }
+    .diagram-step strong { display: block; margin-bottom: 4px; color: #255449; }
+    .down-arrow { color: #719a85; text-align: center; line-height: 1; }
+    .case-tabs { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+    .case-tabs button { background: #fff; border: 1px solid var(--line); border-radius: 7px; padding: 9px 14px; color: var(--muted); font-size: 12px; }
+    .case-tabs button[aria-selected="true"] { color: #fff; background: var(--teal); border-color: var(--teal); }
+    .case-panel > p { color: var(--muted); font-size: 13px; margin-top: 11px; }
+    .case-panel h4 { margin-top: 23px; }
+    .case-grid { display: grid; grid-template-columns: 1.08fr .92fr; gap: 20px; }
+    .case-grid > div { min-width: 0; }
+    .case-panel .step-list { counter-reset: step; list-style: none; padding: 0; }
+    .case-panel .step-list li { position: relative; padding-left: 31px; font-size: 13px; margin-top: 16px; }
+    .case-panel .step-list li::before { content: counter(step); counter-increment: step; position: absolute; left: 0; top: 1px; width: 21px; height: 21px; line-height: 21px; font-size: 11px; text-align: center; background: var(--teal-soft); color: var(--teal); border-radius: 50%; }
+    .output-tree { background: #f0f5f0; border: 1px solid var(--line); border-radius: 8px; color: #345448; font-size: 11px; }
+    .output-facts { margin-top: 18px; }
+    .output-facts p { font-size: 13px; margin-top: 9px; }
+    details { background: #fff; border: 1px solid var(--line); border-radius: 8px; margin-top: 10px; }
+    summary { cursor: pointer; font-weight: 600; font-size: 13px; padding: 14px 17px; }
+    details > div { padding: 0 18px 18px; color: var(--muted); font-size: 13px; }
+    .sources { margin-top: 17px; display: flex; flex-wrap: wrap; gap: 9px 20px; font-size: 12px; }
+    footer { margin-top: 42px; border-top: 1px solid var(--line); padding-top: 22px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 20px; }
+    .print-only { display: none; }
+    .toast { position: fixed; left: calc(50% + 100px); bottom: 25px; transform: translateX(-50%); background: #193e35; color: white; padding: 10px 19px; border-radius: 7px; font-size: 12px; box-shadow: 0 6px 25px #172a3522; z-index: 30; }
+    [hidden] { display: none !important; }
+    @media (min-width: 1700px) { .main { margin-left: calc(244px + (100vw - 1700px) / 2); } }
+    @media (max-width: 1160px) {
+      .sidebar { width: 210px; padding-left: 15px; padding-right: 15px; }
+      .main { margin-left: 210px; padding-left: 25px; padding-right: 25px; }
+      .root-map { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .tree-explorer { grid-template-columns: minmax(255px, .9fr) minmax(0, 1.1fr); }
+      .tree-detail { padding: 23px; }
+      .case-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 850px) {
+      html { scroll-padding-top: 20px; }
+      .sidebar { position: relative; width: 100%; padding: 17px 22px; display: block; }
+      .brand { font-size: 21px; }
+      .brand-mark { width: 23px; height: 23px; }
+      .sidebar-subtitle, .sidebar-foot { display: none; }
+      .sidebar nav { display: flex; overflow-x: auto; margin-top: 14px; gap: 5px; }
+      .sidebar nav a { flex-shrink: 0; font-size: 11px; padding: 6px 9px; }
+      .main { margin: 0; padding: 25px 22px 40px; }
+      .tree-explorer { grid-template-columns: 1fr; }
+      .tree-pane { border-right: 0; border-bottom: 1px solid var(--line); }
+      .tree-list { max-height: 330px; }
+      .tree-toolbar { flex-wrap: wrap; }
+      .search { width: 100%; }
+      .two-col, .three-col { grid-template-columns: 1fr; }
+      .table-wrap table { min-width: 680px; }
+      .table-wrap::before { content: "左右滑动查看完整表格"; display: block; padding: 8px 14px; color: var(--muted); font-size: 11px; }
+      .identity { grid-template-columns: 1fr; }
+      .identity .diagram-arrow { transform: rotate(90deg); }
+      .topbar { align-items: start; }
+      .section { padding-top: 35px; }
+    }
+    @media (max-width: 500px) {
+      .main { padding-left: 16px; padding-right: 16px; }
+      .root-map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .card { padding: 19px; }
+      .topbar { flex-direction: column; gap: 12px; margin-bottom: 26px; }
+      h2 { font-size: 24px; }
+      .tree-detail { padding: 21px 17px; }
+      .file-facts { grid-template-columns: 54px minmax(0, 1fr); gap: 8px 10px; }
+      footer { flex-direction: column; }
+      .toast { left: 50%; width: max-content; max-width: 90%; }
+    }
+    @page {
+      size: A4;
+      margin: 16mm 14mm;
+      @bottom-center { content: "Sflow · " counter(page) " / " counter(pages); font-family: "Inter", sans-serif; font-size: 8pt; color: #526570; }
+    }
+    @media print {
+      html { scroll-behavior: auto; }
+      body { font-family: "Inter", "Microsoft YaHei", sans-serif; font-size: 9pt; line-height: 1.65; background: white; color: #152b32; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .sidebar, .topbar, .hero-links, .tree-toolbar, .tree-explorer, .case-tabs, .segmented, .copy-button, .toast, .no-print { display: none !important; }
+      .main { margin: 0; max-width: none; padding: 0; }
+      .print-only { display: block; }
+      .hero { padding-bottom: 8mm; }
+      h1 { font-size: 27pt; }
+      h2 { font-size: 17pt; }
+      h3 { font-size: 11pt; }
+      h4 { font-size: 9pt; }
+      .hero .intro { font-size: 10pt; max-width: none; }
+      .section { padding-top: 10mm; }
+      .section-header { margin-bottom: 4mm; }
+      .section-header { break-inside: avoid; break-after: avoid; }
+      .section-header p { font-size: 9pt; }
+      .section-title::before { height: 16px; }
+      .root-map { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+      .root-node { padding: 10px; border-radius: 4px; }
+      .root-node code { font-size: 11pt; }
+      .root-node span, .root-node small { font-size: 7pt; }
+      .card { padding: 5mm; border-radius: 4px; }
+      .two-col, .three-col, .case-grid { display: block; }
+      .two-col > *, .three-col > *, .case-grid > * { margin-top: 4mm; }
+      #bia-register .two-col, .case-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 5mm; }
+      #bia-register .two-col { break-inside: avoid; }
+      #examples { break-before: page; }
+      .table-wrap { overflow: visible; border: 0; border-radius: 0; }
+      .table-wrap::before { display: none; }
+      .table-wrap table { min-width: 0; }
+      table { font-size: 8pt; border: 1px solid var(--line); }
+      th { font-size: 7pt; padding: 6px 9px; }
+      td { padding: 7px 9px; min-width: 0 !important; }
+      thead { display: table-header-group; }
+      tr { break-inside: avoid; }
+      h2, h3, h4, summary, .code-head { break-after: avoid; }
+      p { orphans: 3; widows: 3; }
+      pre { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; overflow: visible; font-size: 7.8pt; line-height: 1.65; padding: 10px 12px; }
+      pre code { overflow-wrap: anywhere; }
+      .code-box { break-inside: avoid; background: #f1f4f1; color: #17372b; border: 1px solid #ccd6ce; }
+      .code-head { background: #e2eae2; color: #355044; border-color: #ccd6ce; padding: 5px 10px; font-size: 7pt; }
+      .note { font-size: 8pt; break-inside: avoid; margin-top: 4mm; padding: 10px 12px; }
+      .case-panel[hidden] { display: block !important; }
+      .case-panel { margin-top: 5mm; padding: 0; border: 0; border-radius: 0; }
+      .case-panel ~ .case-panel { break-before: page; }
+      .case-panel .step-list li { break-inside: avoid; }
+      .pipeline { gap: 14px; overflow: visible; padding-bottom: 4mm; }
+      .stage { flex: 1 1 0; min-width: 0; padding: 9px 6px; }
+      .stage strong { font-size: 7pt; overflow-wrap: anywhere; }
+      .stage span { font-size: 6pt; }
+      .stage::after { left: calc(100% + 2px); font-size: 12px; }
+      .stage-detail { font-size: 8pt; padding: 12px; }
+      #flow > .card, .stage-detail { break-inside: avoid; }
+      .identity { grid-template-columns: 1fr auto 1fr auto 1fr; gap: 7px; break-inside: avoid; }
+      .identity .diagram-arrow { transform: none; }
+      .identity-card { padding: 11px; }
+      .identity-card p { font-size: 8pt; }
+      figure.card { break-inside: avoid; }
+      .diagram-step, .small, .flow-caption, .output-facts p { font-size: 8pt; }
+      .file-reference { columns: 2; column-gap: 6mm; }
+      .file-reference article { border-top: 1px solid var(--line); padding: 3mm 0; break-inside: avoid; font-size: 8pt; }
+      .file-reference article h3 { color: var(--teal); font: 8pt/1.6 "IBM Plex Mono", Consolas, monospace; overflow-wrap: anywhere; }
+      .file-reference article p { margin-top: 2mm; }
+      details { break-inside: avoid; }
+      details > div { display: block !important; font-size: 8pt; padding: 0 12px 12px; }
+      summary { padding: 10px 12px; font-size: 9pt; }
+      a { color: inherit; text-decoration: none; }
+      footer { font-size: 7pt; }
+    }
+
+
+
+
+
+  /* SFLOW_COMPOSITION_STYLE */
+.cp-lab { --cp-ink:#182b36; --cp-muted:#526570; --cp-line:#d9e1dc; --cp-surface:#fff; --cp-soft:#f0f5ef; --cp-accent:#08786c; --cp-cross:#3977b1; color:var(--cp-ink); font:14px/1.8 "Inter","Microsoft YaHei",system-ui,sans-serif; min-width:0; }
+:root:not([data-theme="light"])[data-theme] .cp-lab { --cp-ink:#e7eae5; --cp-muted:#a8b6ab; --cp-line:#3c4940; --cp-surface:#171f1b; --cp-soft:#222d25; --cp-accent:#b4de80; --cp-cross:#8fbdf0; }
+.cp-lab * { box-sizing:border-box; }
+.cp-lab h3,.cp-lab h4,.cp-lab p { margin:0; }
+.cp-lab h3 { font-size:18px; line-height:1.55; }
+.cp-lab h4 { font-size:13px; margin-bottom:10px; }
+.cp-lab code,.cp-lab pre { font-family:"IBM Plex Mono",Consolas,monospace; }
+.cp-lab code { overflow-wrap:anywhere; }
+.cp-lab button,.cp-lab select,.cp-lab input { font:inherit; color:var(--cp-ink); }
+.cp-lab button { background:var(--cp-surface); border:1px solid var(--cp-line); border-radius:6px; padding:7px 11px; font-size:12px; cursor:pointer; }
+.cp-lab button:hover { border-color:var(--cp-accent); }
+.cp-lab button:disabled { opacity:.55; cursor:default; }
+.cp-lab button:focus-visible,.cp-lab select:focus-visible,.cp-lab input:focus-visible { outline:3px solid #d69a43; outline-offset:3px; }
+.cp-lab select,.cp-lab input[type=text],.cp-new-tile input { border:1px solid var(--cp-line); border-radius:5px; background:var(--cp-surface); padding:7px 8px; min-width:0; font-size:12px; }
+.cp-intro { color:var(--cp-muted); margin-bottom:18px!important; }
+.cp-presets { display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding-bottom:18px; }
+.cp-presets > span { font-size:12px; color:var(--cp-muted); margin-right:5px; }
+.cp-step { background:var(--cp-surface); border:1px solid var(--cp-line); border-radius:11px; padding:23px; margin-top:15px; min-width:0; }
+.cp-heading { display:flex; justify-content:space-between; align-items:start; gap:20px; margin-bottom:18px; }
+.cp-heading p { font-size:12px; color:var(--cp-muted); margin-top:8px; max-width:720px; }
+.cp-small-actions { display:flex; flex-wrap:wrap; gap:6px; flex-shrink:0; }
+.cp-catalog { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; }
+.cp-component { border:1px solid var(--cp-line); border-radius:7px; padding:12px 9px; cursor:pointer; display:flex; flex-direction:column; align-items:flex-start; gap:5px; }
+.cp-component:has(input:checked) { background:var(--cp-soft); border-color:var(--cp-accent); }
+.cp-component input { accent-color:var(--cp-accent); margin:0 0 4px; }
+.cp-component strong { font-size:13px; }
+.cp-component span { color:var(--cp-muted); font-size:10px; }
+.cp-options { display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; }
+.cp-options label { display:flex; align-items:center; gap:10px; font-size:12px; color:var(--cp-muted); }
+.cp-import-map { display:grid; grid-template-columns:1fr 28px 1.15fr; gap:14px; margin-top:20px; border-top:1px solid var(--cp-line); padding-top:18px; }
+.cp-import-map > div { min-width:0; }
+.cp-import-map pre { background:var(--cp-soft); border-radius:6px; margin:0; padding:13px; font-size:11px; line-height:1.7; overflow-x:auto; }
+.cp-arrow { align-self:center; color:var(--cp-accent); font-size:23px; text-align:center; }
+.cp-units { display:flex; flex-wrap:wrap; align-content:start; gap:7px; }
+.cp-unit { color:var(--cp-accent); background:var(--cp-soft); border:1px solid var(--cp-line); border-radius:5px; padding:6px 9px; font:11px/1.6 "IBM Plex Mono",Consolas,monospace; }
+.cp-caption { color:var(--cp-muted); font-size:11px; line-height:1.85; margin-top:13px!important; }
+.cp-topology-summary { color:var(--cp-muted); font-size:12px; margin-bottom:14px; }
+.cp-topology-summary strong { color:var(--cp-accent); font-weight:600; }
+.cp-board { position:relative; padding:15px 23px; border:1px solid var(--cp-line); border-radius:9px; background:var(--cp-soft); isolation:isolate; }
+#cp-wires { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2; }
+.cp-tiles { position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:30px; }
+.cp-tile { min-width:0; border:1px dashed var(--cp-line); border-radius:7px; padding:11px 13px 15px; background:color-mix(in srgb,var(--cp-surface) 55%,transparent); }
+.cp-tile h4 { font-size:11px; font-weight:500; color:var(--cp-muted); }
+.cp-block { position:relative; background:var(--cp-surface); border:1px solid var(--cp-line); border-radius:6px; margin-top:11px; padding:11px 10px; z-index:3; }
+.cp-block > strong { font-size:12px; display:block; }
+.cp-block > code { color:var(--cp-accent); font-size:9px; display:block; margin:2px 0 9px; }
+.cp-port { position:relative; display:flex; justify-content:space-between; gap:5px; font-size:10px; color:var(--cp-muted); padding:3px 0; }
+.cp-port small { font-size:8px; color:var(--cp-muted); }
+.cp-pin { position:absolute; top:9px; width:6px; height:6px; border-radius:50%; background:var(--cp-accent); }
+.cp-port[data-role=master] .cp-pin { right:-14px; }
+.cp-port[data-role=slave] .cp-pin { left:-14px; }
+.cp-port[data-used=false] .cp-pin { background:var(--cp-surface); border:1px solid var(--cp-muted); }
+.cp-port[data-used=false] small { opacity:.75; }
+.cp-legend { display:flex; gap:14px; flex-wrap:wrap; font-size:10px; color:var(--cp-muted); margin-top:11px; }
+.cp-legend span { display:flex; align-items:center; gap:6px; }
+.cp-line { display:inline-block; width:21px; border-top:2px solid var(--cp-accent); }
+.cp-line.cp-cross { border-top:2px dashed var(--cp-cross); }
+.cp-editors { display:grid; grid-template-columns:.8fr 1.2fr; gap:22px; margin-top:22px; }
+.cp-editors > div { min-width:0; }
+.cp-assignments { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.cp-assignment { display:flex; gap:8px; align-items:center; justify-content:space-between; font-size:11px; }
+.cp-assignment select { max-width:116px; }
+.cp-new-tile { display:flex; gap:7px; margin-top:12px; }
+.cp-new-tile input { width:100%; }
+.cp-new-tile button { flex-shrink:0; }
+.cp-endpoints { display:grid; grid-template-columns:minmax(0,1fr) 12px minmax(0,1fr) auto; align-items:end; gap:7px; }
+.cp-endpoints label { font-size:10px; color:var(--cp-muted); }
+.cp-endpoints select { display:block; width:100%; margin-top:4px; font-size:11px; }
+.cp-endpoints > span { align-self:end; margin-bottom:7px; color:var(--cp-accent); }
+.cp-links { display:grid; gap:6px; margin-top:11px; }
+.cp-link { display:flex; align-items:center; gap:8px; padding:7px 8px; border:1px solid var(--cp-line); border-radius:5px; font-size:10px; }
+.cp-link code { flex:1; }
+.cp-link > span { color:var(--cp-cross); font-size:9px; white-space:nowrap; }
+.cp-link button { padding:2px 6px; font-size:10px; }
+.cp-message { font-size:12px; color:var(--cp-accent); min-height:1.5em; margin-top:12px!important; }
+.cp-configs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; }
+.cp-configs button { display:flex; flex-direction:column; text-align:left; padding:15px; gap:7px; min-width:0; }
+.cp-configs button[aria-pressed=true] { border-color:var(--cp-accent); background:var(--cp-soft); }
+.cp-configs strong { font:600 12px "IBM Plex Mono",Consolas,monospace; overflow-wrap:anywhere; }
+.cp-configs code { color:var(--cp-accent); font-size:10px; }
+.cp-configs span { color:var(--cp-muted); font-size:11px; }
+.cp-config-result { margin-top:16px; border-left:3px solid var(--cp-accent); background:var(--cp-soft); border-radius:0 5px 5px 0; padding:12px 15px; font-size:12px; }
+.cp-config-result p + p { margin-top:6px; }
+.cp-code-tabs { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.cp-code-tabs button[aria-pressed=true] { border-color:var(--cp-accent); color:var(--cp-accent); background:var(--cp-soft); }
+.cp-code-panel { background:var(--cp-soft); border:1px solid var(--cp-line); border-radius:7px; overflow:hidden; }
+.cp-code-head { display:flex; justify-content:space-between; align-items:center; gap:15px; padding:9px 12px; border-bottom:1px solid var(--cp-line); font-size:10px; color:var(--cp-muted); }
+.cp-code-head button { font-size:10px; padding:3px 8px; }
+.cp-code-panel pre { font-size:11px; line-height:1.7; margin:0; padding:16px; max-height:440px; overflow:auto; white-space:pre; color:var(--cp-ink); }
+.cp-code-panel pre code { font:inherit; white-space:inherit; overflow-wrap:inherit; }
+.cp-sr-only { position:absolute; width:1px; height:1px; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); }
+@layer base { @media print { #composition-lab .cp-code-panel[hidden] { display:block!important; } } }
+@media print { #cp-wires { z-index:0; } .cp-tiles { z-index:1; } .cp-tile { background:transparent; } }
+@media(max-width:1150px) { .cp-catalog { grid-template-columns:repeat(3,minmax(0,1fr)); } .cp-heading { flex-direction:column; } .cp-assignments { grid-template-columns:1fr; } .cp-editors { grid-template-columns:1fr; } }
+@media(max-width:700px) { .cp-step { padding:17px; } .cp-import-map { grid-template-columns:1fr; } .cp-arrow { transform:rotate(90deg); } .cp-tiles { grid-template-columns:1fr; gap:16px; } .cp-board { padding:16px 23px; } .cp-configs { grid-template-columns:1fr; } .cp-configs button { gap:4px; } .cp-endpoints { grid-template-columns:minmax(0,1fr) 10px minmax(0,1fr); } .cp-endpoints button { grid-column:1/-1; } .cp-assignments { grid-template-columns:1fr 1fr; } .cp-assignment { flex-wrap:wrap; } .cp-assignment select { width:100%; max-width:none; } }
+@media print { .cp-lab { --cp-ink:#182b36; --cp-muted:#526570; --cp-line:#d9e1dc; --cp-surface:#fff; --cp-soft:#f0f5ef; --cp-accent:#08786c; --cp-cross:#3977b1; font-size:8pt; } .cp-presets,.cp-options,.cp-editors,.cp-small-actions,.cp-code-tabs,.cp-heading > button,.cp-code-head button { display:none!important; } .cp-step { padding:4mm; border-radius:3px; } .cp-heading p,.cp-caption { font-size:7.5pt; } .cp-heading h3 { font-size:11pt; } .cp-catalog { grid-template-columns:repeat(6,minmax(0,1fr)); } .cp-component { padding:8px; } .cp-component input { display:none; } .cp-component:not(:has(input:checked)) { display:none; } .cp-import-map { grid-template-columns:1fr 20px 1fr; } .cp-arrow { transform:none; } .cp-tiles { grid-template-columns:repeat(3,minmax(0,1fr)); gap:22px; } .cp-board { break-inside:avoid; } .cp-block,.cp-tile { break-inside:avoid; } .cp-configs { grid-template-columns:repeat(3,minmax(0,1fr)); } .cp-configs button { padding:10px; } .cp-code-panel[hidden] { display:block!important; } .cp-code-panel { margin-top:4mm; } .cp-code-panel pre { max-height:none; overflow:visible; white-space:pre-wrap; overflow-wrap:anywhere; font-size:7pt; } .cp-code-head { break-after:avoid; } }
+
+/* END_SFLOW_COMPOSITION_STYLE */
+  </style>
+</head>
+<body>
+  <aside class="sidebar" aria-label="手册导航">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Sflow</div>
+    <p class="sidebar-subtitle">面向 IP / subsystem / SoC 开发者</p>
+    <nav aria-label="章节">
+      <a href="#overview" aria-current="location">开发 tree 全景</a>
+      <a href="#directories">交互目录与文件说明</a>
+      <a href="#placement">文件放在哪里</a>
+      <a href="#configuration">配置与依赖关系</a>
+      <a href="#composition">IP 组合与 tile / view</a>
+      <a href="#flow">一次构建如何串联</a>
+      <a href="#bia-register">BIA 与寄存器地址</a>
+      <a href="#examples">使用案例与命令输出</a>
+      <a href="#outputs">读懂 out 与调试结果</a>
+      <a href="#troubleshooting">遇到错误时</a>
+      <a href="#sources">依据与实现入口</a>
+    </nav>
+    <div class="sidebar-foot">内容基线 <code>76acf63</code><br>更新于 2026-11-14<br>本页包含完整离线内容<br><a href="https://github.com/TechYan/sflow" target="_blank" rel="noopener">查看 GitHub 仓库 ↗</a></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar"><span>开发者手册 / 独立设计仓库</span><div class="topbar-actions"><a class="button" href="#examples">查看上手案例</a><button class="button primary" id="print-guide" type="button">打印 / 保存 PDF</button></div></div>
+
+    <header class="hero" id="overview">
+      <div class="eyebrow">SFLOW DEVELOPMENT TREE</div>
+      <h1>从目录到一次<br>可追溯的构建</h1>
+      <p class="intro">一个开发 tree 是独立的设计 Git 仓库。你在 <code>src/</code> 维护 RTL、验证代码和设计元数据，在 <code>env/</code> 选择平台与依赖版本，通过 <code>run.py</code> 执行流程，并在 <code>out/</code> 查看发布、连线、编译和调试结果。</p>
+      <div class="hero-links"><a href="#directories">查一个目录该怎么用 ↓</a><a href="#composition">操作 IP / tile / config 组合图 ↓</a><a href="#bia-register">看 BIA 与地址如何接入 ↓</a><a href="#outputs">找到结果和 rerun 命令 ↓</a></div>
+      <div class="root-map" aria-label="开发 tree 的五个主要入口">
+        <button class="root-node" data-open-file="env"><code>env/</code><span>平台版本<br>设计依赖与本地覆盖</span><small>声明与锁定</small></button>
+        <button class="root-node" data-open-file="imports"><code>import/</code><span>已选平台<br>独立依赖 checkout</span><small>同步与取用</small></button>
+        <button class="root-node" data-open-file="src"><code>src/</code><span>RTL、验证<br>接口与生成配方</span><small>设计输入</small></button>
+        <button class="root-node" data-open-file="out"><code>out/</code><span>发布与生成结果<br>日志和调试副本</span><small>构建证据</small></button>
+        <button class="root-node" data-open-file="run"><code>run.py</code><span>build / sim / lint<br>状态、版本与重跑</span><small>日常入口</small></button>
+      </div>
+      <p class="note">IP、subsystem、SoC、library 和 common 使用同一套目录骨架。构建根通过自己的平台锁选择整次构建的 runtime；被导入设计的独立平台偏好用于它自身的 standalone 开发。</p>
+    </header>
+
+    <section class="section" id="directories" aria-labelledby="directories-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="directories-title">交互目录与文件说明</h2></div><p>点击路径查看归属、填写方式和消费阶段。搜索可使用路径或关键词，例如 “RTL”“feature”“rerun”。下面展示常见文件与可扩展目录，具体文件由 tree 类型和项目声明决定。</p></div></div>
+      <div class="tree-toolbar">
+        <div class="search"><label for="file-search">查找目录、文件或用途</label><input id="file-search" type="search" placeholder="搜索，例如 register / 宏 / 失败节点" autocomplete="off"></div>
+        <div class="segmented" id="file-filters" aria-label="按文件归属筛选"><button type="button" data-filter="all" aria-pressed="true">全部</button><button type="button" data-filter="design" aria-pressed="false">设计输入</button><button type="button" data-filter="environment" aria-pressed="false">版本环境</button><button type="button" data-filter="generated" aria-pressed="false">构建产物</button></div>
+      </div>
+      <div class="tree-explorer"><div class="tree-pane"><div class="tree-root mono">my_design/</div><ul class="tree-list" id="file-tree" aria-label="开发 tree 文件列表"></ul><p class="small muted" id="search-status" role="status" style="padding: 12px 12px 0"></p></div><article class="tree-detail" id="file-detail" aria-live="polite" aria-atomic="true"></article></div>
+      <div class="legend"><span><i class="dot"></i>设计输入由项目维护</span><span><i class="dot blue"></i>环境由声明与锁文件选择</span><span><i class="dot amber"></i>产物由 flow 生成</span></div>
+      <noscript><p class="note amber">交互目录需要启用 JavaScript。下方的文件放置表、流程说明和全部使用案例可直接阅读。</p></noscript>
+      <div class="print-only"><p>完整路径说明列在本手册末尾的“目录速查”。</p></div>
+    </section>
+
+    <section class="section" id="placement" aria-labelledby="placement-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="placement-title">文件放在哪里，怎样接入</h2></div><p>文件路径和消费声明共同决定它如何参与构建。<code>src/</code> 会进入源码快照，参与编译的文件再通过 project 的 <code>rtl</code> 或 <code>filesets</code> 选择。</p></div></div>
+      <div class="table-wrap"><table><thead><tr><th>你要添加的内容</th><th>建议位置</th><th>需要怎样声明 / 使用</th></tr></thead><tbody>
+        <tr><td>手写 RTL、package</td><td><button class="path-link" data-open-file="rtl"><code>src/rtl/</code></button></td><td>写入 <code>project.hjson</code> 的 <code>rtl</code>，或选中 fileset 的 <code>files</code>。package 顺序用 fileset 的 <code>deps</code> 表达。</td></tr>
+        <tr><td>头文件与共享 include</td><td><button class="path-link" data-open-file="include"><code>src/include/</code></button> 或 RTL 相邻目录</td><td>显式加入 fileset 的 <code>include_dirs</code>。源码所在目录参与源文件相对 include；实际 include 闭包由前端审计。</td></tr>
+        <tr><td>Testbench、case、VIP</td><td><button class="path-link" data-open-file="verif"><code>src/verif/</code></button></td><td>用 fileset 选入 TB/VIP，config 指定 <code>topmodule</code>。<code>suites</code> 选择 plusargs、seed、timeout 和成功标志。</td></tr>
+        <tr><td>项目清单与构建配置</td><td><button class="path-link" data-open-file="project"><code>src/meta/manifest/project.hjson</code></button></td><td>声明 name/kind、生成脚本、targets、filesets、configs、suites。config 选择 target/view/variant/feature/fileset。</td></tr>
+        <tr><td>模块端口与 bundle 映射</td><td><button class="path-link" data-open-file="interface"><code>src/meta/interface/</code></button></td><td>sidecar 写 module、bundle type/role 和字段到 RTL 端口的 map。project 的 <code>interface</code> 指向对外 sidecar。</td></tr>
+        <tr><td>实例、连线、tile、顶层导出</td><td><button class="path-link" data-open-file="connectivity"><code>src/meta/connectivity/</code></button></td><td>把 assembly 路径填入 <code>targets.&lt;name&gt;.assembly</code> 或相应 view。BIA 按此生成顶层与 tile RTL。</td></tr>
+        <tr><td>寄存器与地址描述</td><td><button class="path-link" data-open-file="register"><code>src/meta/register/</code></button></td><td>内置地址阶段读取根 publication 的 <code>addresses.hjson</code>。字段级寄存器描述及其生成器由项目配方组织。</td></tr>
+        <tr><td>variant、feature 与代码生成</td><td><button class="path-link" data-open-file="recipe"><code>src/meta/build.py</code></button></td><td><code>VARIANTS</code> 声明合法 variant 与有类型的 feature，<code>build(context)</code> 写入 <code>context["output"]</code> 并返回发布的 RTL/filesets 等信息。</td></tr>
+        <tr><td>feature / fuse 的原始数据</td><td><button class="path-link" data-open-file="feature"><code>src/meta/feature/</code></button>、<button class="path-link" data-open-file="fuse"><code>src/meta/fuse/</code></button></td><td>项目可在配方中读取这些数据。当前平台的 feature 权威入口为 <code>VARIANTS</code> 与 config 的 <code>features</code>。</td></tr>
+        <tr><td>公共 bundle 类型</td><td><button class="path-link" data-open-file="bundles"><code>common_info/src/info/bundles/</code></button></td><td>公共库按类型名提供 <code>&lt;type&gt;.hjson</code>，定义字段、master 方向与宽度；BIA 消费其发布副本。</td></tr>
+        <tr><td>公共 RTL / VIP 依赖</td><td><code>独立 sharedlib / VIP tree</code></td><td>在 imports 中声明 Git 来源，更新锁并同步。在 fileset 的 <code>deps</code> 中选择需要的设计、variant 与 fileset。</td></tr>
+        <tr><td>PDK、SRAM 等外部模型</td><td><code>项目指定的绝对路径</code></td><td>通过 fileset 的 <code>external_files</code> / <code>external_include_dirs</code> 声明。构建记录文件及实际头文件摘要。</td></tr>
+      </tbody></table></div>
+      <p class="note blue"><code>src/meta/assembly/</code> 是模板预留的项目组织目录。实际 BIA assembly 由 target/view 的 <code>assembly</code> 字段绑定，当前样例放在 <code>src/meta/connectivity/</code>。feature/fuse 目录中的项目数据也通过配方显式接入。</p>
+    </section>
+
+    <section class="section" id="configuration" aria-labelledby="configuration-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="configuration-title">配置与依赖关系</h2></div><p>先确定仓库来源，再选择一个设计的生成形式，最后在父设计中实例化。三个层级分别有自己的名称和文件。</p></div></div>
+      <div class="card">
+        <div class="identity" aria-label="仓库、build unit 与硬件实例的关系">
+          <div class="identity-card"><h3>设计仓库</h3><code>pcie</code><p><code>env/imports.*</code> 固定来源与完整 commit。一个仓库包含设计代码与元数据。</p></div>
+          <div class="diagram-arrow" aria-hidden="true">→</div>
+          <div class="identity-card"><h3>Build unit</h3><code>pcie_rc_x16</code><p><code>pcie + rc_x16</code> 解析为一份 publication，带有对应 feature 和模块命名空间。</p></div>
+          <div class="diagram-arrow" aria-hidden="true">→</div>
+          <div class="identity-card"><h3>硬件实例</h3><code>rc0 · rc1</code><p>父 assembly 中的两个实例引用同一 build unit，复用它的发布和 BIA 实现。</p></div>
+        </div>
+      </div>
+      <div class="two-col" style="margin-top: 18px">
+        <div class="card"><h3>两套版本声明</h3><dl class="file-facts"><dt>平台</dt><dd><code>env/platform.hjson</code> + <code>platform.lock.json</code> 选择 sflow 代码、bootstrap API 及其锁定 Python 依赖。</dd><dt>设计</dt><dd><code>env/imports.hjson</code> + <code>imports.lock.json</code> 选择设计仓库闭包，固定各仓库完整 commit。</dd><dt>本地开发</dt><dd><code>platform.local.json</code> 覆盖平台，<code>overrides.local.hjson</code> 覆盖设计；实际路径和 dirty 状态进入 provenance。</dd></dl></div>
+        <div class="card"><h3>从 config 到一次执行</h3><dl class="file-facts"><dt>target</dt><dd>选择某份 assembly 或 fileset 组合。</dd><dt>view</dt><dd>选择该 target 下的结构 / fileset 表示，默认 <code>tile</code>。</dd><dt>variant</dt><dd>选择 <code>VARIANTS</code> 中已声明的生成分支。</dd><dt>feature</dt><dd>config 按 build unit 覆盖已声明的 bool/int/string 值，形成全局 registry 和宏。</dd><dt>suite</dt><dd>选择运行用例与 seed。编译配置由 config/fileset 决定。</dd></dl></div>
+      </div>
+      <div class="table-wrap" style="margin-top: 18px"><table><thead><tr><th>依赖图</th><th>在哪声明</th><th>决定什么</th></tr></thead><tbody>
+        <tr><td>Import</td><td><code>env/imports.hjson</code></td><td>获取哪些独立设计仓库及其精确版本。</td></tr>
+        <tr><td>Build</td><td><code>project.build.dependencies</code></td><td>哪个生成器先发布，供另一个生成器通过 <code>context["dependencies"]</code> 使用。</td></tr>
+        <tr><td>Hardware</td><td>assembly 的 <code>instances</code>、<code>connections</code></td><td>哪些 design_variant 被实例化，如何连接 bundle 和划分 tile。</td></tr>
+        <tr><td>Fileset</td><td><code>filesets.*.deps</code></td><td>哪些源码参与当前编译、package 与其他文件的编译顺序。</td></tr>
+      </tbody></table></div>
+    </section>
+
+
+
+
+
+
+
+
+
+
+
+<!-- SFLOW_COMPOSITION_SECTION -->
+    <section class="section" id="composition" aria-labelledby="composition-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="composition-title">自由组合 IP，连接 block，重组 tile 与 config</h2></div><p>这组交互图把源码组合、发布、硬件连接和 SoC 配置放在一起。组件库采用当前六 IP demo 的真实接口，生成的声明可复制到开发 tree 中继续使用。</p></div></div>
+<div class="cp-lab" id="composition-lab">
+  <p class="cp-intro">从组件库选择 IP，查看 workspace 与 publication；编辑 bundle 连接和 tile 归属，再用 view 组织结构与 fileset，形成可供 SoC 构建的 config。下方实时生成对应声明，来源与版本占位符按实际仓库填写。</p>
+  <p class="cp-caption">这里用六个样例 IP 展示组合。实际组件库通过 imports 扩展为项目的独立 IP、subsystem 和公共库，各组件按自身的清单、variant 与接口契约接入。</p>
+  <div class="cp-presets" role="group" aria-label="选择组件组合示例">
+    <span>组合示例</span><button type="button" data-cp-preset="io">PCIe + DMA + DNoC</button><button type="button" data-cp-preset="full">六 IP 组合</button><button type="button" data-cp-preset="dual">双 PCIe，共用 variant</button>
+  </div>
+  <section class="cp-step" aria-labelledby="cp-components-title">
+    <div class="cp-heading"><div><h3 id="cp-components-title">组件库 → 当前 workspace → build unit</h3><p>imports 声明并锁定来源，sync 获取 checkout；build 根据所选 config、硬件与 fileset 依赖解析闭包，按 build.dependencies 调度发布。</p></div></div>
+    <div class="cp-catalog" id="cp-catalog"></div>
+    <div class="cp-options"><label>PCIe variant <select id="cp-variant"><option value="default">default</option><option value="rc_x16" selected>rc_x16</option><option value="ep_x16">ep_x16</option><option value="dm_x8">dm_x8</option></select></label><label>PCIe 实例数 <select id="cp-count"><option value="1">1</option><option value="2">2</option></select></label></div>
+    <div class="cp-import-map"><div><h4>取入独立仓库</h4><pre id="cp-workspace"></pre></div><span class="cp-arrow" aria-hidden="true">→</span><div><h4>按 design_variant 发布</h4><div class="cp-units" id="cp-units"></div><p class="cp-caption" id="cp-unit-note"></p></div></div>
+    <p class="cp-caption">组件在各自仓库维护，SoC 根的平台锁选择本次执行 runtime。闭包内同名设计使用一致的来源和 commit。</p>
+  </section>
+  <section class="cp-step" aria-labelledby="cp-connectivity-title">
+    <div class="cp-heading"><div><h3 id="cp-connectivity-title">BIA connectivity → block 互联与 tile repartition</h3><p>实线表示同 tile 连线，虚线表示跨 tile 连线。改变实例的 tile，观察连线分类、层次模块与 assembly 一起更新。</p></div><div class="cp-small-actions"><button type="button" id="cp-one-tile">合并为单 tile</button><button type="button" id="cp-reset-tiles">按功能重新分区</button></div></div>
+    <div class="cp-topology-summary" id="cp-topology-summary" role="status" aria-live="polite"></div>
+    <div class="cp-board" id="cp-board"><canvas id="cp-wires" aria-hidden="true"></canvas><div class="cp-tiles" id="cp-tiles"></div></div>
+    <div class="cp-legend"><span><i class="cp-line"></i>同 tile / tile 内部 wire</span><span><i class="cp-line cp-cross"></i>跨 tile / 顶层 wire 与 tile 端口</span><span>M master → S slave · sflow_rw</span></div>
+    <div class="cp-editors">
+      <div><h4>调整实例归属</h4><p class="cp-caption">编辑下方归属对应 partitioned 分区；从 flat 编辑时切换到该 view。</p><div id="cp-tile-assignments" class="cp-assignments"></div><div class="cp-new-tile"><label class="cp-sr-only" for="cp-new-tile">新 tile 名称</label><input id="cp-new-tile" placeholder="新 tile 名称，例如 compute"><button type="button" id="cp-add-tile">添加 tile</button></div></div>
+      <div><h4>连接兼容的 bundle 端点</h4><div class="cp-endpoints"><label>源 master<select id="cp-source"></select></label><span aria-hidden="true">→</span><label>目标 slave<select id="cp-sink"></select></label><button type="button" id="cp-add-link">添加连接</button></div><div class="cp-links" id="cp-links"></div><p class="cp-caption" id="cp-export-note"></p></div>
+    </div>
+    <p class="cp-message" id="cp-message" role="status" aria-live="polite"></p>
+    <p class="cp-caption">重分区通过 assembly 的 tiles 与 instances[].tile 声明。BIA 按接口契约生成结构 RTL，跨 tile 传递 bundle 字段；仲裁、译码、协议转换由对应 IP 或适配 block 实现。</p>
+  </section>
+  <section class="cp-step" aria-labelledby="cp-config-title">
+    <div class="cp-heading"><div><h3 id="cp-config-title">view → config → SoC 使用</h3><p>同一组组件和逻辑连线可以使用不同 assembly 分区或 fileset 选择。点击 config，查看当前结构、构建命令和产物路径。</p></div></div>
+    <div class="cp-configs" role="group" aria-label="选择 SoC config">
+      <button type="button" data-cp-config="soc_flat" aria-pressed="false"><strong>soc_flat</strong><code>view = flat</code><span>所有实例放进一个 tile，选 rtl fileset。</span></button>
+      <button type="button" data-cp-config="soc_partitioned" aria-pressed="true"><strong>soc_partitioned</strong><code>view = partitioned</code><span>使用当前自定义 tile 归属，选 rtl fileset。</span></button>
+      <button type="button" data-cp-config="soc_debug" aria-pressed="false"><strong>soc_debug</strong><code>view = debug</code><span>复用自定义分区，选择 rtl + debug 和调试宏。</span></button>
+    </div>
+    <div class="cp-config-result" id="cp-config-result"></div>
+    <p class="cp-caption">父 view 在此绑定根 assembly / filesets；子实例显式选 view=tile。相同 design_variant 在同一次构建内使用一致的 target/view。debug fileset 在此留作项目扩展入口。</p>
+  </section>
+  <section class="cp-step" aria-labelledby="cp-files-title">
+    <div class="cp-heading"><div><h3 id="cp-files-title">把组合落实到开发 tree</h3><p>对应文件实时更新。复制声明后填写实际 Git 来源与 ref，按标题路径放入现有 SoC tree，再通过同步和 build 命令执行。</p></div><button type="button" id="cp-download">下载声明 JSON</button></div>
+    <div class="cp-code-tabs" role="group" aria-label="选择组合声明文件"><button type="button" data-cp-code="imports" aria-pressed="false">imports</button><button type="button" data-cp-code="project" aria-pressed="false">project / configs</button><button type="button" data-cp-code="flat" aria-pressed="false">flat assembly</button><button type="button" data-cp-code="partitioned" aria-pressed="true">partitioned assembly</button><button type="button" data-cp-code="commands" aria-pressed="false">命令与输出路径</button></div>
+    <div class="cp-code-panel" data-cp-panel="imports" hidden><div class="cp-code-head"><span>env/imports.hjson · 来源与 ref 需填写</span><button type="button" data-cp-copy="cp-imports-code">复制</button></div><pre><code id="cp-imports-code"></code></pre></div>
+    <div class="cp-code-panel" data-cp-panel="project" hidden><div class="cp-code-head"><span>src/meta/manifest/project.hjson</span><button type="button" data-cp-copy="cp-project-code">复制</button></div><pre><code id="cp-project-code"></code></pre></div>
+    <div class="cp-code-panel" data-cp-panel="flat" hidden><div class="cp-code-head"><span>src/meta/connectivity/flat.hjson</span><button type="button" data-cp-copy="cp-flat-code">复制</button></div><pre><code id="cp-flat-code"></code></pre></div>
+    <div class="cp-code-panel" data-cp-panel="partitioned"><div class="cp-code-head"><span>src/meta/connectivity/partitioned.hjson</span><button type="button" data-cp-copy="cp-partitioned-code">复制</button></div><pre><code id="cp-partitioned-code"></code></pre></div>
+    <div class="cp-code-panel" data-cp-panel="commands" hidden><div class="cp-code-head"><span>在 SoC tree 中执行 · 路径中的 build-id 由实际结果给出</span><button type="button" data-cp-copy="cp-commands-code">复制</button></div><pre><code id="cp-commands-code"></code></pre></div>
+    <p class="cp-caption">下载文件是以目标路径为键的声明集合，使用时将各项分别写入对应文件。这里在浏览器中编辑和展示配置，真实构建由本地 sflow 与 SC 执行。</p>
+  </section>
+</div>
+
+    </section>
+<!-- END_SFLOW_COMPOSITION_SECTION -->
+
+    <section class="section" id="flow" aria-labelledby="flow-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="flow-title">一次构建如何串联</h2></div><p>选择运行方式，再点击阶段查看它读什么、产生什么。SiliconCompiler 按显式依赖执行任务，同层 publication 可按依赖并行运行。</p></div></div>
+      <div class="card">
+        <div class="flow-toolbar"><h3 id="flow-heading">build / 硬件构建</h3><div class="segmented" id="flow-modes" aria-label="构建方式"><button data-mode="build" aria-pressed="true">build</button><button data-mode="sim" aria-pressed="false">sim</button><button data-mode="lint" aria-pressed="false">lint</button><button data-mode="library" aria-pressed="false">library/common</button></div></div>
+        <p class="flow-caption" id="flow-caption">具有 BIA assembly 的设计按此路径生成并编译。</p>
+        <div class="pipeline" id="pipeline" aria-label="执行阶段图"></div>
+        <article class="stage-detail" id="stage-detail" aria-live="polite"></article>
+      </div>
+      <div class="three-col" style="margin-top: 18px"><div class="card"><h3>build</h3><p class="small muted" style="margin-top: 9px">生成、发布、连接、组织 filelist，并执行 Icarus compile。无 BIA 的显式 <code>topmodule</code> 项目沿 publication/fileset 路径组织源码。</p></div><div class="card"><h3>sim / run --build</h3><p class="small muted" style="margin-top: 9px"><code>sim</code> 编译一次，再按 case/seed 执行。<code>run --build</code> 校验指定 simulation build 的镜像摘要后，使用已有镜像运行 suite。</p></div><div class="card"><h3>lint / 公共库</h3><p class="small muted" style="margin-top: 9px"><code>lint</code> 使用 Slang 检查同一配置产物。没有 topmodule/BIA 的 library/common 执行 snapshot/publish，结果体现已完成的阶段。</p></div></div>
+    </section>
+
+    <section class="section" id="bia-register" aria-labelledby="bia-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="bia-title">BIA 与寄存器地址如何接入</h2></div><p>两条链路都从发布后的设计输入出发。BIA 处理接口与结构连接，地址阶段由构建根分配 region。</p></div></div>
+      <div class="two-col">
+        <figure class="card"><h3>BIA 连接链路</h3><div class="diagram-stack"><div class="diagram-step"><strong>公共 bundle 类型</strong><code>common_info/src/info/bundles/sflow_rw.hjson</code><br>字段、master 方向与宽度</div><div class="down-arrow" aria-hidden="true">↓</div><div class="diagram-step"><strong>模块 sidecar + 父 assembly</strong><code>src/meta/interface/*.hjson</code> 映射端口<br><code>src/meta/connectivity/*.hjson</code> 声明实例、连线与 tile</div><div class="down-arrow" aria-hidden="true">↓</div><div class="diagram-step"><strong>publish → addresses → bia_&lt;unit&gt;</strong>校验类型、角色、字段宽度与端点，绑定已发布子设计接口</div><div class="down-arrow" aria-hidden="true">↓</div><div class="diagram-step"><strong>connectivity/&lt;unit&gt;/&lt;view&gt;/</strong>顶层与 tile 的 <code>.sv</code>、<code>interface.json</code><br>随后由 assembly 选入 filelist</div></div><figcaption class="small muted" style="margin-top: 16px">BIA 生成结构连接。仲裁、译码与协议状态机由设计 RTL 提供。子 design 的导出接口通过 project 的 <code>interface</code> 字段声明。</figcaption></figure>
+        <figure class="card"><h3>根地址 / register 链路</h3><div class="diagram-stack"><div class="diagram-step"><strong>构建根的 region 描述</strong><code>src/meta/register/addresses.hjson</code><br>每项包含 <code>name / base / size</code></div><div class="down-arrow" aria-hidden="true">↓</div><div class="diagram-step"><strong>root publication</strong><code>library/&lt;root_unit&gt;/src/meta/register/addresses.hjson</code></div><div class="down-arrow" aria-hidden="true">↓</div><div class="diagram-step"><strong>addresses 节点</strong>检查名称、范围、正大小与 region 重叠</div><div class="down-arrow" aria-hidden="true">↓</div><div class="diagram-step"><strong>addresses/ → BIA / assembly</strong><code>addresses.json</code><br><code>sflow_addresses_pkg.sv</code> 包含 <code>&lt;NAME&gt;_BASE</code> 与 <code>&lt;NAME&gt;_SIZE</code></div></div><figcaption class="small muted" style="margin-top: 16px">内置阶段生成 region 级地址定义。字段级 CSR RTL、软件头文件、UVM RAL 等产物可由项目在 <code>build.py</code> 中调用对应生成器，写入 publication 并声明需要编译的 fileset。</figcaption></figure>
+      </div>
+      <p class="note">SoC 构建使用 SoC 根 publication 的地址分配。IP 的相对寄存器布局可保存在自身 <code>src/meta/register/</code> 中，再由项目生成器按集成契约消费。</p>
+    </section>
+
+    <section class="section" id="examples" aria-labelledby="examples-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="examples-title">使用案例与命令输出</h2></div><p>命令面向 Linux / macOS 的 shell。每个案例标明工作目录和前提，终端中的输出用于说明实际结果字段与路径，动态 ID 以占位符表示。打印时会展开全部案例。</p></div></div>
+      <div class="case-tabs" id="case-tabs" role="tablist" aria-label="使用案例">
+        <button id="tab-start" role="tab" aria-controls="case-start" aria-selected="true" tabindex="0">首次运行</button>
+        <button id="tab-rtl" role="tab" aria-controls="case-rtl" aria-selected="false" tabindex="-1">添加 RTL</button>
+        <button id="tab-integrate" role="tab" aria-controls="case-integrate" aria-selected="false" tabindex="-1">集成 IP 与 variant</button>
+        <button id="tab-addresses" role="tab" aria-controls="case-addresses" aria-selected="false" tabindex="-1">地址与生成器</button>
+        <button id="tab-suite" role="tab" aria-controls="case-suite" aria-selected="false" tabindex="-1">仿真 suite</button>
+        <button id="tab-rerun" role="tab" aria-controls="case-rerun" aria-selected="false" tabindex="-1">失败节点重跑</button>
+        <button id="tab-version" role="tab" aria-controls="case-version" aria-selected="false" tabindex="-1">版本与联合调试</button>
+      </div>
+
+      <article class="case-panel card" id="case-start" role="tabpanel" aria-labelledby="tab-start">
+        <h3>从可运行 reference 开始</h3><p>前提为 Git、Python ≥3.11、uv，以及 PATH 中的 <code>iverilog</code> / <code>vvp</code>。Python 依赖由平台的 <code>uv.lock</code> 固定。目标目录需要使用一个尚未创建的路径。</p>
+        <div class="case-grid"><div><h4>在 sflow 平台 checkout 中执行</h4><div class="code-box"><div class="code-head"><span>shell · 平台根目录</span><button class="copy-button">复制</button></div><pre><code>uv sync --locked
+uv run --locked sflow reference check
+uv run --locked sflow reference materialize \
+  --dest /tmp/sflow-guide
+
+cd /tmp/sflow-guide/workspaces/pcie
+python env/sync.py
+python run.py list
+python run.py build
+python run.py sim
+python run.py status</code></pre></div><p class="small muted" style="margin-top: 12px">仓库内 <code>references/</code> 的来源使用 <code>reference:*</code> 占位符。materialize 会创建独立 Git 源仓库和已绑定的开发 checkout，入口由这些 checkout 执行。</p></div><div><h4>你会得到的结构</h4><pre class="output-tree">/tmp/sflow-guide/
+  repos/
+    sflow/           独立平台源
+    common_info/     bundle 类型
+    sharedlib/       公共 RTL
+    pcie/            PCIe reference 源
+    soc/             SoC reference 源
+  workspaces/
+    pcie/            IP 开发 tree
+    soc/             SoC 开发 tree</pre><div class="code-box output"><div class="code-head"><span>sim 成功结果字段示例 · 节选</span></div><pre><code>{
+  "state": "passed",
+  "run_directory": ".../out/linux/builds/&lt;id&gt;",
+  "steps": {
+    "generate": "passed",
+    "compile": "passed",
+    "lint": "skipped",
+    "simulation_smoke": "passed"
+  }
+}</code></pre></div></div></div>
+        <p class="note">需要创建自己的 tree 时，在平台 checkout 使用 <code>sflow new</code>。<code>ip/subsystem/soc</code> starter 需要可用的 <code>sharedlib</code> 与 <code>common_info</code> Git 来源。<code>--imports</code> 文件是名称到 <code>{source, ref}</code> 的映射，生成后的 <code>env/imports.hjson</code> 带有 schema 和 dependencies 外层。</p>
+        <div class="case-grid"><div class="code-box"><div class="code-head"><span>JSON · /work/config/sources.hjson 参数模板</span><button class="copy-button">复制</button></div><pre><code>{
+  "sharedlib": {
+    "source": "/work/repos/sharedlib",
+    "ref": "&lt;available-design-commit&gt;"
+  },
+  "common_info": {
+    "source": "/work/repos/common_info",
+    "ref": "&lt;available-design-commit&gt;"
+  }
+}</code></pre></div><div class="code-box"><div class="code-head"><span>shell · 先填写实际路径与版本</span><button class="copy-button">复制</button></div><pre><code>uv run --locked sflow new --type ip --name my_ip \
+  --dest /work/design/my_ip \
+  --imports /work/config/sources.hjson \
+  --platform-source /work/platform/sflow \
+  --platform-ref &lt;available-platform-commit&gt;
+
+cd /work/design/my_ip
+python env/sync.py
+python run.py build</code></pre></div></div>
+      </article>
+
+      <article class="case-panel card" id="case-rtl" role="tabpanel" aria-labelledby="tab-rtl" hidden>
+        <h3>添加一个手写 RTL 文件</h3><p>工作目录为上个案例的 PCIe 开发 tree，保留 reference 的原有 project 内容。此例将新文件加入默认 RTL 集合，展示文件参与编译所需的完整步骤。</p>
+        <div class="case-grid"><div><h4>创建 src/rtl/debug_counter.sv</h4><div class="code-box"><div class="code-head"><span>SystemVerilog · src/rtl/debug_counter.sv</span><button class="copy-button">复制</button></div><pre><code>`timescale 1ns/1ps
+module debug_counter (
+    input  wire       clk,
+    input  wire       rst_n,
+    output reg  [7:0] value
+);
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) value &lt;= 8'h00;
+    else        value &lt;= value + 1'b1;
+  end
+endmodule</code></pre></div></div><div><h4>更新项目清单中的 rtl 列表</h4><div class="code-box"><div class="code-head"><span>JSON · project.hjson 中的对应字段</span><button class="copy-button">复制</button></div><pre><code>"rtl": [
+  "src/rtl/pcie_core.sv",
+  "src/rtl/debug_counter.sv"
+]</code></pre></div><div class="code-box"><div class="code-head"><span>shell · PCIe tree 根目录</span><button class="copy-button">复制</button></div><pre><code>python run.py build
+python run.py status</code></pre></div><p class="small muted" style="margin-top: 12px">如果项目已经使用 <code>filesets</code>，将文件写入被选中 fileset 的 <code>files</code>。需要把该模块接到设计上时，在父 RTL 中实例化，或补 sidecar 并通过 BIA assembly 连接。</p></div></div>
+        <h4>有 package / TB 时使用 fileset 表达顺序</h4><div class="code-box"><div class="code-head"><span>JSON · 合并到实际 project，示例路径需先准备文件</span><button class="copy-button">复制</button></div><pre><code>"filesets": {
+  "pkg": {"files": ["src/rtl/types_pkg.sv"]},
+  "rtl": {
+    "files": ["src/rtl/core.sv"],
+    "include_dirs": ["src/include"],
+    "deps": [{"fileset": "pkg"}]
+  },
+  "tb": {
+    "files": ["src/verif/core_tb.sv"],
+    "deps": [{"fileset": "rtl"}]
+  }
+}</code></pre></div>
+      </article>
+
+      <article class="case-panel card" id="case-integrate" role="tabpanel" aria-labelledby="tab-integrate" hidden>
+        <h3>在 SoC 中复用两个 PCIe rc_x16 实例</h3><p>使用 materialize 产生的 SoC reference。它已声明 PCIe 依赖，包含 rc0、rc1、ep、dm 四个实例。rc0 与 rc1 共用 <code>pcie_rc_x16</code>，其余实例分别选择 <code>ep_x16</code> 与 <code>dm_x8</code>。</p>
+        <div class="case-grid"><div><h4>父 assembly 中的实例声明</h4><div class="code-box"><div class="code-head"><span>JSON · SoC assembly 中的实例节选</span><button class="copy-button">复制</button></div><pre><code>"instances": [
+  {"name": "rc0", "design": "pcie",
+   "variant": "rc_x16", "tile": "rc0"},
+  {"name": "rc1", "design": "pcie",
+   "variant": "rc_x16", "tile": "rc1"}
+]</code></pre></div><p class="small muted" style="margin-top: 12px">完整 assembly 还需声明同名 tile、connections 与 top_ports。variant 的配方需要为生成模块、sidecar 和 assembly 提供对应的 unit 名称，PCIe reference 的 <code>build.py</code> 展示了这一实现。</p><div class="code-box"><div class="code-head"><span>shell · materialize 的 SoC tree</span><button class="copy-button">复制</button></div><pre><code>cd /tmp/sflow-guide/workspaces/soc
+python env/sync.py
+python run.py list
+python run.py build
+python run.py sim</code></pre></div></div><div><h4>有 feature override 的 config</h4><div class="code-box"><div class="code-head"><span>JSON · 合并到 SoC project 的字段</span><button class="copy-button">复制</button></div><pre><code>"configs": {
+  "integration": {
+    "target": "default",
+    "view": "tile",
+    "features": {
+      "pcie_rc_x16": {"LANES": 16}
+    }
+  }
+}</code></pre></div><div class="code-box"><div class="code-head"><span>shell · 添加 config 后</span><button class="copy-button">复制</button></div><pre><code>python run.py build --config integration</code></pre></div><div class="code-box output"><div class="code-head"><span>发布目录示例 · 同 variant 复用一份</span></div><pre><code>library/
+  pcie_rc_x16/
+  pcie_ep_x16/
+  pcie_dm_x8/
+  soc_default/
+  common_info_default/
+  sharedlib_default/
+
+features.svh 中的宏示例
+`define PCIE_RC_X16_LANES 16</code></pre></div></div></div>
+        <p class="note">修改依赖关系时，先在 <code>env/imports.hjson</code> 声明设计并显式更新锁，再在 assembly 或 fileset 中引用。build dependency 用于生成器输入次序，硬件实例则由 assembly 声明。</p>
+      </article>
+
+      <article class="case-panel card" id="case-addresses" role="tabpanel" aria-labelledby="tab-addresses" hidden>
+        <h3>分配地址，并把生成的寄存器 RTL 发布给后续阶段</h3><p>第一部分可在 reference 根直接使用。第二部分展示项目生成器的接入位置，需要项目提供实际寄存器生成逻辑。</p>
+        <div class="case-grid"><div><h4>根 src/meta/register/addresses.hjson</h4><div class="code-box"><div class="code-head"><span>JSON · region 描述</span><button class="copy-button">复制</button></div><pre><code>{
+  "regions": [
+    {"name": "dma", "base": 4096, "size": 256},
+    {"name": "atu", "base": 8192, "size": 256}
+  ]
+}</code></pre></div><div class="code-box"><div class="code-head"><span>shell · 当前构建根</span><button class="copy-button">复制</button></div><pre><code>python run.py build</code></pre></div></div><div><h4>生成地址 package 的结构</h4><div class="code-box output"><div class="code-head"><span>SystemVerilog · addresses/sflow_addresses_pkg.sv</span></div><pre><code>`timescale 1ns/1ps
+package sflow_addresses_pkg;
+  localparam logic [31:0] DMA_BASE = 32'h00001000;
+  localparam logic [32:0] DMA_SIZE = 33'h000000100;
+  localparam logic [31:0] ATU_BASE = 32'h00002000;
+  localparam logic [32:0] ATU_SIZE = 33'h000000100;
+endpackage</code></pre></div><p class="small muted" style="margin-top: 12px">根地址文件经 publish 进入 addresses 节点，package 自动进入 assembly 的编译输入。base/size 使用整数，region 需在 32 位地址空间内且互不重叠。</p></div></div>
+        <h4>项目生成配方的最小接口</h4><div class="code-box"><div class="code-head"><span>Python · build.py 接口示意，接入已有生成器时填写 emit_register_rtl</span><button class="copy-button">复制</button></div><pre><code>from pathlib import Path
+
+VARIANTS = {"default": {"DATA_WIDTH": 32}}
+
+def build(context):
+    source = Path(context["source"])
+    output = Path(context["output"])
+    spec = source / "src/meta/register/regs.hjson"
+    generated = output / "generated/csr_regs.sv"
+    generated.parent.mkdir(parents=True, exist_ok=True)
+    # 在此调用项目提供的生成器，读取 spec、使用已解析 feature。
+    # emit_register_rtl(spec, generated, context["features"])
+    return {"rtl": ["src/rtl/core.sv", "generated/csr_regs.sv"]}</code></pre></div>
+        <p class="note amber">上面的配方展示接入契约，使用前需实现生成器并准备实际文件。输出写入 <code>context["output"]</code>，返回的 fileset 名称与依赖结构需与已解析 project 对齐。配方可读取 context 的 feature，权威 context 由平台生成并校验。</p>
+      </article>
+
+      <article class="case-panel card" id="case-suite" role="tabpanel" aria-labelledby="tab-suite" hidden>
+        <h3>编译一次，运行多个 case / seed</h3><p>在 PCIe reference 的 <code>project.hjson</code> 中合并下面的 suites 字段。reference 默认提供启动 harness，完成时打印 <code>SFLOW_STARTUP_COMPLETE</code>。</p>
+        <div class="case-grid"><div><h4>声明运行用例</h4><div class="code-box"><div class="code-head"><span>JSON · project.hjson 的 suites 字段</span><button class="copy-button">复制</button></div><pre><code>"suites": {
+  "smoke": {
+    "cases": [
+      {"name": "startup", "seeds": [1, 2],
+       "args": ["+MODE=quick"], "timeout": 30,
+       "success_marker": "SFLOW_STARTUP_COMPLETE"},
+      {"name": "repeat", "seeds": [7]}
+    ]
+  }
+}</code></pre></div><div class="code-box"><div class="code-head"><span>shell · PCIe tree</span><button class="copy-button">复制</button></div><pre><code>python run.py sim --suite smoke
+
+# 使用指定 simulation build 的已有镜像
+python run.py run --build out/linux/builds/&lt;build-id&gt; \
+  --suite smoke</code></pre></div></div><div><h4>每个 case / seed 独立保存</h4><pre class="output-tree">out/linux/builds/&lt;build-id&gt;/
+  run/smoke/&lt;execution-id&gt;/
+    startup/1/     → SC simulate/0
+    startup/2/     → SC simulate/1
+    repeat/7/      → SC simulate/2
+    result.json    本次 suite 结果</pre><p class="small muted" style="margin-top: 12px">独立的 <code>run --build</code> 执行会保存 suite 总结果。首次 sim 的整体结果位于 build 的 <code>result.json</code>，每个 case 工作目录都有自己的 <code>result.json</code>。</p><div class="note">实际功能 testbench 通过 fileset + config 的 <code>topmodule</code> 接入。用例完成时打印选定的成功标志。退出错误、错误诊断、超时或缺少成功标志都会导致失败。</div></div></div>
+      </article>
+
+      <article class="case-panel card" id="case-rerun" role="tabpanel" aria-labelledby="tab-rerun" hidden>
+        <h3>修复 BIA 调试副本后，重跑失败节点</h3><p>适用于已启动 SC 节点的失败。终端与结果中的 <code>failed_nodes</code> 会给出真实路径。以下以 <code>bia_pcie_default/0</code> 为例。</p>
+        <ol class="step-list"><li>找到报错中的 <code>inputs</code> 与 <code>command</code>。BIA sidecar 常位于 <code>&lt;node&gt;/debug/inputs/lib_pcie_default/src/meta/interface/core.hjson</code>，assembly 位于相邻的 <code>connectivity/</code>。</li><li>编辑该调试副本，修复 bundle 类型、role、字段映射或连线端点。</li><li>执行保存的 <code>rerun.sh</code>。本地和 LSF 使用同一入口，退出码反映本次节点状态。</li><li>查看打印的 attempt 结果路径，以及其 <code>input_changes</code>、<code>work_directory</code> 和 <code>log</code>。</li></ol>
+        <div class="case-grid"><div><div class="code-box"><div class="code-head"><span>shell · 将路径替换为失败结果给出的绝对路径</span><button class="copy-button">复制</button></div><pre><code>bash /absolute/path/bia_pcie_default/0/rerun.sh
+
+# debug 队列和资源参数按集群实际情况填写
+bsub -q debug -n 1 bash \
+  /absolute/path/bia_pcie_default/0/rerun.sh</code></pre></div><div class="code-box output"><div class="code-head"><span>成功后的终端输出形式</span></div><pre><code>node rerun passed; result: .../debug/attempts/&lt;uuid&gt;/result.json</code></pre></div></div><div><pre class="output-tree">bia_pcie_default/0/
+  rerun.sh
+  rerun.json
+  debug/
+    inputs/                可编辑副本
+    artifacts/             附加发布输入
+    environment.json       保存的环境
+    manifest.json          SC 配置
+    baseline.json          捕获时的摘要
+    attempts/&lt;uuid&gt;/
+      result.json
+      inputs/ artifacts/   本次独立快照
+      plan.json
+      environment.json
+      effective_environment.json
+      tmp/
+      sc/                  本次节点日志与输出</pre></div></div>
+        <p class="note">每次调用保存独立 attempt，原始 build 的结果继续描述首次 flow。保存的继承环境随脚本恢复，SC 在原阶段应用 overrides；当前 <code>LSB_*</code> 作业身份与本次临时目录由新执行提供。计算节点需能访问保存的解释器、平台、build 和外部输入路径。</p>
+        <h4>修改原始 src 后，怎样更新调试输入</h4><p>先执行正常 build/publish，取得新 build 的完整 <code>library/&lt;unit&gt;/</code>。将对应调试 publication 完整替换为新目录，保留它的 manifest/context 和文件删除结果，再执行原命令。BIA/addresses 的位置是 <code>debug/inputs/lib_&lt;unit&gt;/</code>，compile/lint 的位置是 <code>debug/artifacts/library/&lt;unit&gt;/</code>。feature/config/variant 与保存计划保持一致，改变这些选择时通过新 build 解析。</p>
+      </article>
+
+      <article class="case-panel card" id="case-version" role="tabpanel" aria-labelledby="tab-version" hidden>
+        <h3>锁定版本、显式升级与联合调试</h3><p>在目标开发 tree 根执行。设计来源声明变更后显式更新 imports 锁，兼容平台升级则通过 platform 命令更新根 runtime。</p>
+        <div class="case-grid"><div><h4>同步与更新命令</h4><div class="code-box"><div class="code-head"><span>shell · 开发 tree 根目录</span><button class="copy-button">复制</button></div><pre><code># 按现有锁同步
+python env/sync.py
+python env/sync.py status
+
+# 显式更新指定设计依赖的锁
+python env/sync.py update pcie
+
+# 兼容平台版本更新
+python run.py platform update --ref &lt;platform-commit&gt;
+python env/sync.py
+python run.py platform status</code></pre></div><p class="small muted" style="margin-top: 12px">将 imports 声明与更新后的锁一同提交到设计仓库。平台升级依赖兼容 metadata/bootstrap 契约，需要迁移的旧 tree 使用平台 migration 入口。</p></div><div><h4>本地设计覆盖</h4><div class="code-box"><div class="code-head"><span>HJSON / JSON · env/overrides.local.hjson</span><button class="copy-button">复制</button></div><pre><code>{
+  "pcie": "/work/design/pcie-dev"
+}</code></pre></div><h4>本地平台覆盖</h4><div class="code-box"><div class="code-head"><span>标准 JSON · env/platform.local.json</span><button class="copy-button">复制</button></div><pre><code>{
+  "path": "/work/platform/sflow-dev"
+}</code></pre></div><p class="small muted" style="margin-top: 12px">覆盖文件在生成 tree 中被 Git 忽略。调试时显式声明可读的绝对路径，实际 commit、dirty 与 override 状态写入本次构建 provenance。</p></div></div>
+      </article>
+    </section>
+
+    <section class="section" id="outputs" aria-labelledby="outputs-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="outputs-title">读懂 out 与调试结果</h2></div><p>先读 latest 找到具体 build，再沿对应阶段看输入、结果与日志。每次 build 使用独立 ID，case 与单节点 rerun 也各自保留执行记录。</p></div></div>
+      <div class="two-col"><div><pre class="output-tree">out/&lt;os&gt;/
+  latest.json                         最近一次 flow 结果
+  builds/&lt;build-id&gt;/
+    plan.json                         解析后的配置与依赖
+    result.json                       整体状态与阶段状态
+    provenance.json                   版本与本地覆盖证据
+    features.json / features.svh       feature registry 与宏
+    library/&lt;design_variant&gt;/         独立 publication
+      src/                            静态与配方处理后的源码
+      generated/                      项目约定的生成目录
+      context.json                    生成配方的已解析 context
+      manifest.json                   发布元数据与文件摘要
+    connectivity/&lt;unit&gt;/&lt;view&gt;/       BIA 顶层、tile 与接口
+    addresses/                        地址 JSON / SV package
+    config/&lt;config&gt;/&lt;view&gt;/
+      compile/                        filelist、metadata、include 审计
+      lint/                           Slang 日志与 include 审计
+    run/&lt;suite&gt;/&lt;execution&gt;/           case / seed 工作目录别名
+    sc/&lt;design&gt;/&lt;job&gt;/&lt;step&gt;/&lt;index&gt;/ 原生 SC 工作目录
+      inputs/ outputs/ reports/
+      sc_&lt;step&gt;_&lt;index&gt;.log
+      rerun.sh / rerun.json            失败捕获后生成
+      debug/                          调试输入与独立 attempts</pre></div><div class="output-facts"><h3>从结果回到原因</h3><p><strong>配置选错</strong>，查看 <code>plan.json</code> 中的 config、variant、units、filesets 与 feature digest。</p><p><strong>生成内容异常</strong>，查看对应 publication 的 <code>context.json</code> 和 <code>manifest.json</code>，再定位配方。</p><p><strong>编译 / lint 输入异常</strong>，查看 <code>compile.f</code>、<code>slang.f</code>、<code>metadata.json</code> 和实际 include 审计。</p><p><strong>case 失败</strong>，查看 case 的状态、seed、args、成功标志和 <code>sc_simulate_&lt;index&gt;.log</code>。</p><p><strong>节点调试</strong>，沿 <code>failed_nodes</code> 给出的绝对路径编辑副本并运行保存命令。</p><div class="code-box"><div class="code-head"><span>shell · 当前 tree 中找到本次 build</span><button class="copy-button">复制</button></div><pre><code>python run.py status
+
+python - &lt;&lt;'PY'
+import json
+import platform
+from pathlib import Path
+
+latest = Path("out") / platform.system().lower() / "latest.json"
+result = json.loads(latest.read_text())
+print("build", result["run_directory"])
+for node in result.get("failed_nodes", []):
+    print("edit", node["inputs"])
+    print("rerun", node["command"])
+PY</code></pre></div></div></div>
+      <p class="note">publication、连线和 case 的浏览路径通常通过符号链接指向本次 SC 输出。常规开发输入放在 <code>src/</code>，节点调试编辑 <code>debug/inputs</code> 或 <code>debug/artifacts</code>。消费者会校验发布文件摘要与 feature digest。</p>
+    </section>
+
+    <section class="section" id="troubleshooting" aria-labelledby="troubleshooting-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="troubleshooting-title">遇到错误时</h2></div><p>从报错所属阶段查起，使用保存的结果路径定位具体输入。</p></div></div>
+      <details open><summary>reference 提示先 materialize</summary><div>从平台 checkout 执行 <code>uv run --locked sflow reference materialize --dest /tmp/sflow-guide</code>，再进入生成的 <code>workspaces/&lt;design&gt;</code> 运行。目标目录使用新路径。</div></details>
+      <details open><summary>manifest 与锁不一致，或设计来源缺失</summary><div>检查 <code>env/imports.hjson</code> 中的来源和 ref，执行显式 <code>python env/sync.py update [names...]</code> 更新锁，再同步。平台来源通过 <code>platform update</code> 维护。检查被引用设计是否作为直接依赖声明。</div></details>
+      <details open><summary>BIA 报 unknown type / role、字段宽度或端点错误</summary><div>检查 common_info 中对应 bundle 类型、sidecar 的 type/role/map，以及 assembly 的实例名和 connections。已有失败节点时，先用 <code>failed_nodes</code> 的调试副本复现和修复，再用同一脚本重跑。</div></details>
+      <details open><summary>新增文件未进入 filelist，或头文件搜索出现歧义</summary><div>检查当前 config/target/view 选中的 fileset 与其 <code>files/deps/include_dirs</code>。查看 publication 和 <code>compile.f</code>，优先使用可明确解析的源码相对 include 路径。外部模型和头文件通过 external 字段声明。</div></details>
+      <details open><summary>Slang 提示 design element does not have a time scale</summary><div>为设计中需要一起检查的 module/package 明确一致的 timescale。当前 reference 的部分 RTL 与已带 timescale 的地址 package 混用时会触发此诊断。本页对应代码基线的完整回归中有四个已复现的相关既有失败，lint 命令会真实报告这些错误。</div></details>
+      <details open><summary>仿真退出后仍失败，或卡住超时</summary><div>检查 case 的 <code>success_marker</code>、实际日志、错误诊断与 <code>timeout</code>。运行 plusargs 与 seed 写在 suite 中。成功编译的 simulation build 可用 <code>run --build</code> 运行其他 suite，失败节点也会保留单节点命令。</div></details>
+      <details open><summary>本地通过，提交到 LSF 后找不到工具或路径</summary><div>检查计算节点能否访问保存的绝对 Python、平台、build 与外部模型路径。rerun 脚本恢复已捕获的工具和自定义环境，同时使用新作业的身份。队列和资源参数由 <code>bsub</code> 提供。真实 LSF 提交需在已配置集群中验证。</div></details>
+    </section>
+
+    <section class="section" id="sources" aria-labelledby="sources-title">
+      <div class="section-header"><div><div class="section-title"><h2 id="sources-title">依据与实现入口</h2></div><p>本手册面向目标开发 tree。内容核对当前模板、reference、CLI、配置解析、任务实现与节点 rerun 合同，基线为平台 <code>76acf63</code>。</p></div></div>
+      <div class="card"><h3>从这些文件核对具体行为</h3><div class="sources">
+        <a href="https://github.com/TechYan/sflow/blob/76acf63/docs/architecture.md" target="_blank" rel="noopener">当前架构 ↗</a>
+        <a href="https://github.com/TechYan/sflow/tree/76acf63/src/sflowkit/templates/tree" target="_blank" rel="noopener">公共目录模板 ↗</a>
+        <a href="https://github.com/TechYan/sflow/tree/76acf63/references" target="_blank" rel="noopener">IP / SoC reference ↗</a>
+        <a href="https://github.com/TechYan/sflow/blob/76acf63/src/sflowkit/cli.py" target="_blank" rel="noopener">Tree CLI ↗</a>
+        <a href="https://github.com/TechYan/sflow/blob/76acf63/src/sflowkit/configuration.py" target="_blank" rel="noopener">配置 / fileset / feature ↗</a>
+        <a href="https://github.com/TechYan/sflow/blob/76acf63/src/sflowkit/tasks.py" target="_blank" rel="noopener">BIA / 地址 / 前端任务 ↗</a>
+        <a href="https://github.com/TechYan/sflow/blob/76acf63/src/sflowkit/publish.py" target="_blank" rel="noopener">发布与生成器接口 ↗</a>
+        <a href="https://github.com/TechYan/sflow/blob/76acf63/src/sflowkit/node_rerun.py" target="_blank" rel="noopener">失败节点重跑 ↗</a>
+      </div><p class="small muted" style="margin-top: 18px">启动 reference 验证流程接通。项目的功能 stimulus、scoreboard、协议覆盖、CDC/RDC 等验证按设计目标另行组织。命令与输出示例中的路径、commit、build ID 按实际环境填写。</p></div>
+    </section>
+
+    <section class="section print-only" aria-labelledby="reference-title"><div class="section-header"><div><h2 id="reference-title">目录速查</h2><p class="muted">交互目录的完整文件说明，供纸面检索。</p></div></div><div class="file-reference" id="print-file-reference"></div></section>
+    <footer><span>Sflow 开发 tree 使用手册 · 2026-11-14</span><span>单文件离线阅读 · 打印时展开全部案例与目录说明</span></footer>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script>
+    "use strict";
+    const files = [
+      {id:"env", path:"env/", name:"env/", depth:0, folder:true, group:"environment", title:"选择执行环境与依赖版本", desc:"维护根平台绑定、设计依赖声明、精确版本锁和本地开发覆盖。", owner:"项目维护声明；工具维护锁与同步状态", consumer:"bootstrap → 平台激活 → 设计依赖同步 → 配置解析", action:"版本更新通过 platform update 或 env/sync.py update 显式执行，提交声明与锁作为设计版本的一部分。", example:"python env/sync.py\npython env/sync.py status\npython run.py platform status"},
+      {id:"platform", path:"env/platform.hjson", name:"platform.hjson", depth:1, group:"environment", title:"根平台来源声明", desc:"指定 sflow 的 Git source 与期望 ref，构建根使用它选择整次构建的 runtime。", owner:"项目维护者", consumer:"env/sync.py 的标准库 bootstrap", action:"使用可访问的 Git URL 或绝对本地路径，ref 需在来源中存在。兼容升级使用 platform update。", example:'{"schema": 1, "source": "/work/platform/sflow", "ref": "<commit-or-tag>"}'},
+      {id:"platform-lock", path:"env/platform.lock.json", name:"platform.lock.json", depth:1, group:"environment", title:"锁定平台精确版本", desc:"保存完整平台 commit、bootstrap API 及兼容 schema 等信息，执行时据此校验平台。", owner:"platform configure / update 生成，项目提交", consumer:"bootstrap、平台校验、构建 provenance", action:"与 platform.hjson 一起版本管理，通过命令更新。", example:"python run.py platform update --ref <new-commit>\npython env/sync.py"},
+      {id:"imports-manifest", path:"env/imports.hjson", name:"imports.hjson", depth:1, group:"environment", title:"设计仓库来源声明", desc:"schema 2 的 dependencies 声明直接依赖的独立设计 Git 仓库。依赖树经解析形成精确闭包。", owner:"项目维护者", consumer:"imports update / sync / configuration", action:"先在这里声明设计，再通过 assembly/build dependency/fileset 引用该设计。", example:'{"schema": 2, "dependencies": {\n  "pcie": {"source": "/work/repos/pcie", "ref": "<commit>"}\n}}'},
+      {id:"imports-lock", path:"env/imports.lock.json", name:"imports.lock.json", depth:1, group:"environment", title:"锁定设计依赖闭包", desc:"记录设计依赖的来源、完整 commit 和依赖边，并绑定 imports 声明摘要。", owner:"imports update 生成，项目提交", consumer:"同步与构建输入解析", action:"修改依赖声明后显式 update。普通 sync/build 使用当前锁。", example:"python env/sync.py update pcie\npython env/sync.py\npython env/sync.py status"},
+      {id:"override", path:"env/overrides.local.hjson", name:"overrides.local.hjson", depth:1, group:"environment", title:"联合开发时覆盖设计 checkout", desc:"名称到绝对本地路径的映射，用于开发尚未通过父项目锁选中的设计修改。", owner:"本机开发者，生成 tree 中被 Git 忽略", consumer:"设计依赖解析与 provenance", action:"填写本地独立设计仓库路径，执行构建时记录实际 commit、dirty 和 override。", example:'{"pcie": "/work/design/pcie-dev"}'},
+      {id:"platform-local", path:"env/platform.local.json", name:"platform.local.json", depth:1, group:"environment", title:"本地平台开发覆盖", desc:"标准 JSON 格式，用于指定平台开发 checkout。bootstrap 激活前可由 Python 标准库读取。", owner:"本机开发者，生成 tree 中被 Git 忽略", consumer:"平台 bootstrap 与 runtime 选择", action:"填写含有效平台代码、platform.json 与 uv.lock 的绝对目录。", example:'{"path": "/work/platform/sflow-dev"}'},
+      {id:"tree-record", path:"env/tree.json", name:"tree.json", depth:1, group:"environment", title:"模板与平台文件基线", desc:"记录模板类型、内容摘要、bootstrap API 及入口文件摘要，供迁移与归属检查。", owner:"scaffold / migration 生成", consumer:"tree 升级与迁移检查", action:"在项目中保留版本记录。平台兼容升级与目录模板迁移各自通过对应入口执行。"},
+      {id:"sync", path:"env/sync.py", name:"sync.py", depth:1, group:"environment", title:"在激活环境前启动同步", desc:"先选择并校验根平台，再通过所选平台的 uv 环境执行设计依赖同步。", owner:"平台提供的稳定入口", consumer:"开发者 shell / CI", action:"在新 clone 的 tree 中优先执行。", example:"python env/sync.py\npython env/sync.py status"},
+      {id:"imports", path:"import/", name:"import/", depth:0, folder:true, group:"environment", title:"平台与设计依赖 checkout", desc:"sflow 为保留的平台位置，其他名称对应锁定的独立设计仓库。", owner:"同步工具维护 checkout；项目通过声明与 override 选择来源", consumer:"runtime、configuration、snapshot", action:"常规依赖从 imports 声明与锁同步。联合开发可显式覆盖到独立工作仓库。"},
+      {id:"import-sflow", path:"import/sflow/", name:"sflow/", depth:1, folder:true, group:"environment", title:"根选定的 sflow 平台", desc:"包含平台实现、模板、平台能力声明和 uv.lock，提供当前 tree 的执行 runtime。", owner:"根平台绑定", consumer:"run.py / env/sync.py", action:"版本通过 platform update 管理；本地平台实验可使用 platform.local.json。"},
+      {id:"import-design", path:"import/<design>/", name:"<design>/", depth:1, folder:true, group:"environment", title:"已同步的设计依赖", desc:"每个导入设计也是独立 tree，包含自己的源码、元数据和版本信息。", owner:"对应独立设计仓库", consumer:"构建根的依赖解析与 snapshot", action:"父构建使用根选定的平台执行设计闭包。需要开发某个依赖时，在独立工作仓库中编辑并声明 override。"},
+      {id:"src", path:"src/", name:"src/", depth:0, folder:true, group:"design", title:"项目拥有的设计输入", desc:"RTL、验证、设计元数据、生成配方和公共定义放在这里，构建会对选中设计的 src 建立快照。", owner:"设计团队", consumer:"snapshot → publish → 后续阶段", action:"在所选 fileset 中声明参与编译的文件，在配方中显式读取生成器需要的数据。"},
+      {id:"rtl", path:"src/rtl/", name:"rtl/", depth:1, folder:true, group:"design", title:"手写 RTL 与 package", desc:"放模块、package 及源码相邻头文件。目录层次可按功能继续划分。", owner:"RTL 开发者", consumer:"project.rtl / filesets → assembly → compile/lint", action:"将路径加入 rtl 或选中 fileset 的 files，package 的依赖顺序通过 deps 表达。", example:'"rtl": ["src/rtl/my_core.sv"]'},
+      {id:"include", path:"src/include/", name:"include/  [项目可建]", depth:1, folder:true, group:"design", title:"项目公共头文件", desc:"用于 RTL/TB 共用的头文件。该目录按项目需要建立。", owner:"设计团队", consumer:"fileset include_dirs 与前端 include 审计", action:"把目录加入需要它的 fileset include_dirs。设计专属头文件也可放在对应源码目录。", example:'"include_dirs": ["src/include"]'},
+      {id:"verif", path:"src/verif/", name:"verif/", depth:1, folder:true, group:"design", title:"验证环境与 testbench", desc:"可组织 TB、case、sequence、VIP 和脚本。平台通过 fileset 与 topmodule 选择编译输入，通过 suite 选择运行参数。", owner:"验证团队", consumer:"fileset → compile → suite case/seed", action:"显式选择 TB fileset 与 topmodule，设置运行成功标志、timeout 和 seeds。", example:'"suites": {"smoke": {"cases": [\n  {"name": "basic", "seeds": [1, 2]}\n]}}'},
+      {id:"meta", path:"src/meta/", name:"meta/", depth:1, folder:true, group:"design", title:"设计元数据", desc:"统一组织清单、生成配方、接口、连接、地址及项目自定义输入。", owner:"设计团队", consumer:"configuration、publish、BIA、assembly", action:"实际消费入口通过 project 字段、固定地址文件或项目配方绑定。"},
+      {id:"project", path:"src/meta/manifest/project.hjson", name:"manifest/project.hjson", depth:2, group:"design", title:"tree 的设计清单", desc:"声明 schema/name/kind、RTL/filesets、生成脚本、导出接口、targets、configs 与 suites。", owner:"设计 / 集成负责人", consumer:"配置解析 → 所有执行阶段", action:"路径以本 tree 根为基准。manifest 的 name 与导入该设计使用的名称保持一致。", example:'{\n  "schema": 1, "name": "my_ip", "kind": "ip",\n  "rtl": ["src/rtl/my_ip.sv"],\n  "topmodule": "my_ip"\n}'},
+      {id:"recipe", path:"src/meta/build.py", name:"build.py", depth:2, group:"design", title:"variant 与生成配方", desc:"VARIANTS 提供各分支的 feature 默认值，build(context) 使用冻结的来源与已解析特性生成 publication 内容。", owner:"设计 / 生成器维护者", consumer:"configuration 读取 VARIANTS；publish 执行 build", action:"在 context.output 下写产物。允许返回 rtl、filesets、include_dirs、interface。按 project 预声明的 fileset 名称和依赖结构发布。", example:'VARIANTS = {"default": {"WIDTH": 32}}\n\ndef build(context):\n    # 读取 context["source"]，写入 context["output"]\n    return {}'},
+      {id:"interface", path:"src/meta/interface/", name:"interface/", depth:2, folder:true, group:"design", title:"RTL / 导出接口的 sidecar", desc:"描述 module、bundle 的 type/role 与字段到实际端口的 map，可包含独立辅助端口。public.hjson 常作为导出接口。", owner:"RTL / 集成团队", consumer:"BIA 验证与父设计接口绑定", action:"project.interface 指向对外接口文件。内部 primitive 的 sidecar 在本地 assembly 中通过路径引用。"},
+      {id:"connectivity", path:"src/meta/connectivity/", name:"connectivity/", depth:2, folder:true, group:"design", title:"BIA assembly 输入", desc:"声明实例、设计与 variant、tile 分组、bundle 连线和顶层导出端口。", owner:"IP / subsystem / SoC 集成者", consumer:"configuration 的硬件图 → BIA", action:"在 targets 或 view 中填入 assembly 路径，跨设计实例先声明 imports。", example:'"targets": {"default": {\n  "assembly": "src/meta/connectivity/assembly.hjson"\n}}'},
+      {id:"assembly-dir", path:"src/meta/assembly/", name:"assembly/", depth:2, folder:true, group:"design", title:"项目预留的 assembly 组织目录", desc:"模板保留此目录。当前 reference 的 BIA assembly 位于 connectivity，由 target/view 的 assembly 字段绑定。", owner:"项目按需要组织", consumer:"由 project 字段或项目配方显式绑定", action:"文件放入后，通过实际声明选用它。"},
+      {id:"register", path:"src/meta/register/", name:"register/", depth:2, folder:true, group:"design", title:"根地址与项目寄存器数据", desc:"内置地址阶段消费根 publication 中的 addresses.hjson。项目的寄存器布局、字段描述也可按需要存放在这里。", owner:"SoC 地址负责人 / IP 寄存器负责人", consumer:"addresses 节点；项目 build.py 生成器", action:"根 region 使用 name/base/size；项目的字段级生成器由配方调用并发布生成产物。", example:'{"regions": [\n  {"name": "regs", "base": 4096, "size": 256}\n]}'},
+      {id:"feature", path:"src/meta/feature/", name:"feature/", depth:2, folder:true, group:"design", title:"项目 feature 原始数据", desc:"可存放项目配方需要的 feature 描述。当前全局 feature registry 从 VARIANTS 和 config.features 解析。", owner:"项目团队", consumer:"项目配方显式读取；平台解析 VARIANTS/config", action:"在 VARIANTS 声明合法类型与默认值。config 按 build unit 覆盖既有 feature。全局宏由平台统一生成。"},
+      {id:"fuse", path:"src/meta/fuse/", name:"fuse/", depth:2, folder:true, group:"design", title:"项目 fuse 元数据", desc:"供项目组织熔丝定义与相关生成输入。模板提供目录位置，生成行为由项目定义。", owner:"项目团队", consumer:"项目 build.py 中显式调用的生成器", action:"把需要的输入放在 src 内，在配方中读取并将产物写入 publication。"},
+      {id:"bundles", path:"src/info/bundles/  [common_info tree]", name:"info/bundles/  [common_info]", depth:1, folder:true, group:"design", title:"公共 bundle 类型注册表", desc:"common_info 的 common tree 提供类型定义，BIA 读取其发布内容。sflow_rw 示例包含请求、响应字段及 master 方向。", owner:"公共接口库维护者", consumer:"BIA 的 bundle type/role/width 校验", action:"类型文件名为 <type>.hjson，声明 type 与 fields，每个字段包含 name、dir_master、width。"},
+      {id:"out", path:"out/", name:"out/", depth:0, folder:true, group:"generated", title:"本机 OS 对应的构建结果", desc:"每次 build 使用独立 UUID，latest.json 保存最近一次结果。源码、生成内容、filelist、SC 与 case 日志可沿 build 路径查看。", owner:"flow 生成", consumer:"开发者 / CI / run --build / 节点调试", action:"从 out/<os>/latest.json 找到 run_directory，然后按节点与阶段定位输入和日志。", example:"python run.py status"},
+      {id:"latest", path:"out/<os>/latest.json", name:"<os>/latest.json", depth:1, group:"generated", title:"最近一次 flow 的整体结果", desc:"JSON 中包含 state、run_directory、steps 及已产生的阶段信息；节点失败会附带 failed_nodes。", owner:"flow 保存", consumer:"run.py status 与结果检查脚本", action:"完成第一次 build/sim/lint 后可直接通过 status 打印，读取 run_directory 定位具体构建。", example:"python run.py status"},
+      {id:"publication", path:"out/<os>/builds/<id>/library/<unit>/", name:"<os>/builds/<id>/library/<unit>/", depth:1, folder:true, group:"generated", title:"供消费者使用的 publication", desc:"包含静态与生成输入、context.json、manifest.json 及摘要。unit 为 design_variant。浏览目录通常链接到本次 SC 输出。", owner:"publish 节点生成", consumer:"BIA、地址生成、assembly 与前端审计", action:"常规开发修改 src 再 build。节点调试编辑独立 debug 副本；消费者核对文件摘要与 feature digest。"},
+      {id:"generated-bia", path:"out/<os>/builds/<id>/connectivity/<unit>/<view>/", name:"<os>/builds/<id>/connectivity/", depth:1, folder:true, group:"generated", title:"BIA 顶层与 tile 结果", desc:"生成的 .sv 与 interface.json，为后续 assembly 提供设计结构和编译文件。", owner:"bia_<unit> 节点", consumer:"父 BIA / assembly", action:"检查生成结构时回溯到对应 publication 的 sidecar 与 assembly 输入。"},
+      {id:"compile", path:"out/<os>/builds/<id>/config/<config>/<view>/compile/", name:"<os>/builds/<id>/config/.../compile/", depth:1, folder:true, group:"generated", title:"已选配置的编译依据", desc:"保存 rtl.f、sim.f、compile.f、slang.f、metadata.json 和 include 审计等浏览入口。", owner:"assembly / compile / lint 节点", consumer:"前端工具与排错", action:"核对 fileset、宏、源文件和头文件实际选择。debug 重跑会重定位 filelist 到本次 attempt。"},
+      {id:"cases", path:"out/<os>/builds/<id>/run/<suite>/<execution>/", name:"<os>/builds/<id>/run/", depth:1, folder:true, group:"generated", title:"独立 case / seed 的运行结果", desc:"每次 suite 运行有独立 execution，case/seed 目录指向其 SC 节点工作目录。", owner:"suites 与 simulate 节点", consumer:"验证开发者 / run --build", action:"检查 case result、实际运行日志、seed、args、timeout 与 completion marker。"},
+      {id:"debug", path:"out/.../sc/<design>/<job>/<step>/<index>/debug/", name:".../sc/.../<step>/<index>/debug/", depth:1, folder:true, group:"generated", title:"失败节点的独立调试空间", desc:"保存可编辑 inputs/artifacts、原始环境、SC manifest、baseline 和每次 UUID attempt。", owner:"失败捕获生成；开发者编辑调试输入", consumer:"同节点 rerun.sh", action:"按 failed_nodes 给出的真实路径修复。每次命令复制输入并执行原生 SC 单节点，结果和输入变更单独记录。", example:"bash /absolute/path/<step>/<index>/rerun.sh"},
+      {id:"run", path:"run.py", name:"run.py", depth:0, group:"environment", title:"每个 tree 的日常命令入口", desc:"稳定薄入口激活根平台的锁定环境，再调用其 CLI。工作目录与目标根由入口脚本确定。", owner:"平台模板提供", consumer:"开发者 / CI", action:"使用 list 查看当前可选项，再执行 build/sim/lint/run/status/platform。", example:"python run.py list\npython run.py build\npython run.py sim\npython run.py lint\npython run.py status"},
+      {id:"readme", path:"README.md / VERSION / .gitignore", name:"README.md / VERSION / .gitignore", depth:0, group:"design", title:"项目说明与本地输出规则", desc:"维护项目功能、约定与版本说明。模板提供初始内容及 import/out/本地覆盖等忽略规则。", owner:"项目团队", consumer:"开发者与版本管理", action:"记录本项目的 config、生成器和验证用法；结合团队的版本规范维护。"}
+    ];
+    const stages = {
+      resolve: {name:"解析配置", label:"config / variant", desc:"从根平台、设计闭包和 project 声明解析 target/view/variant、feature、硬件与 fileset 图。", input:"env/platform.*、env/imports.*、各 tree 的 project.hjson 与 build.py", output:"plan.json、resolved units / features / build_order", check:"此阶段报错时检查声明、来源、config、variant 和依赖。此时尚未启动可重跑的 SC 节点。"},
+      snapshot: {name:"snapshot", label:"冻结 src", desc:"核对计划中的源码摘要，为选中设计创建独立源码快照，生成 feature/provenance 文件。", input:"选中设计的 src/ 与计划摘要", output:"source/ 快照、features.json / features.svh / provenance.json", check:"source changed after planning 表示源码在解析后发生变化，先核对实际编辑与本次计划。"},
+      publish: {name:"publish", label:"每个 build unit", desc:"按 build.dependencies 执行生成配方，为每个 design_variant 发布静态和生成输入。", input:"source/ 快照、已解析 feature、声明的依赖 publication", output:"library/<unit>/、context.json、manifest.json", check:"查看配方读取的 source/dependencies 与写入的 output，检查 variant 注册表及返回的 fileset。"},
+      addresses: {name:"addresses", label:"构建根地址", desc:"读取根 publication 的 addresses.hjson，验证 region 并生成地址 package。", input:"lib_<root_unit>/src/meta/register/addresses.hjson", output:"addresses/addresses.json、sflow_addresses_pkg.sv", check:"检查 region 名称、base、size、32 位范围与地址重叠。"},
+      bia: {name:"BIA", label:"按硬件层次", desc:"从 bundle 定义、sidecar、assembly 和子设计生成接口绑定结构连线。", input:"相关 lib_*、addresses、子组件 gen_*", output:"connectivity/<unit>/<view>/ 下的顶层、tile RTL 与 interface.json", check:"检查 bundle type/role/width、map、端点、实例引用和显式 tile。"},
+      assembly: {name:"assembly", label:"filelist / 宏", desc:"按所选 fileset 图汇总已发布源码、BIA 与地址文件，统一传递 feature 宏和 include 范围。", input:"publication、connectivity、addresses、features 与选中 fileset", output:"rtl.f、sim.f、compile.f、slang.f、metadata.json", check:"检查文件选择与编译顺序、保留宏命名空间、fileset 依赖和外部输入声明。"},
+      compile: {name:"compile", label:"Icarus", desc:"先审计实际 include 闭包，再执行 Icarus 编译并验证使用的输入摘要。", input:"prepared/compile.f、metadata 与发布的 RTL / include", output:"SC compile 节点的 .vvp 镜像、日志与 include 审计", check:"查看 sc_compile_0.log、include_dependencies.json 和 filelist 实际路径。"},
+      simulate: {name:"simulate", label:"case / seed", desc:"编译镜像由各 case/seed 独立执行，检查退出状态、错误诊断、timeout 和成功标志。", input:".vvp 镜像、case args、seed、timeout、success_marker", output:"run/<suite>/<execution>/<case>/<seed>/ 结果与日志", check:"从 case result 定位该 seed 的实际日志。缺少成功标志也会产生失败节点 rerun 命令。"},
+      lint: {name:"lint", label:"Slang", desc:"对同一配置选择的源码执行 Slang 诊断，审计其实际 include 和宏使用。", input:"prepared/slang.f、metadata 中的 defines 与发布输入", output:"config/<config>/<view>/lint/ 的日志与审计", check:"错误会使任务失败，warning 记录在结果中。timescale 不一致需要在相应设计元素中明确。"}
+    };
+    const modes = {
+      build: {title:"build / 硬件构建", caption:"具有 BIA assembly 的设计按此路径生成并编译。", steps:["resolve","snapshot","publish","addresses","bia","assembly","compile"]},
+      sim: {title:"sim / 编译并运行", caption:"同一编译结果供多个 case / seed 使用，每个运行节点保留独立日志。", steps:["resolve","snapshot","publish","addresses","bia","assembly","compile","simulate"]},
+      lint: {title:"lint / 同配置静态检查", caption:"assembly 准备选中配置的输入，交由 Slang 执行实际语法、语义和 include 检查。", steps:["resolve","snapshot","publish","addresses","bia","assembly","lint"]},
+      library: {title:"library / common 内容发布", caption:"适用于未声明 topmodule / BIA assembly 的内容库；声明有效顶层与 fileset 后可进入 RTL 检查路径。", steps:["resolve","snapshot","publish"]}
+    };
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[character]));
+    let selectedFile = "project";
+    let selectedFilter = "all";
+    let flowMode = "build";
+    let selectedStage = "publish";
+    let toastTimer;
+
+    function showFile(id) {
+      const file = files.find(item => item.id === id);
+      if (!file) return;
+      selectedFile = id;
+      document.querySelectorAll(".tree-file").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.file === id)));
+      const example = file.example ? `<div class="detail-example"><h4>填写或运行示例</h4><p>路径和版本占位符按项目填写，配置片段合并到相应文件。</p><div class="code-box"><div class="code-head"><span>${escapeHtml(file.path)}</span><button class="copy-button" type="button">复制</button></div><pre><code>${escapeHtml(file.example)}</code></pre></div></div>` : "";
+      document.getElementById("file-detail").innerHTML = `<div class="detail-path mono">${escapeHtml(file.path)}</div><h3>${escapeHtml(file.title)}</h3><p class="detail-desc">${escapeHtml(file.desc)}</p><dl class="file-facts"><dt>谁维护</dt><dd>${escapeHtml(file.owner)}</dd><dt>谁消费</dt><dd>${escapeHtml(file.consumer)}</dd><dt>怎样用</dt><dd>${escapeHtml(file.action)}</dd></dl>${example}`;
+    }
+
+    function renderTree() {
+      const query = document.getElementById("file-search").value.trim().toLowerCase();
+      const visible = files.filter(file => (selectedFilter === "all" || file.group === selectedFilter) && `${file.path} ${file.title} ${file.desc} ${file.consumer} ${file.action}`.toLowerCase().includes(query));
+      document.getElementById("file-tree").innerHTML = visible.map(file => `<li><button type="button" class="tree-file" style="--depth:${file.depth}" data-file="${file.id}" aria-label="${escapeHtml(file.path)}" aria-pressed="${file.id === selectedFile}"><span class="file-glyph ${file.folder ? "folder" : ""}" aria-hidden="true"></span><span class="mono">${escapeHtml(file.name)}</span></button></li>`).join("");
+      document.getElementById("search-status").textContent = visible.length ? `显示 ${visible.length} 个目录 / 文件条目` : "没有匹配条目，请换一个路径或关键词。";
+      if (visible.length) showFile(visible.some(file => file.id === selectedFile) ? selectedFile : visible[0].id);
+      else document.getElementById("file-detail").innerHTML = '<p class="empty">可搜索文件路径、生成阶段或用途，例如 build.py、地址、BIA。</p>';
+    }
+
+    function openFile(id) {
+      selectedFilter = "all";
+      document.getElementById("file-search").value = "";
+      document.querySelectorAll("[data-filter]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.filter === "all")));
+      selectedFile = id;
+      renderTree();
+      showFile(id);
+      document.getElementById("directories").scrollIntoView({behavior:"smooth"});
+      const target = document.querySelector(`[data-file="${id}"]`);
+      if (target) target.scrollIntoView({block:"nearest", behavior:"smooth"});
+    }
+
+    function showStage(id) {
+      selectedStage = id;
+      const stage = stages[id];
+      document.querySelectorAll("[data-stage]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.stage === id)));
+      document.getElementById("stage-detail").innerHTML = `<h3>${escapeHtml(stage.name)} · ${escapeHtml(stage.label)}</h3><p>${escapeHtml(stage.desc)}</p><dl class="file-facts"><dt>输入</dt><dd>${escapeHtml(stage.input)}</dd><dt>输出</dt><dd>${escapeHtml(stage.output)}</dd><dt>排查</dt><dd>${escapeHtml(stage.check)}</dd></dl>`;
+    }
+
+    function renderFlow(mode) {
+      flowMode = mode;
+      const flow = modes[mode];
+      document.getElementById("flow-heading").textContent = flow.title;
+      document.getElementById("flow-caption").textContent = flow.caption;
+      document.getElementById("pipeline").innerHTML = flow.steps.map(id => `<button type="button" class="stage" data-stage="${id}" aria-pressed="${id === selectedStage}"><strong>${escapeHtml(stages[id].name)}</strong><span>${escapeHtml(stages[id].label)}</span></button>`).join("");
+      document.querySelectorAll("[data-mode]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.mode === mode)));
+      showStage(flow.steps.includes(selectedStage) ? selectedStage : "publish");
+    }
+
+    function activateCase(tab) {
+      document.querySelectorAll('#case-tabs [role="tab"]').forEach(button => {
+        const active = button === tab;
+        button.setAttribute("aria-selected", String(active));
+        button.tabIndex = active ? 0 : -1;
+        document.getElementById(button.getAttribute("aria-controls")).hidden = !active;
+      });
+    }
+
+    function showToast(message) {
+      clearTimeout(toastTimer);
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.hidden = false;
+      toastTimer = setTimeout(() => { toast.hidden = true; }, 2800);
+    }
+
+    async function copyCode(button) {
+      const text = button.closest(".code-box").querySelector("code").textContent;
+      let copied = false;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        }
+      } catch (error) { /* The local-file fallback below also supports offline use. */ }
+      if (!copied) {
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.append(area);
+        area.select();
+        copied = document.execCommand("copy");
+        area.remove();
+        button.focus({preventScroll:true});
+      }
+      showToast(copied ? "已复制，可粘贴到对应文件或终端" : "请选中代码后使用系统复制快捷键");
+    }
+
+    document.getElementById("file-search").addEventListener("input", renderTree);
+    document.addEventListener("click", event => {
+      const file = event.target.closest("[data-file]");
+      const opener = event.target.closest("[data-open-file]");
+      const filter = event.target.closest("[data-filter]");
+      const mode = event.target.closest("[data-mode]");
+      const stage = event.target.closest("[data-stage]");
+      const tab = event.target.closest('#case-tabs [role="tab"]');
+      const copy = event.target.closest(".copy-button");
+      if (file) showFile(file.dataset.file);
+      if (opener) openFile(opener.dataset.openFile);
+      if (filter) {
+        selectedFilter = filter.dataset.filter;
+        document.querySelectorAll("[data-filter]").forEach(button => button.setAttribute("aria-pressed", String(button === filter)));
+        renderTree();
+      }
+      if (mode) renderFlow(mode.dataset.mode);
+      if (stage) showStage(stage.dataset.stage);
+      if (tab) activateCase(tab);
+      if (copy) copyCode(copy);
+    });
+    document.getElementById("case-tabs").addEventListener("keydown", event => {
+      const tabs = [...document.querySelectorAll('#case-tabs [role="tab"]')];
+      const index = tabs.indexOf(document.activeElement);
+      if (index < 0) return;
+      let target;
+      if (event.key === "ArrowRight") target = tabs[(index + 1) % tabs.length];
+      if (event.key === "ArrowLeft") target = tabs[(index - 1 + tabs.length) % tabs.length];
+      if (event.key === "Home") target = tabs[0];
+      if (event.key === "End") target = tabs[tabs.length - 1];
+      if (target) { event.preventDefault(); activateCase(target); target.focus(); }
+    });
+    document.getElementById("print-guide").addEventListener("click", () => window.print());
+    document.getElementById("print-file-reference").innerHTML = files.map(file => `<article><h3>${escapeHtml(file.path)}</h3><p><strong>${escapeHtml(file.title)}</strong> ${escapeHtml(file.desc)}</p><p>使用 ${escapeHtml(file.action)}</p><p>消费阶段 ${escapeHtml(file.consumer)}</p></article>`).join("");
+    renderTree();
+    showFile(selectedFile);
+    renderFlow(flowMode);
+    const navigationLinks = [...document.querySelectorAll('.sidebar nav a')];
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) navigationLinks.forEach(link => {
+          if (link.hash === `#${entry.target.id}`) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      }
+    }, {rootMargin:"-10% 0px -70% 0px"});
+    document.querySelectorAll("main > header[id], main > section[id]").forEach(section => observer.observe(section));
+  </script>
+
+
+
+
+
+<!-- SFLOW_COMPOSITION_SCRIPT -->
+  <script>
+(() => {
+  "use strict";
+  const root = document.getElementById("composition-lab");
+  if (!root) return;
+  const byId = id => root.querySelector(`#${id}`);
+  const escape = value => String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  const catalog = [
+    {name:"pcie",label:"PCIe",purpose:"主机 / 内存 / 配置",tile:"io",ports:{host:"slave",mem:"master",cfg:"master"}},
+    {name:"dma",label:"DMA",purpose:"搬运 / 配置",tile:"io",ports:{cfg:"slave",mem:"master"}},
+    {name:"dnoc",label:"DNoC",purpose:"数据互联",tile:"fabric",ports:{in0:"slave",in1:"slave",out:"master"}},
+    {name:"rnoc",label:"RNoC",purpose:"寄存器互联",tile:"fabric",ports:{in:"slave",dma:"master",atu:"master"}},
+    {name:"atu",label:"ATU",purpose:"地址转换",tile:"fabric",ports:{in:"slave",out:"master",cfg:"slave"}},
+    {name:"mc",label:"MC",purpose:"内存接口",tile:"memory",ports:{mem:"slave"}}
+  ];
+  const defaultLinks = [
+    ["pcie.mem","dnoc.in0"], ["dma.mem","dnoc.in1"], ["dnoc.out","atu.in"],
+    ["atu.out","mc.mem"], ["pcie.cfg","rnoc.in"], ["rnoc.dma","dma.cfg"], ["rnoc.atu","atu.cfg"]
+  ];
+  const state = {selected:new Set(["pcie","dma","dnoc"]),variant:"rc_x16",count:1,config:"soc_partitioned",tiles:{},tileNames:["io","fabric","memory"],links:[],code:"partitioned"};
+  catalog.forEach(component => { state.tiles[component.name] = component.tile; });
+  const serialize = value => JSON.stringify(value, null, 2);
+
+  function instances() {
+    const values = catalog.filter(component => state.selected.has(component.name)).map(component => ({...component,id:component.name,variant:component.name === "pcie" ? state.variant : "default"}));
+    if (state.selected.has("pcie") && state.count === 2) values.splice(1,0,{...catalog[0],id:"pcie_1",variant:state.variant});
+    return values;
+  }
+  function endpointOwner(endpoint) { return endpoint.split(".")[0]; }
+  function activeLinks(nodes) {
+    const ids = new Set(nodes.map(node => node.id));
+    return state.links.filter(([from,to]) => ids.has(endpointOwner(from)) && ids.has(endpointOwner(to)));
+  }
+  function currentTile(node) { return state.config === "soc_flat" ? "all" : state.tiles[node.id] || node.tile; }
+  function makeAssembly(nodes, flat) {
+    const links = activeLinks(nodes);
+    const used = new Set(links.flat());
+    const tileFor = node => flat ? "all" : state.tiles[node.id] || node.tile;
+    return {
+      name:"soc_combo",
+      tiles:[...new Set(nodes.map(tileFor))].map(name => ({name})),
+      instances:nodes.map(node => ({name:node.id,design:node.name,variant:node.variant,view:"tile",tile:tileFor(node)})),
+      connections:links.map(([from,to],index) => ({name:`link_${index}`,from,to})),
+      top_ports:{bundles:nodes.flatMap(node => Object.keys(node.ports).filter(port => !used.has(`${node.id}.${port}`)).map(port => ({name:`${node.id}_${port}`,bundle:`${node.id}.${port}`})))}
+    };
+  }
+  function declarations(nodes) {
+    const names = [...state.selected,"common_info","sharedlib"];
+    const imports = {schema:2,dependencies:Object.fromEntries(names.map(name => [name,{source:`ssh://git.example/${name}.git`,ref:`<${name}-commit>`}]))};
+    const project = {
+      schema:1,name:"soc",kind:"soc",build:{script:"src/meta/build.py"},
+      filesets:{rtl:{files:[]},debug:{files:[]}},
+      targets:{compose:{views:{
+        flat:{assembly:"src/meta/connectivity/flat.hjson",filesets:["rtl"]},
+        partitioned:{assembly:"src/meta/connectivity/partitioned.hjson",filesets:["rtl"]},
+        debug:{assembly:"src/meta/connectivity/partitioned.hjson",filesets:["rtl","debug"],defines:["SFLOW_VIEW_DEBUG=1"]}
+      }}},
+      default_target:"compose",default_config:state.config,
+      configs:{soc_flat:{target:"compose",view:"flat"},soc_partitioned:{target:"compose",view:"partitioned"},soc_debug:{target:"compose",view:"debug"}},
+      suites:{smoke:{cases:[{name:"startup",seeds:[1,2]}]}}
+    };
+    return {"env/imports.hjson":imports,"src/meta/manifest/project.hjson":project,"src/meta/connectivity/flat.hjson":makeAssembly(nodes,true),"src/meta/connectivity/partitioned.hjson":makeAssembly(nodes,false)};
+  }
+  function renderCatalog() {
+    if (!byId("cp-catalog").children.length) byId("cp-catalog").innerHTML = catalog.map(component => `<label class="cp-component"><input type="checkbox" data-cp-component="${component.name}"><strong>${component.label}</strong><span>${component.purpose}</span></label>`).join("");
+    root.querySelectorAll("[data-cp-component]").forEach(input => { input.checked = state.selected.has(input.dataset.cpComponent); });
+  }
+  function renderWorkspace(nodes) {
+    byId("cp-workspace").textContent = "soc/\n  env/imports.*\n  import/\n    sflow/\n" + [...state.selected,"common_info","sharedlib"].map(name => `    ${name}/`).join("\n") + "\n  src/meta/\n  run.py";
+    const units = [...new Set(nodes.map(node => `${node.name}_${node.variant}`)),"common_info_default","sharedlib_default","soc_default"];
+    byId("cp-units").innerHTML = units.map(unit => `<span class="cp-unit">${unit}</span>`).join("");
+    byId("cp-unit-note").textContent = `${state.selected.size} 个设计组件，${nodes.length} 个硬件实例，${units.length} 份 publication（含根与公共库）。相同 variant 的多个实例复用一个 build unit。`;
+  }
+  function renderGraph(nodes) {
+    const links = activeLinks(nodes);
+    const used = new Set(links.flat());
+    const tiles = [...new Set(nodes.map(currentTile))];
+    const cross = links.filter(([from,to]) => currentTile(nodes.find(node => node.id === endpointOwner(from))) !== currentTile(nodes.find(node => node.id === endpointOwner(to)))).length;
+    byId("cp-topology-summary").innerHTML = `<strong>${nodes.length}</strong> 个 block · <strong>${tiles.length}</strong> 个 tile · <strong>${links.length}</strong> 条 bundle 连接 · <strong>${cross}</strong> 条跨 tile 连接`;
+    byId("cp-tiles").innerHTML = tiles.length ? tiles.map(tile => `<div class="cp-tile"><h4>tile / ${escape(tile)}</h4>${nodes.filter(node => currentTile(node) === tile).map(node => `<div class="cp-block" data-cp-node="${node.id}"><strong>${node.id}</strong><code>${node.name}_${node.variant}</code>${Object.entries(node.ports).map(([port,role]) => `<div class="cp-port" data-cp-port="${node.id}.${port}" data-role="${role}" data-used="${used.has(`${node.id}.${port}`)}"><span class="cp-pin"></span><span>${role === "master" ? "M" : "S"} ${port}</span><small>${used.has(`${node.id}.${port}`) ? "已连接" : "导出到顶层"}</small></div>`).join("")}</div>`).join("")}</div>`).join("") : '<p class="cp-caption">选择组件后在这里显示实例、tile 与连接。</p>';
+    byId("cp-tile-assignments").innerHTML = nodes.map(node => `<label class="cp-assignment"><span>${node.id}</span><select data-cp-tile="${node.id}" aria-label="${node.id} 的 tile">${state.tileNames.map(tile => `<option value="${escape(tile)}" ${tile === (state.tiles[node.id] || node.tile) ? "selected" : ""}>${escape(tile)}</option>`).join("")}</select></label>`).join("");
+    byId("cp-links").innerHTML = links.map(([from,to],index) => {
+      const source = nodes.find(node => node.id === endpointOwner(from));
+      const sink = nodes.find(node => node.id === endpointOwner(to));
+      return `<div class="cp-link"><code>${from} → ${to}</code><span>${currentTile(source) === currentTile(sink) ? "同 tile" : "跨 tile"}</span><button type="button" data-cp-remove="${index}" aria-label="删除连接 ${from} 到 ${to}">删除</button></div>`;
+    }).join("");
+    const available = role => nodes.flatMap(node => Object.entries(node.ports).filter(([port,type]) => type === role && !used.has(`${node.id}.${port}`)).map(([port]) => `${node.id}.${port}`));
+    const populate = (id,values) => { byId(id).innerHTML = values.length ? values.map(value => `<option value="${value}">${value}</option>`).join("") : '<option value="">无空闲端点</option>'; };
+    populate("cp-source",available("master"));
+    populate("cp-sink",available("slave"));
+    byId("cp-add-link").disabled = !available("master").length || !available("slave").length;
+    const exported = nodes.reduce((count,node) => count + Object.keys(node.ports).filter(port => !used.has(`${node.id}.${port}`)).length,0);
+    byId("cp-export-note").textContent = `当前 ${exported} 个未连接 bundle 显式导出为顶层端口，生成 top_ports。一个端点在连接或顶层导出中使用一次。`;
+    requestAnimationFrame(drawWires);
+  }
+  function drawWires() {
+    const board = byId("cp-board");
+    const canvas = byId("cp-wires");
+    const bounds = board.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return;
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.ceil(bounds.width * ratio);
+    canvas.height = Math.ceil(bounds.height * ratio);
+    const context = canvas.getContext("2d");
+    context.scale(ratio,ratio);
+    const nodes = instances();
+    const colors = getComputedStyle(root);
+    activeLinks(nodes).forEach(([from,to]) => {
+      const start = root.querySelector(`[data-cp-port="${from}"] .cp-pin`)?.getBoundingClientRect();
+      const end = root.querySelector(`[data-cp-port="${to}"] .cp-pin`)?.getBoundingClientRect();
+      if (!start || !end) return;
+      const x1 = start.x + start.width / 2 - bounds.x;
+      const y1 = start.y + start.height / 2 - bounds.y;
+      const x2 = end.x + end.width / 2 - bounds.x;
+      const y2 = end.y + end.height / 2 - bounds.y;
+      const cross = currentTile(nodes.find(node => node.id === endpointOwner(from))) !== currentTile(nodes.find(node => node.id === endpointOwner(to)));
+      context.strokeStyle = colors.getPropertyValue(cross ? "--cp-cross" : "--cp-accent");
+      context.fillStyle = context.strokeStyle;
+      context.lineWidth = 1.7;
+      context.setLineDash(cross ? [5,4] : []);
+      const bend = Math.max(25,Math.min(85,Math.abs(x2-x1) / 2));
+      context.beginPath();
+      context.moveTo(x1,y1);
+      context.bezierCurveTo(x1+bend,y1,x2-bend,y2,x2,y2);
+      context.stroke();
+      context.setLineDash([]);
+      context.beginPath(); context.moveTo(x2,y2); context.lineTo(x2-5,y2-3); context.lineTo(x2-5,y2+3); context.closePath(); context.fill();
+    });
+  }
+  function renderDeclarations(nodes) {
+    const value = declarations(nodes);
+    const view = state.config === "soc_flat" ? "flat" : state.config === "soc_debug" ? "debug" : "partitioned";
+    byId("cp-imports-code").textContent = serialize(value["env/imports.hjson"]);
+    byId("cp-project-code").textContent = serialize(value["src/meta/manifest/project.hjson"]);
+    byId("cp-flat-code").textContent = serialize(value["src/meta/connectivity/flat.hjson"]);
+    byId("cp-partitioned-code").textContent = serialize(value["src/meta/connectivity/partitioned.hjson"]);
+    byId("cp-config-result").innerHTML = `<p><strong>${state.config}</strong> 选择 target=compose / view=${view} / filesets=${view === "debug" ? "rtl + debug" : "rtl"}</p><p><code>connectivity/soc_default/${view}/</code> → <code>config/${state.config}/${view}/compile/</code></p>`;
+    byId("cp-commands-code").textContent = `# 在现有 SoC tree 中写入各项声明，并填写真实来源/ref\npython env/sync.py update\npython env/sync.py\npython run.py build --config ${state.config}\npython run.py sim --config ${state.config} --suite smoke\n\n# 在本次 out/<os>/builds/<build-id>/ 中查看\n# connectivity/soc_default/${view}/soc_combo_top.sv\n# config/${state.config}/${view}/compile/compile.f\n# run/smoke/<execution-id>/<case>/<seed>/\n# 通过 python run.py status 获取实际 build 路径`;
+    root.querySelectorAll("[data-cp-config]").forEach(button => button.setAttribute("aria-pressed",String(button.dataset.cpConfig === state.config)));
+  }
+  function showCode(name) {
+    state.code = name;
+    root.querySelectorAll("[data-cp-code]").forEach(button => button.setAttribute("aria-pressed",String(button.dataset.cpCode === name)));
+    root.querySelectorAll("[data-cp-panel]").forEach(panel => { panel.hidden = panel.dataset.cpPanel !== name; });
+  }
+  function render() {
+    const focusedTile = document.activeElement?.dataset.cpTile;
+    const nodes = instances();
+    state.links = activeLinks(nodes);
+    renderCatalog();
+    byId("cp-variant").disabled = !state.selected.has("pcie");
+    byId("cp-count").disabled = !state.selected.has("pcie");
+    byId("cp-variant").value = state.variant;
+    byId("cp-count").value = String(state.count);
+    renderWorkspace(nodes);
+    renderGraph(nodes);
+    renderDeclarations(nodes);
+    if (focusedTile) root.querySelector(`[data-cp-tile="${focusedTile}"]`)?.focus({preventScroll:true});
+  }
+  function preset(name) {
+    state.selected = new Set(name === "full" ? catalog.map(component => component.name) : ["pcie","dma","dnoc"]);
+    state.count = name === "dual" ? 2 : 1;
+    state.variant = "rc_x16";
+    state.config = "soc_partitioned";
+    catalog.forEach(component => { state.tiles[component.name] = component.tile; });
+    state.tiles.pcie_1 = "io";
+    state.links = defaultLinks.filter(([from,to]) => state.selected.has(endpointOwner(from)) && state.selected.has(endpointOwner(to)));
+    render();
+  }
+  async function copy(id) {
+    const text = byId(id).textContent;
+    try { await navigator.clipboard.writeText(text); }
+    catch (error) {
+      const area = document.createElement("textarea"); area.value = text; area.style.position = "fixed"; area.style.opacity = "0"; document.body.append(area); area.select();
+      const copied = document.execCommand("copy"); area.remove();
+      if (!copied) { byId("cp-message").textContent = "请选中代码后使用系统复制快捷键。"; return; }
+    }
+    byId("cp-message").textContent = "声明已复制，按代码标题的路径放入开发 tree。";
+  }
+  root.addEventListener("change",event => {
+    const target = event.target;
+    if (target.matches("[data-cp-component]")) {
+      if (target.checked) state.selected.add(target.dataset.cpComponent);
+      else state.selected.delete(target.dataset.cpComponent);
+      render();
+    }
+    if (target.id === "cp-variant") { state.variant = target.value; render(); }
+    if (target.id === "cp-count") { state.count = Number(target.value); state.tiles.pcie_1 ||= "io"; render(); }
+    if (target.matches("[data-cp-tile]")) {
+      state.tiles[target.dataset.cpTile] = target.value;
+      if (state.config === "soc_flat") state.config = "soc_partitioned";
+      render();
+    }
+  });
+  root.addEventListener("click",event => {
+    const button = event.target.closest("button");
+    if (!button) return;
+    byId("cp-message").textContent = "";
+    if (button.dataset.cpPreset) preset(button.dataset.cpPreset);
+    if (button.dataset.cpConfig) {
+      state.config = button.dataset.cpConfig;
+      showCode(state.config === "soc_flat" ? "flat" : "partitioned");
+      render();
+    }
+    if (button.dataset.cpCode) showCode(button.dataset.cpCode);
+    if (button.dataset.cpCopy) copy(button.dataset.cpCopy);
+    if (button.dataset.cpRemove !== undefined) { state.links.splice(Number(button.dataset.cpRemove),1); render(); }
+    if (button.id === "cp-add-link") {
+      const from = byId("cp-source").value;
+      const to = byId("cp-sink").value;
+      if (from && to) { state.links.push([from,to]); render(); }
+    }
+    if (button.id === "cp-add-tile") {
+      const name = byId("cp-new-tile").value.trim();
+      if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) { byId("cp-message").textContent = "tile 名称使用字母或下划线开头，其后可用字母、数字、下划线。"; return; }
+      if (!state.tileNames.includes(name)) state.tileNames.push(name);
+      byId("cp-new-tile").value = "";
+      render();
+      byId("cp-message").textContent = `已添加 ${name}，在实例归属中选择它即可。`;
+    }
+    if (button.id === "cp-one-tile") {
+      if (!state.tileNames.includes("all")) state.tileNames.push("all");
+      instances().forEach(node => { state.tiles[node.id] = "all"; });
+      state.config = "soc_partitioned"; render();
+    }
+    if (button.id === "cp-reset-tiles") {
+      instances().forEach(node => { state.tiles[node.id] = node.tile; });
+      state.config = "soc_partitioned"; render();
+    }
+    if (button.id === "cp-download") {
+      const blob = new Blob([serialize(declarations(instances()))+"\n"],{type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a"); link.href = url; link.download = "sflow-composition-files.json"; link.click();
+      setTimeout(() => URL.revokeObjectURL(url),1000);
+    }
+  });
+  new ResizeObserver(() => requestAnimationFrame(drawWires)).observe(byId("cp-board"));
+  new MutationObserver(() => requestAnimationFrame(drawWires)).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+  window.addEventListener("beforeprint",drawWires);
+  window.addEventListener("afterprint",drawWires);
+  preset("io");
+})();
+
+  </script>
+<!-- END_SFLOW_COMPOSITION_SCRIPT -->
+</body>
+</html>

@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
 import SflowCode from '../../components/SflowCode.astro';
 import SflowTopology from '../../components/SflowTopology.astro';
+import SflowComposition from '../../components/SflowComposition.astro';
 import { sitePath } from '../../lib/catalog.mjs';
 import { sections, socTree, outputTree, platformTree, createCommand, startCommand, phases } from '../../data/sflow-guide.mjs';
 import '../../styles/sflow-guide.css';
@@ -14,13 +15,13 @@ const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
     <div class="eyebrow">SFLOW / USER GUIDE</div>
     <h1>独立开发。<br/><span>在同一个 flow 中集成。</span></h1>
     <p>从一个 SoC 的开发目录出发，看清平台、IP 与公共库如何组合，<br class="sf-wide-break"/>再沿着发布物，走到 BIA 顶层、编译和仿真。</p>
-    <div class="detail-actions"><a class="primary-button" href="#start">跑通第一个构建 <Icon name="arrow" size={15}/></a><a class="secondary-button" href="#tree"><Icon name="terminal" size={15}/> 先看 SoC tree</a></div>
+    <div class="detail-actions"><a class="primary-button" href="#start">跑通第一个构建 <Icon name="arrow" size={15}/></a><a class="primary-button" href="#composition">操作 IP / tile / config 组合图 <Icon name="arrow" size={15}/></a><a class="secondary-button" href="#tree"><Icon name="terminal" size={15}/> 先看 SoC tree</a></div>
     <div class="sf-hero-map" aria-label="独立仓库经 sflow 和 SiliconCompiler 构建成为 DUT 与运行产物">
       <div><small>01 / SOURCES</small><strong>独立开发 tree</strong><span>IP · subsystem · SoC · library</span></div><span class="sf-map-arrow" aria-hidden="true">→</span>
       <div class="sf-map-engine"><small>02 / BUILD PLATFORM</small><strong>sflow <span>+ SiliconCompiler</span></strong><span>publish → BIA → assembly</span></div><span class="sf-map-arrow" aria-hidden="true">→</span>
       <div><small>03 / ARTIFACTS</small><strong>可追溯的构建结果</strong><span>DUT · filelist · image · case log</span></div>
     </div>
-    <div class="sf-guide-meta"><span>8 个阅读章节</span><span>6 个示例 IP</span><span>可复制的本地命令</span><span>基于 meta platform</span></div>
+    <div class="sf-guide-meta"><span>交互组件组合与完整离线手册</span><span>6 个示例 IP</span><span>可复制的本地命令</span><span>基于 meta platform</span></div>
   </header>
   <div class="sf-guide-layout">
     <nav class="sf-toc" aria-label="Sflow 使用指南目录"><div class="small-heading">ON THIS PAGE</div>{sections.map(([id,title],i)=><a href={`#${id}`}><span>{String(i+1).padStart(2,'0')}</span>{title}</a>)}<a class="sf-toc-source" href={href('sflow/README.md')}>版本与来源说明 ↗</a></nav>
@@ -55,8 +56,15 @@ const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
         <SflowCode title="比较同一个 SoC 的两种集成方式" code={`python run.py build --target flat\npython run.py build --target hier`}/>
         <div class="sf-callout"><strong>共享库也是真正独立的 tree。</strong><p><code>sharedlib</code> 提供 FIFO、同步器等 RTL，<code>common_info</code> 提供公共格式与 bundle 定义。VIP 可作为独立设计库；flow runtime 已从旧 toolkit 中独立出来。</p></div>
       </section>
+      <section id="composition" class="sf-section">
+        <div class="section-kicker"><span>04</span> IP / CONNECTIVITY / VIEW / CONFIG</div>
+        <h2>从任意组件组合，到 SoC 使用的配置</h2>
+        <p class="sf-lead">选择组件与 variant，编辑 bundle 连线和 tile 分区，再用不同 view 形成 SoC config。组件接口与声明沿用当前 sflow 的六 IP demo。</p>
+        <SflowComposition/>
+        <p class="sf-caption"><a href={href('sflow/development-tree-guide.html')}>打开完整离线 HTML 手册 / 打印版 ↗</a> · 手册包含目录检索、文件放置、完整命令与失败节点 rerun。</p>
+      </section>
       <section id="variants" class="sf-section">
-        <div class="section-kicker"><span>04</span> ONE REPO / MULTIPLE IMPLEMENTATIONS</div><h2>两个 PCIe，为什么不会覆盖彼此？</h2>
+        <div class="section-kicker"><span>05</span> ONE REPO / MULTIPLE IMPLEMENTATIONS</div><h2>两个 PCIe，为什么不会覆盖彼此？</h2>
         <p class="sf-lead">需要区分三层身份：源码 repo、构建单元 <code>design_variant</code>、硬件 instance。发布目录以构建单元命名，而不是以实例名命名。</p>
         <div class="sf-variant-map"><div class="sf-variant-source"><span>ONE SOURCE REPOSITORY</span><strong>pcie/</strong><code>src/meta/build.py → VARIANTS</code></div><div class="sf-variant-branches">{[['rc_x16','rc0 + rc1','16','1'],['ep_x16','ep','16','2'],['dm_x8','dm','8','3']].map(([v,inst,lanes,role])=><div><small>BUILD UNIT</small><h3>pcie_{v}</h3><code>LANES = {lanes} / ROLE = {role}</code><span class="sf-variant-arrow" aria-hidden="true">↓</span><strong>{inst}</strong><span>硬件实例</span></div>)}</div></div>
         <p>示例共有四个 PCIe 实例，但只有三份 PCIe 发布物。两个 <code>rc_x16</code> 实例复用同一个模块实现；不同 variant 的生成模块使用独立名称。</p>
@@ -65,7 +73,7 @@ const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
         <p class="sf-caption">上方是 feature 值说明，不是 SystemVerilog 宏源码。实际宏由 <code>features.svh</code> 生成，使用带构建单元前缀的名称。</p>
       </section>
       <section id="build" class="sf-section">
-        <div class="section-kicker"><span>05</span> BUILD / CONNECT / ASSEMBLE</div><h2>Flow 的骨架，由 SC 负责调度</h2>
+        <div class="section-kicker"><span>06</span> BUILD / CONNECT / ASSEMBLE</div><h2>Flow 的骨架，由 SC 负责调度</h2>
         <p class="sf-lead">sflow 负责解析元数据、建立任务图和整理产物，SiliconCompiler 负责执行任务。点击阶段，查看它消费什么、产出什么，以及文件在哪里。</p>
         <figure class="sf-dag"><div class="sf-figure-header"><span>SC TASK GRAPH / 示意</span><span>依赖满足后调度</span></div><svg viewBox="0 0 920 280" role="img" aria-label="Snapshot 后两个 publish 单元并行，等待发布完成执行 BIA 和 assembly，再选择 compile 到 run，或 lint 分支。地址及其他辅助任务省略。"><defs><marker id="sf-dag-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke="var(--accent)" stroke-width="1.5"/></marker></defs><g class="sf-svg-wire" marker-end="url(#sf-dag-arrow)"><path d="M143 140H167V65H198M143 140H167V215H198M324 65H348V140H377M324 215H348V140H377M490 140H534M647 140H672V65H705M647 140H672V215H705M792 89V116"/></g><g class="sf-svg-block"><rect x="20" y="115" width="123" height="50" rx="5"/><rect x="198" y="40" width="126" height="50" rx="5"/><rect x="198" y="190" width="126" height="50" rx="5"/><rect x="377" y="115" width="113" height="50" rx="5"/><rect x="534" y="115" width="113" height="50" rx="5"/><rect x="705" y="40" width="175" height="49" rx="5"/><rect x="705" y="116" width="175" height="49" rx="5"/><rect x="705" y="190" width="175" height="50" rx="5"/></g><g class="sf-svg-title" text-anchor="middle"><text x="81" y="146">snapshot</text><text x="261" y="71">publish A</text><text x="261" y="221">publish B</text><text x="434" y="146">BIA</text><text x="590" y="146">assembly</text><text x="792" y="70">compile</text><text x="792" y="146">case / seed run</text><text x="792" y="221">lint</text></g><text class="sf-svg-small" x="261" y="144" text-anchor="middle">可并行</text></svg><figcaption>为便于阅读省略地址、公共库等辅助节点。实际边由当前设计依赖生成；compile / run 与 lint 按命令选择。</figcaption></figure>
         <div class="sf-stages" role="group" aria-label="选择构建阶段">{phases.map((p,i)=><button type="button" data-phase={p.id} aria-pressed={i===1 ? 'true' : 'false'}><span>0{i+1}</span><strong>{p.name}</strong><small>{p.label}</small></button>)}</div>
@@ -74,7 +82,7 @@ const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
         <div class="sf-table-wrap"><table><thead><tr><th>四种图</th><th>定义位置</th><th>它回答的问题</th></tr></thead><tbody><tr><td>Import</td><td><code>env/imports.*</code></td><td>取哪些源码、什么版本？</td></tr><tr><td>Build</td><td><code>build.dependencies</code></td><td>生成器要等待哪些输入？</td></tr><tr><td>Hardware</td><td>BIA assembly</td><td>哪些实例、怎样连线？</td></tr><tr><td>Fileset</td><td>project filesets / deps</td><td>哪些文件参与、编译顺序如何？</td></tr></tbody></table></div>
       </section>
       <section id="bia" class="sf-section">
-        <div class="section-kicker"><span>06</span> BUNDLE INTERCONNECT AUTOMATION</div><h2>从 bundle 描述到顶层 SystemVerilog</h2>
+        <div class="section-kicker"><span>07</span> BUNDLE INTERCONNECT AUTOMATION</div><h2>从 bundle 描述到顶层 SystemVerilog</h2>
         <p class="sf-lead">不必在 SoC 中逐根手连信号。BIA 结合公共 bundle 定义、模块 sidecar 和 assembly，把端点展开成连接代码。</p>
         <div class="sf-bia-inputs"><div><small>PROTOCOL</small><strong>common_info</strong><span>字段 / 位宽 / 方向</span></div><div><small>INTERFACE</small><strong>IP sidecar</strong><span>模块端口 / bundle 角色</span></div><div><small>COMPOSITION</small><strong>SoC assembly</strong><span>实例 / 连接 / tile 分组</span></div></div>
         <div class="sf-bia-engine"><span>↓</span><strong>BIA</strong><p>检查类型、角色、位宽与端点</p><span>↓</span><code>connectivity/&lt;design_variant&gt;/&lt;view&gt;/*.sv</code></div>
@@ -83,7 +91,7 @@ const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
         <p class="sf-caption">最终地址由 SoC 的 <code>register/addresses.hjson</code> 分配；IP 管相对寄存器布局，common_info 管公共格式与定义。</p>
       </section>
       <section id="outputs" class="sf-section">
-        <div class="section-kicker"><span>07</span> FOLLOW THE ARTIFACTS</div><h2>构建结束后，到哪里找结果？</h2>
+        <div class="section-kicker"><span>08</span> FOLLOW THE ARTIFACTS</div><h2>构建结束后，到哪里找结果？</h2>
         <p class="sf-lead">每次构建都有独立 ID。先看 <code>latest.json</code>，再进入它指向的 build 目录，沿着发布物、filelist 和 case 日志定位问题。</p>
         <SflowCode title="$ tree out/<os>/builds/<id>/  ·  汇总示意" code={outputTree} tree/>
         <div class="sf-callout"><strong>开发源码与消费产物有明确边界。</strong><p><code>library/</code> 等浏览路径链接到本次 SC 输出，不链接回开发源码。发布后核对文件摘要；外部工艺库和 SRAM 输入也有摘要记录。</p></div>
@@ -91,7 +99,7 @@ const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
         <p class="sf-caption">目录汇总了 sim 与 lint 的产物位置；二者是独立可选构建，单次执行不一定同时出现全部文件。</p>
       </section>
       <section id="daily" class="sf-section">
-        <div class="section-kicker"><span>08</span> EVERYDAY WORK</div><h2>日常只需要记住几个入口</h2>
+        <div class="section-kicker"><span>09</span> EVERYDAY WORK</div><h2>日常只需要记住几个入口</h2>
         <SflowCode title="在独立开发 tree 中" code={`python env/sync.py                          # 只同步锁定版本\npython run.py list                          # 查看 target / config\npython run.py build --config multi_pcie      # 发布 → 连线 → 编译\npython run.py sim --config multi_pcie        # 编译 + suite 运行\npython run.py lint --config multi_pcie       # 基础 RTL 诊断\npython run.py status                        # 最近结果\n\n# 用实际的、已执行 sim 的 build 路径替换 <build-dir>\npython run.py run --build <build-dir> --suite smoke`}/>
         <details class="sf-details"><summary>升级 sflow，会不会改动 IP 的源码？</summary><p>兼容升级只由构建根切换平台版本。模板 / schema 迁移另走显式迁移流程，先预览差异，保留项目 RTL、BIA、feature 等自定义内容。</p><SflowCode title="切换构建根的平台版本" code={`python run.py platform update --ref <new-platform-commit>\npython env/sync.py\npython run.py platform status`}/></details>
         <details class="sf-details"><summary>SoC 集成时需要临时调试一个 IP？</summary><p>通过 <code>env/overrides.local.hjson</code> 显式覆盖到开发者 checkout；修复后提交 IP，再更新上层设计锁。平台开发覆盖使用 <code>env/platform.local.json</code>。两者均记录在 provenance，且不提交本地覆盖文件。</p><SflowCode title="显式更新设计依赖（与平台升级分开）" code={`python env/sync.py update pcie`}/></details>

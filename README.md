@@ -59,14 +59,14 @@ v0.3.0 提供 **8 个随包 skills**。本地原生分析需要 Linux、Python �
 | **Bus Protocol Lab** | 理解 AXI、PCIe 的字节映射与报文拆分 | AXI→PCIe Packet Studio、AXI Atomic、PCIe TLP Split | **[操作协议工具 ↗](https://techyan.github.io/demo/projects/bus-protocol-lab/)** |
 | **PG Builder** | 编辑寄存器操作流程并导出结果 | 可操作的 PG 编辑器，read / write / rmw / poll 示例 | **[打开编辑器 ↗](https://techyan.github.io/demo/projects/pg_gen/)** |
 | **UVM Wiki** | 了解验证环境结构并关联源码 | 从脱敏 demo_uvm 生成的 7 种视图、索引与源码浏览 | **[浏览结构 ↗](https://techyan.github.io/demo/projects/uvm_wiki/)** |
-| **Sflow** | 组织独立 IP / SoC tree，理解集成与构建 | SoC Terminal tree、集成切换、variant 与 SC/BIA 阶段图 | **[阅读 user guide ↗](https://techyan.github.io/demo/sflow/)** |
+| **Sflow** | 组合独立 IP，连接 block，选择 tile / view / config 供 SoC 构建 | 组件选择、BIA 连线与 tile 重分区、实时声明、完整开发 tree 手册 | **[操作组合图 ↗](https://techyan.github.io/demo/sflow/#composition)** · [完整手册](https://techyan.github.io/demo/sflow/development-tree-guide.html) |
 | **SVIP** | 阅读协议 VIP 使用指南与验证示例 | AXI4 / APB / JTAG / SPI / Control，13 份指南、17 个自有示例 | **[查看指南 ↗](https://techyan.github.io/demo/projects/svip/)** |
 | **xpggen** | 了解终端寄存器操作与多格式导出 | 真实 TUI 截图、合成寄存器、PG 与四种导出格式 | **[查看终端演示 ↗](https://techyan.github.io/demo/projects/xpggen/)** |
 | **xDCT** | 比较设计接口变化与兼容性影响 | 两版 top interface 的语义对比、筛选、6 个 breaking change | **[打开接口对比 ↗](https://techyan.github.io/demo/projects/xDCT/)** |
 
 [网站项目索引](https://techyan.github.io/demo/)还支持分类筛选、中文 / 英文搜索、深浅主题和手机浏览。
 
-Sflow 指南从 [快速开始](https://techyan.github.io/demo/sflow/#start)进入，或直接查看 [完整 SoC tree](https://techyan.github.io/demo/sflow/#tree)、[构建阶段](https://techyan.github.io/demo/sflow/#build)。
+Sflow 指南可以从 [IP / tile / config 组合图](https://techyan.github.io/demo/sflow/#composition)选择组件并生成声明，也可以从 [快速开始](https://techyan.github.io/demo/sflow/#start)进入，或查看 [完整 SoC tree](https://techyan.github.io/demo/sflow/#tree)、[构建阶段](https://techyan.github.io/demo/sflow/#build)。[完整 HTML 手册](https://techyan.github.io/demo/sflow/development-tree-guide.html)支持离线阅读、目录检索、命令复制与打印。
 
 ## 从演示继续追踪证据
 

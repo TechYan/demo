@@ -1,8 +1,25 @@
 {
-  "kind": "authored-user-guide",
+  "kind": "authored-interactive-user-guide",
   "source_repository": "TechYan/sflow",
-  "source_commit": "0906cbc27d8bbeb3a633b74ff288f787029a654f",
+  "source_commit": "829e8fbc24512062689dbbabf5e4576ff0925458",
+  "handbook_source_path": "docs/development-tree-guide.html",
+  "handbook_path": "sflow/development-tree-guide.html",
+  "handbook_sha256": "cb4492f53c49599e81eee46b1c94297b900760fdb7c0dc624cb4a69cf247740b",
+  "page_source": "src/pages/sflow/index.astro",
+  "interactive_component": "src/components/SflowComposition.astro",
   "generated_simulation_results": false,
-  "scope": "Architecture and usage guide; static directory examples and commands; no EDA execution in the browser.",
-  "page_source": "src/pages/sflow/index.astro"
+  "scope": "Browser edits IP selection, connectivity, tile ownership and SoC view/config declarations. Actual builds execute locally through sflow and SiliconCompiler.",
+  "verification": {
+    "actual_sc_icarus_build_scenarios": 7,
+    "simulation_config": "soc_debug",
+    "simulation_seeds": [
+      1,
+      2
+    ],
+    "component_subsets": 64,
+    "native_bia_flat_partitioned_views": 128,
+    "existing_site_browser_tests": 11,
+    "composition_browser_regressions": 2,
+    "total_site_browser_tests": 13
+  }
 }

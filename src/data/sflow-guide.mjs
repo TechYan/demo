@@ -1,6 +1,6 @@
 export const sections = [
   ['start', '快速开始'], ['tree', '读懂 SoC tree'], ['integration', '组合独立仓库'],
-  ['variants', 'Variant 与 feature'], ['build', '构建如何发生'], ['bia', 'BIA 与层次连接'],
+  ['composition', '交互 IP / tile / config'], ['variants', 'Variant 与 feature'], ['build', '构建如何发生'], ['bia', 'BIA 与层次连接'],
   ['outputs', '找到构建产物'], ['daily', '日常操作与升级']
 ];
 export const socTree = `soc/                                     # 当前构建根
