@@ -1,16 +1,19 @@
 # SVIP documentation and source example demo
 
-Open [the complete guide index](index.html), [reusable examples](examples.html), or [the source browser](sources.html).
+Start with the [SVIP product showcase](https://techyan.github.io/demo/projects/svip/). For the archived examples, open [the complete guide index](index.html), [reusable examples](examples.html), or [the source browser](sources.html).
 
 ## 2026-11 update (repository-side highlights)
 
-The source repository has evolved past the frozen guide revision below. Current highlights:
+The product showcase describes SVIP main at `e0dbcb3d239ec755456e29efaff375f62df3e563` (2026-11-22). The source revision in the archive section below identifies the 13 guides and 17 examples.
+
+- **XDP Rev. 1** supports master, reactive slave and passive roles, four independent credit-debit channels, and 64 or 128 bytes per read beat. The November 22 update covers status-only error returns, tag reuse and request rejection diagnostics. [Architecture SVG](figures/xdp-port.svg) · [Editable draw.io](figures/xdp-port.drawio) · [Timing walkthrough](https://techyan.github.io/demo/projects/svip/#timing)
+- **Integration and testsuite**. The showcase follows one passive port through checking, byte comparison and tracker correlation. It includes public API call patterns, runner commands, and the scope of the reported regression results. [Integration](https://techyan.github.io/demo/projects/svip/#integration) · [Testsuite](https://techyan.github.io/demo/projects/svip/#testsuite)
 
 - **regif VIP** (new): the RSC reg slave custom register channel — master/slave/passive, a table-driven register-file model (RW/RO/WO/W1C/RC, PF/VF banks), and a UVM RAL adapter.
-- **AI-native observation outputs**: every protocol tracker now emits a `SVIP_TRK` index tag into the simulation log (file/rows/kinds), stable per-row `trk=<n>` references and an `# EOF` completeness receipt in tracker files, a machine-checkable `svip-trk/1` manifest (`+svip_trk_manifest=`), and a `trk_report.py` cross-validation tool — so debug agents can hop from a run log straight to the evidence rows.
+- **AI-native observation outputs**: participating trackers emit a `SVIP_TRK` index tag into the simulation log (file/rows/kinds) and an `# EOF` completeness receipt; XDP also supplies stable per-row `trk=<n>` references, a machine-checkable `svip-trk/1` manifest (`+svip_trk_manifest=`), and a `trk_report.py` cross-validation tool — so debug agents can hop from a run log straight to the evidence rows.
 - **svip-debug skill** (new, shipped with the protected delivery): an operating skill for verification/debug agents covering API lookup from docs and plaintext contract files (works with the encrypted delivery), integration recipes (including mounting a passive monitor with tracker logging), and the simulation-log → tracker → manifest debugging workflow.
 
-The guide pages in this demo remain frozen at the source revision recorded below; see the source repository README and `common/trk/README.md` for the latest.
+The [status-only error](figures/xdp-error-return.json) and [credit return](figures/xdp-credit-return.json) WaveJSON files describe illustrative timing diagrams. The SVGs use WaveDrom 3.8.0's dark skin with a navy canvas and tinted data buses for the site. Open the architecture source in diagrams.net to edit its native shapes and connectors. The tracker walkthrough displays selected fields with illustrative values. The regression counts summarize upstream verification records.
 
 ## Source and scope
 

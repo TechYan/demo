@@ -4,7 +4,10 @@ import Icon from '../../components/Icon.astro';
 import ProjectVisual from '../../components/ProjectVisual.astro';
 import projects from '../../data/projects.json';
 import { sitePath } from '../../lib/catalog.mjs';
-export function getStaticPaths() { return projects.map(project => ({ params: { id: project.id }, props: { project } })); }
+export function getStaticPaths() {
+  return projects.filter(project => project.id !== 'svip')
+    .map(project => ({ params: { id: project.id }, props: { project } }));
+}
 const { project } = Astro.props;
 const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
 const next = projects[(projects.findIndex(p => p.id === project.id) + 1) % projects.length];

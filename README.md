@@ -6,11 +6,31 @@
 
 AI 波形调试 · 总线性能分析 · 协议可视化 · 验证与寄存器工具
 
-[**进入项目网站 ↗**](https://techyan.github.io/demo/) · [**体验 wavedbg 最新能力 ↗**](https://techyan.github.io/demo/wavedbg/performance/) · [**选择项目 ↓**](#选择你想了解的项目)
+[**进入项目网站 ↗**](https://techyan.github.io/demo/) · [**体验 wavedbg 最新能力 ↗**](https://techyan.github.io/demo/wavedbg/performance/) · [**查看 SVIP 验证 IP ↗**](https://techyan.github.io/demo/projects/svip/) · [**项目导航 ↓**](#项目导航)
 
 </div>
 
 这里是 TechYan 项目的**公开演示入口**。你可以先了解每个项目解决什么问题，再选择网页体验、实际报告或示例资料。浏览这些内容无需安装工具，也无需访问私有源码仓库。
+
+<a id="选择你想了解的项目"></a>
+
+## 项目导航
+
+| 项目 | 解决什么问题 | 展示内容 | 在线入口 |
+|---|---|---|---|
+| **wavedbg** | 让 AI 根据问题查波形，并从指定 AXI 接口生成性能结论 | v0.3.0 实际 HTML / log；四个波形调试导览 | **[最新能力 ↗](https://techyan.github.io/demo/wavedbg/performance/)** · [波形案例](https://techyan.github.io/demo/wavedbg/) |
+| **SVIP** | 在 DUT 上驱动协议或旁路观测，定位事务与引脚上的错误 | XDP 架构、WaveDrom 时序、tracker、用户 API 与 testsuite | **[查看 VIP 功能 ↗](https://techyan.github.io/demo/projects/svip/)** · [按接口选型](https://techyan.github.io/demo/projects/svip/#protocols) |
+| **PVKit** | 分析总线流量、性能瓶颈与事务关联 | 15 个 AXI4 / CXL Native 场景，HTML、真实 TUI、tracker 与 CSV | **[选择场景 ↗](https://techyan.github.io/demo/projects/pvkit/)** |
+| **Bus Protocol Lab** | 理解 AXI、PCIe 的字节映射与报文拆分 | AXI→PCIe Packet Studio、AXI Atomic、PCIe TLP Split | **[操作协议工具 ↗](https://techyan.github.io/demo/projects/bus-protocol-lab/)** |
+| **PG Builder** | 编辑寄存器操作流程并导出结果 | 可操作的 PG 编辑器，read / write / rmw / poll 示例 | **[打开编辑器 ↗](https://techyan.github.io/demo/projects/pg_gen/)** |
+| **UVM Wiki** | 了解验证环境结构并关联源码 | 从脱敏 demo_uvm 生成的 7 种视图、索引与源码浏览 | **[浏览结构 ↗](https://techyan.github.io/demo/projects/uvm_wiki/)** |
+| **Sflow** | 组合独立 IP，连接 block，选择 tile / view / config 供 SoC 构建 | 组件选择、BIA 连线与 tile 重分区、实时声明、完整开发 tree 手册 | **[操作组合图 ↗](https://techyan.github.io/demo/sflow/#composition)** · [完整手册](https://techyan.github.io/demo/sflow/development-tree-guide.html) |
+| **xpggen** | 了解终端寄存器操作与多格式导出 | 真实 TUI 截图、合成寄存器、PG 与四种导出格式 | **[查看终端演示 ↗](https://techyan.github.io/demo/projects/xpggen/)** |
+| **xDCT** | 比较设计接口变化与兼容性影响 | 两版 top interface 的语义对比、筛选、6 个 breaking change | **[打开接口对比 ↗](https://techyan.github.io/demo/projects/xDCT/)** |
+
+[网站项目索引](https://techyan.github.io/demo/)还支持分类筛选、中文 / 英文搜索、深浅主题和手机浏览。
+
+Sflow 指南可以从 [IP / tile / config 组合图](https://techyan.github.io/demo/sflow/#composition)选择组件并生成声明，也可以从 [快速开始](https://techyan.github.io/demo/sflow/#start)进入，或查看 [完整 SoC tree](https://techyan.github.io/demo/sflow/#tree)、[构建阶段](https://techyan.github.io/demo/sflow/#build)。[完整 HTML 手册](https://techyan.github.io/demo/sflow/development-tree-guide.html)支持离线阅读、目录检索、命令复制与打印。
 
 ## 最新推荐：wavedbg · 从 AXI 波形到性能报告
 
@@ -48,31 +68,25 @@ AI 波形调试 · 总线性能分析 · 协议可视化 · 验证与寄存器�
 
 v0.3.0 提供 **8 个随包 skills**。本地原生分析需要 Linux、Python 和现场授权的 Verdi 环境；网页可独立浏览，展示已有结果。wavedbg 源码仓库仍为私有，**本页所有演示入口均指向公开内容**。详细流程见[公开使用说明](wavedbg/performance/README.md)；旧版四个波形导览仍保留其 v0.2.1 来源标注。
 
-## 选择你想了解的项目
+## SVIP · 从协议事务追到引脚
 
-不确定从哪里开始？需要 **AI 查波形**选 wavedbg，需要 **分析总线性能结果**选 PVKit，需要 **理解报文拆分**选 Bus Protocol Lab。其余入口按用途列在下方。
+SVIP 为已有 DUT 提供主动 BFM、被动 monitor、协议检查与可编程响应。新增的 **XDP VIP** 分别管理 REQ、SDATA、RTN、RDATA 四路 credit，支持每拍 64B 或 128B 的读数据。最新更新处理仅返回错误状态的读请求，并允许完成后复用同一 tag。
 
-| 项目 | 解决什么问题 | 展示内容 | 在线入口 |
-|---|---|---|---|
-| **wavedbg** | 让 AI 根据问题查波形，并从指定 AXI 接口生成性能结论 | v0.3.0 实际 HTML / log；四个波形调试导览 | **[最新能力 ↗](https://techyan.github.io/demo/wavedbg/performance/)** · [波形案例](https://techyan.github.io/demo/wavedbg/) |
-| **PVKit** | 分析总线流量、性能瓶颈与事务关联 | 15 个 AXI4 / CXL Native 场景，HTML、真实 TUI、tracker 与 CSV | **[选择场景 ↗](https://techyan.github.io/demo/projects/pvkit/)** |
-| **Bus Protocol Lab** | 理解 AXI、PCIe 的字节映射与报文拆分 | AXI→PCIe Packet Studio、AXI Atomic、PCIe TLP Split | **[操作协议工具 ↗](https://techyan.github.io/demo/projects/bus-protocol-lab/)** |
-| **PG Builder** | 编辑寄存器操作流程并导出结果 | 可操作的 PG 编辑器，read / write / rmw / poll 示例 | **[打开编辑器 ↗](https://techyan.github.io/demo/projects/pg_gen/)** |
-| **UVM Wiki** | 了解验证环境结构并关联源码 | 从脱敏 demo_uvm 生成的 7 种视图、索引与源码浏览 | **[浏览结构 ↗](https://techyan.github.io/demo/projects/uvm_wiki/)** |
-| **Sflow** | 组合独立 IP，连接 block，选择 tile / view / config 供 SoC 构建 | 组件选择、BIA 连线与 tile 重分区、实时声明、完整开发 tree 手册 | **[操作组合图 ↗](https://techyan.github.io/demo/sflow/#composition)** · [完整手册](https://techyan.github.io/demo/sflow/development-tree-guide.html) |
-| **SVIP** | 阅读协议 VIP 使用指南与验证示例 | AXI4 / APB / JTAG / SPI / Control，13 份指南、17 个自有示例 | **[查看指南 ↗](https://techyan.github.io/demo/projects/svip/)** |
-| **xpggen** | 了解终端寄存器操作与多格式导出 | 真实 TUI 截图、合成寄存器、PG 与四种导出格式 | **[查看终端演示 ↗](https://techyan.github.io/demo/projects/xpggen/)** |
-| **xDCT** | 比较设计接口变化与兼容性影响 | 两版 top interface 的语义对比、筛选、6 个 breaking change | **[打开接口对比 ↗](https://techyan.github.io/demo/projects/xDCT/)** |
+[![XDP 单端口架构，主从端点通过四路通道通信，被动 monitor 将采样交给 tracker、检查和功能覆盖](svip/figures/xdp-port.svg)](https://techyan.github.io/demo/projects/svip/)
 
-[网站项目索引](https://techyan.github.io/demo/)还支持分类筛选、中文 / 英文搜索、深浅主题和手机浏览。
-
-Sflow 指南可以从 [IP / tile / config 组合图](https://techyan.github.io/demo/sflow/#composition)选择组件并生成声明，也可以从 [快速开始](https://techyan.github.io/demo/sflow/#start)进入，或查看 [完整 SoC tree](https://techyan.github.io/demo/sflow/#tree)、[构建阶段](https://techyan.github.io/demo/sflow/#build)。[完整 HTML 手册](https://techyan.github.io/demo/sflow/development-tree-guide.html)支持离线阅读、目录检索、命令复制与打印。
+| 你想验证什么 | 公开演示 |
+|---|---|
+| 错误读何时结束，零额度何时能再发 | [逐拍查看两组 WaveDrom 时序](https://techyan.github.io/demo/projects/svip/#timing) |
+| 首个错误字节来自哪一拍 | [从 tracker 的 pin_trk 回到 RDATA](https://techyan.github.io/demo/projects/svip/#tracker) |
+| 怎样接入现有 UVM 环境或自定义从端响应 | [被动接入和用户 API](https://techyan.github.io/demo/projects/svip/#integration) |
+| 如何选择读宽、初始化方式和定向用例 | [XDP testsuite 与复现命令](https://techyan.github.io/demo/projects/svip/#testsuite) |
+| 哪个组件适合当前 DUT | [协议与角色选型](https://techyan.github.io/demo/projects/svip/#protocols) · [13 份归档指南](https://techyan.github.io/demo/svip/index.html) · [17 个源码示例](https://techyan.github.io/demo/svip/examples.html) |
 
 ## 从演示继续追踪证据
 
 每个项目都提供独立说明，标注展示方式、输入来源和结果边界：
 
-[wavedbg 最新性能能力](wavedbg/performance/README.md) · [wavedbg 波形案例](wavedbg/README.md) · [PVKit](pvkit/README.md) · [Bus Protocol Lab](bus-protocol-lab/README.md) · [PG Builder](pg_gen/README.md) · [UVM Wiki](uvm_wiki/README.md) · [SVIP](svip/README.md) · [xpggen](xpggen/README.md) · [xDCT](xDCT/README.md)
+[wavedbg 最新性能能力](wavedbg/performance/README.md) · [wavedbg 波形案例](wavedbg/README.md) · [SVIP](svip/README.md) · [PVKit](pvkit/README.md) · [Bus Protocol Lab](bus-protocol-lab/README.md) · [PG Builder](pg_gen/README.md) · [UVM Wiki](uvm_wiki/README.md) · [xpggen](xpggen/README.md) · [xDCT](xDCT/README.md)
 
 浏览器工具可以直接操作；TUI 页面展示真实截图或终端打印；指南不在浏览器运行仿真。公开输入来自合成或脱敏示例，私有源码仓库的可见性不变。来源、处理说明与文件哈希随各项目提供。
 
