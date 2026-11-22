@@ -1,0 +1,13 @@
+{
+  "signal": [
+    { "name": "CLK",          "wave": "n....." },
+    { "name": "REQ.send",     "wave": "01010." },
+    { "name": "REQ.tag",      "wave": "x3x3x.", "data": ["2A", "2A"] },
+    { "name": "RTN.send",     "wave": "0.1010" },
+    { "name": "RTN.resp/tag", "wave": "x.5x3x", "data": ["DECERR / 2A", "OKAY / 2A"] },
+    { "name": "RDATA.send",   "wave": "0...10" },
+    { "name": "RDATA.last",   "wave": "x...1x" }
+  ],
+  "head": { "tock": 0 },
+  "config": { "hscale": 3, "skin": "dark" }
+}

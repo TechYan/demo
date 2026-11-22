@@ -1,0 +1,173 @@
+---
+import '../../styles/axi-performance.css';
+import '../../styles/svip.css';
+import Icon from '../../components/Icon.astro';
+import projects from '../../data/projects.json';
+import { sitePath } from '../../lib/catalog.mjs';
+
+const href = (path: string) => sitePath(path, import.meta.env.BASE_URL);
+const figure = (name: string) => href('svip/figures/' + name);
+const project = projects.find(project => project.id === 'svip')!;
+const timings = [
+  {
+    file: 'xdp-error-return', title: '错误读如何释放 tag', signals: 'REQ / RTN / RDATA',
+    note: 'E0–E5 为采样上升沿，斜纹表示该字段在当前拍未使用。',
+    alt: 'E1 发出 tag 2A 的读请求，E2 收到 DECERR 且无 RDATA。E3 用同一 tag 再读，E4 收到 OKAY 和最后一拍数据。',
+    edges: [
+      ['E1', '发出读请求', 'REQ 使用 tag 2A。两个请求先后使用同一个 tag。'],
+      ['E2', '错误响应结束第一笔读', '请求已收齐，RTN 的 tag 唯一匹配，DECERR 已知且 RDATA.send 为 0。master 当沿完成，返回数据为零拍。'],
+      ['E3 → E4', '复用 tag，再读成功', '新请求使用 2A。OKAY RTN 和首拍 RDATA 在 E4 同沿到达，本例这一拍也是末拍。'],
+    ],
+  },
+  {
+    file: 'xdp-credit-return', title: '零余额的通道何时能再发', signals: 'REQ / SEND / FREE',
+    note: 'E0–E5 为采样上升沿，credit_before / after 是该沿结算前后的余额。',
+    alt: 'REQ 初始额度为 1，E1 发送后余额为 0，E3 收到 free，E4 才再次发送。',
+    edges: [
+      ['E1', '花掉最后一个 credit', 'REQ 的沿前额度为 1。send 被采到后，该通道的余额降为 0。'],
+      ['E3', '采到归还', '时钟使能保持有效，free 归还一个 credit。E3 沿前额度仍为 0，本沿没有发送。'],
+      ['E4', '恢复发送', '沿前额度已回到 1。第二次发送后额度再次归零；其他三路各自维护余额。'],
+    ],
+  },
+];
+const apis = [
+  ['主端发请求', 'try_submit_with_reason(req, h, why)', '接纳后得到句柄。拒绝时可读出原因，区分请求格式和资源限制。'],
+  ['等待与回收', 'wait_done(h, timeout_cycles, state, result)', '超时后可继续等待。take_result 一次性取走终态结果。'],
+  ['自定义从端', 'get_request / put_response', '使用内建响应策略，或按请求句柄给出数据与状态。旧复位代次与重复响应会被识别。'],
+  ['订阅观测结果', 'phase_ap / txn_ap / compare_ap', '从 monitor 订阅引脚事件和完整事务，从检查环境订阅比较结果。'],
+];
+const families = [
+  ['XDP', 'master / reactive slave / passive', '四路 credit-debit、64B 或 128B 读拍、逐字节 scoreboard。', '#timing'],
+  ['AXI4 MM', 'manager / subordinate / passive', '独立读写 ID、多笔 outstanding、可配置的 memory / RANDOM / USER 响应。', 'svip/axi/doc/user-guide.html'],
+  ['APB3 / APB4', 'requester / passive', '等待态、字节选通、引脚检查与 UVM RAL；响应由 DUT 或独立模型提供。', 'svip/apb/doc/user-guide.html'],
+  ['PCIe v0.2', 'Root Port / Endpoint', 'Gen1–3 ×1、VC0、32-bit Original PIPE，提供纯 SV、UVM 和 C/DPI 入口。'],
+  ['Sendfree', 'source / sink / passive', '双时钟 N∶M 分组 credit 链路，支持自动或手动回收。'],
+  ['regif', 'master / slave / passive', '自定义寄存器通道，带 PF/VF bank 寄存器模型和 RAL adapter。'],
+  ['JTAG', 'master / passive / TAP device', '多 TAP 链、分段扫描、停钟和带掩码的 TDO 比较。', 'svip/jtag/doc/user-guide.html'],
+  ['SPI', 'master / slave / passive', '标准四线 Mode 0–3、双位序、多片选和可编程响应。', 'svip/spi/doc/user-guide.html'],
+  ['Control', 'Clock / Reset / Signal', '按需组合时钟启停、复位和引脚控制，可独立接入现有 testbench。', 'svip/control/doc/user-guide.html'],
+];
+const attach = [
+  '// build_phase：cfg 和 reader 来自同一个端口 binder',
+  'uvm_config_db#(xdp_profile)::set(this, "port", "profile", cfg);',
+  'uvm_config_db#(xdp_pin_reader)::set(this, "port", "reader", reader);',
+  'uvm_config_db#(bit)::set(this, "port", "tracker_en", 1);',
+  'uvm_config_db#(xdp_profile)::set(this, "checks", "profile", cfg);',
+  'port = svip_xdp_agent::type_id::create("port", this);',
+  'checks = svip_xdp_check_env::type_id::create("checks", this);',
+  '',
+  '// connect_phase',
+  'checks.attach(port);',
+].join('\n');
+const commands = [
+  ['确认读口配置支持的定向用例', 'python3 xdp/scripts/run.py --suite p3 --profile rd64-reg --list'],
+  ['复现仅状态错误响应', 'python3 xdp/scripts/run.py --suite p3 --case error_rtn_only --profile rd128-auto'],
+  ['运行带 tracker 与功能覆盖的回归', 'python3 xdp/scripts/run.py --suite p6 --profile rd128-auto --seed 43 --tracker --coverage'],
+];
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="theme-color" content="#0b111b"/>
+    <meta name="description" content={project.lead}/>
+    <title>SVIP · 协议验证 IP 与 XDP — TechYan Demo</title>
+    <link rel="icon" href={href('favicon.svg')} type="image/svg+xml"/>
+    <link rel="canonical" href="https://techyan.github.io/demo/projects/svip/"/>
+  </head>
+  <body class="svip-page">
+    <a class="skip" href="#main">跳到内容</a>
+    <header class="nav-shell">
+      <nav class="nav wrap" aria-label="主导航">
+        <a class="wordmark" href={href('') + '#projects'}><Icon name="layers" size={27}/>SVIP <span>/ TechYan</span></a>
+        <div class="nav-links"><a href="#protocols">协议选型</a><a href="#timing">XDP 波形</a><a href="#tracker">Tracker</a><a href="#integration">用户 API</a><a href="#testsuite">Testsuite</a></div>
+        <a class="nav-github" href="https://github.com/TechYan/demo/tree/main/svip">GitHub <span aria-hidden="true">↗</span></a>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero wrap" aria-labelledby="svip-title">
+        <div class="hero-copy">
+          <a class="release-pill" href="#timing"><span></span>新增 XDP <b>REV. 1</b><span aria-hidden="true">↘</span></a>
+          <h1 id="svip-title">SVIP</h1>
+          <p class="product-title">SystemVerilog 协议验证 IP</p>
+          <p class="lead">用主端发起事务，用响应模型驱动对端，或把被动 monitor 接到已有 DUT。以 XDP 为例，看一笔读从请求、返回到逐字节检查的全过程。</p>
+          <div class="hero-actions">
+            <a class="button primary" aria-label="进入演示" href={href('projects/svip/') + '#timing'}>进入演示 <span>XDP 波形 ↓</span></a>
+            <a class="button quiet" href="#protocols">按接口选择 VIP <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <figure class="hero-visual">
+          <div class="window-label"><span><i></i><i></i><i></i></span><span>XDP / PORT ARCHITECTURE</span><span>REV. 1</span></div>
+          <a class="arch-picture" href={figure('xdp-port.svg')} aria-label="放大 XDP 端口架构图"><img src={figure('xdp-port.svg')} width="712" height="404" alt="主端和响应端通过 REQ、SDATA、RTN、RDATA 通信。被动 monitor 把同一端口的引脚观测分发给 tracker、检查与覆盖组件。"/></a>
+          <figcaption class="visual-caption"><span>单端口被动采样</span><span><a href={figure('xdp-port.svg')}>放大架构图 ↗</a> · <a download href={figure('xdp-port.drawio')}>draw.io 源图 ↓</a></span></figcaption>
+        </figure>
+      </section>
+      <div class="proof-strip"><div class="wrap">
+        <span><b>4</b>独立 credit 通道</span><span><b>64 / 128 B</b>每拍读数据</span>
+        <span><b>REG / AUTO</b>额度初始化</span><span><b>SV / UVM</b>两种接入方式</span>
+      </div></div>
+
+      <section class="section wrap" id="timing" aria-labelledby="timing-title">
+        <div class="section-heading"><div><span class="eyebrow">XDP / TIMING</span><h2 id="timing-title">读懂 XDP 的关键采样沿</h2></div><p>展开场景，对照上升沿编号和通道事件。<br/>两张 WaveDrom 均为按接口契约绘制的教学时序。</p></div>
+        <div class="timings">{timings.map((item, index) =>
+          <details class="timing-case" name="xdp-timing" open={index === 0}>
+            <summary><span><strong>{item.title}</strong><small>{item.signals}</small></span><Icon name="chevron" size={18}/></summary>
+            <div class="timing-body">
+              <figure><div class="timing-plot" role="region" aria-label={item.title + '波形，可横向滚动'} tabindex="0"><img loading="lazy" src={figure(item.file + '.svg')} alt={item.alt}/></div>
+                <figcaption><span>{item.note}</span><a download href={figure(item.file + '.json')}>WaveJSON ↓</a></figcaption>
+              </figure>
+              <ol class="edge-notes">{item.edges.map(([edge, title, description]) =>
+                <li><span>{edge}</span><div><strong>{title}</strong><p>{description}</p></div></li>)}</ol>
+            </div>
+          </details>)}</div>
+      </section>
+
+      <section class="section band" id="tracker" aria-labelledby="tracker-title"><div class="wrap split">
+        <div><span class="eyebrow">DEBUG / TRACKER LOG</span><h2 id="tracker-title">从字节错比回到引脚</h2>
+          <p class="section-intro">在 run.log 搜索 <code>SVIP_TRK</code> 找到该端口的 tracker。用 <code>port / epoch / uid</code> 关联一次事务，再从错比行的 <code>pin_trk</code> 跳回采到数据的那一拍。</p>
+          <p class="support-copy">收尾时，<code># EOF</code> 记录总行数。报告器用 <code>svip-trk/1</code> manifest 核对文件、行数、事件类型和状态，供工程师或调试 agent 复核。</p>
+        </div>
+        <div class="trace-view">
+          <div class="frame-toolbar"><span><span class="dot"></span>link0.trk</span><span>字段节选示意 · 数值为示例</span></div>
+          <div class="trace-record"><b>run.log</b><samp>SVIP_TRK proto=xdp file=link0.trk</samp></div>
+          <div class="trace-record"><b>COMPARE</b><samp>port=link0 epoch=1 uid=7<br/>byte_addr=0x1042 expected=0x5a actual=0x5b<br/>result=FAIL pin_edge_ref=24 <a href="#pin-row">pin_trk=41 ↘</a></samp></div>
+          <div class="trace-record" id="pin-row" tabindex="-1"><b>RDATA</b><samp>trk=41 port=link0 epoch=1 uid=7<br/>edge=24 chan=RDATA beat=0</samp></div>
+        </div>
+      </div></section>
+
+      <section class="section wrap" id="integration" aria-labelledby="integration-title">
+        <div class="section-heading"><div><span class="eyebrow">INTEGRATION / USER API</span><h2 id="integration-title">先旁路观察，再按需驱动</h2></div><p>纯 SV 可直接使用 BFM。UVM 1.2 环境可增加 agent、sequence、checker 或 scoreboard。</p></div>
+        <div class="integration-grid">
+          <div class="api-list">{apis.map(([name, signature, detail]) =>
+            <article><h3>{name}</h3><code>{signature}</code><p>{detail}</p></article>)}</div>
+          <div class="integration-example"><h3>把被动 XDP 接到现有 testbench</h3>
+            <ol><li>从端口 binder 获取 profile 和只读 reader。</li><li>编译 <code>xdp/files.f</code> 并启用 <code>SVIP_XDP_UVM</code>。需要检查时追加 <code>xdp/checker/files.f</code>。</li><li>创建被动 agent 和检查环境，打开 tracker 并连接 monitor。</li></ol>
+            <details class="code-disclosure"><summary>查看 UVM 连接片段 <Icon name="chevron" size={15}/></summary><pre tabindex="0"><code>{attach}</code></pre></details>
+            <a class="inline-link" href={href('svip/examples.html')}>其他协议的 17 个 SystemVerilog 示例 →</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section band" id="testsuite" aria-labelledby="suite-title"><div class="wrap">
+        <div class="section-heading"><div><span class="eyebrow">VERIFICATION / TESTSUITE</span><h2 id="suite-title">选择配置，复现一个用例</h2></div><p>在完整 SVIP 工程根目录执行。XDP runner 按 profile 选择用例并保存种子、日志和波形。</p></div>
+        <div class="suite-grid">
+          <div class="suite-evidence"><h3>XDP 验证记录</h3><dl>
+            <div><dt>4</dt><dd>读宽 × 初始化组合<br/><small>64B / 128B × REG / AUTO</small></dd></div>
+            <div><dt>164</dt><dd>P0–P6 冻结基线的用例运行次数<br/><small>30 个回归任务，含主动采集和被动重放</small></dd></div>
+          </dl><p>11 月 22 日新增的定向复验覆盖 <code>error_rtn_only</code>，分别在 64B、128B 读口的纯 SV 与 UVM 环境验证仅状态错误返回和 tag 复用。</p></div>
+          <div class="suite-commands">{commands.map(([title, command]) => <div><h3>{title}</h3><pre tabindex="0"><code>{command}</code></pre></div>)}</div>
+        </div>
+      </div></section>
+
+      <section class="section wrap" id="protocols" aria-labelledby="protocol-title">
+        <div class="section-heading"><div><span class="eyebrow">SVIP / PORTFOLIO</span><h2 id="protocol-title">按接口选择验证组件</h2></div><a class="button outline" href={href('svip/index.html')}>浏览 13 份归档指南 →</a></div>
+        <div class="family-table"><table><thead><tr><th scope="col">组件</th><th scope="col">角色或接口</th><th scope="col">适用的验证任务</th></tr></thead>
+          <tbody>{families.map(([name, role, detail, path]) => <tr><th scope="row">{path ? <a href={path.startsWith('#') ? path : href(path)}>{name} <span aria-hidden="true">↗</span></a> : name}</th><td>{role}</td><td>{detail}</td></tr>)}</tbody>
+        </table></div>
+        <p class="edition">产品说明对应 2026-11-22 的 SVIP 主线 <code>e0dbcb3</code>。13 份 HTML 指南与 17 个公开示例保留原快照 <code>b3347d0</code>。</p>
+      </section>
+    </main>
+    <footer class="footer wrap"><div><a class="wordmark" href={href('') + '#projects'}>TechYan <span>/ Demo</span></a></div><nav aria-label="更多项目资料"><a href={href('wavedbg/performance/')}>wavedbg 性能分析</a><a href={href('svip/sources.html')}>SVIP 示例源码</a><a href={href('svip/provenance.json')}>归档指南来源</a></nav></footer>
+  </body>
+</html>

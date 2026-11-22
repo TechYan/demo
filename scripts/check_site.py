@@ -54,15 +54,17 @@ for page in pages:
 
 for project in projects:
     assert (root / 'projects' / project['id'] / 'index.html').is_file(), project['id']
-    assert (root / project['primary']).is_file(), project['primary']
-    for action in project['actions']:
-        target = root / unquote(urlsplit(action['path']).path)
-        assert target.is_file(), action['path']
-        fragment = unquote(urlsplit(action['path']).fragment)
+    for path in [project['primary'], *(action['path'] for action in project['actions'])]:
+        url = urlsplit(path)
+        target = root / unquote(url.path)
+        if target.is_dir():
+            target /= 'index.html'
+        assert target.is_file(), path
+        fragment = unquote(url.fragment)
         if fragment:
             parser = Links()
             parser.feed(target.read_text(encoding='utf-8'))
-            assert fragment in parser.ids, action['path']
+            assert fragment in parser.ids, path
 
 checksums = (root / 'pvkit/SHA256SUMS').read_text().splitlines()
 for line in checksums:

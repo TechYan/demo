@@ -1,0 +1,12 @@
+{
+  "signal": [
+    { "name": "CLK",           "wave": "n....." },
+    { "name": "REQ.clken",     "wave": "1....." },
+    { "name": "credit_before", "wave": "3.4.34", "data": ["1", "0", "1", "0"] },
+    { "name": "REQ.send",      "wave": "010.10" },
+    { "name": "REQ.free",      "wave": "0..10." },
+    { "name": "credit_after",  "wave": "34.34.", "data": ["1", "0", "1", "0"] }
+  ],
+  "head": { "tock": 0 },
+  "config": { "hscale": 3, "skin": "dark" }
+}

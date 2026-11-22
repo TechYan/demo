@@ -1,85 +1,5 @@
 [
   {
-    "id": "pvkit",
-    "name": "PVKit",
-    "category": "analysis",
-    "label": "PERFORMANCE & PROTOCOL",
-    "color": "lime",
-    "description": "从总线流量到性能指标，沿着每一笔事务追踪证据。",
-    "lead": "15 个 AXI4 / CXL Native 场景，将原始 CSV、交互报告、真实 TUI 和完整 tracker 放在同一个入口。",
-    "tags": [
-      "AXI4",
-      "CXL Native",
-      "HTML",
-      "TUI"
-    ],
-    "keywords": [
-      "性能",
-      "带宽",
-      "outstanding",
-      "tracker",
-      "WSTRB",
-      "credit"
-    ],
-    "format": "交互报告 / 终端回放",
-    "metric": "15",
-    "metricLabel": "release scenarios",
-    "primary": "pvkit/index.html",
-    "actions": [
-      {
-        "title": "全部场景",
-        "description": "7 个 AXI4 与 8 个 CXL Native 场景",
-        "path": "pvkit/index.html",
-        "type": "GALLERY"
-      },
-      {
-        "title": "AXI4 并发读写",
-        "description": "带宽、outstanding、背压与事务关联",
-        "path": "pvkit/examples/axi4/concurrent/traffic.pv.html",
-        "type": "INTERACTIVE"
-      },
-      {
-        "title": "CXL 反复 EMPTY",
-        "description": "展开 slot，观察 credit EMPTY 的时间关系",
-        "path": "pvkit/examples/cxl_native/repeated_empty/traffic.pv.html",
-        "type": "INTERACTIVE"
-      },
-      {
-        "title": "真实 TUI 打印",
-        "description": "3 种报告模式与 3 种终端列宽",
-        "path": "pvkit/examples/axi4/concurrent/tui.html",
-        "type": "TERMINAL"
-      },
-      {
-        "title": "分析日志",
-        "description": "完整模式与全部趋势的 UTF-8 输出",
-        "path": "pvkit/examples/axi4/concurrent/traffic.analyze.log",
-        "type": "LOG"
-      },
-      {
-        "title": "Tracker 日志",
-        "description": "原始采样事件和请求关联",
-        "path": "pvkit/examples/axi4/concurrent/traffic.tracker.log",
-        "type": "LOG"
-      }
-    ],
-    "highlights": [
-      {
-        "title": "Performance → Debug",
-        "detail": "从指标概览进入协议事件，在相同数据上切换观察角度。"
-      },
-      {
-        "title": "同源多种输出",
-        "detail": "HTML、TUI、日志与 CSV 来自相同 release 数据，输入哈希可校验。"
-      },
-      {
-        "title": "完整的证据边界",
-        "detail": "保留缺失响应与 UNKNOWN，区分数据活动带宽窗口和完整采集范围。"
-      }
-    ],
-    "scope": "使用 xpvkit 0.5.5 release 的合成数据。响应未完成案例包含预期诊断；示例不代表真实 DUT 性能。"
-  },
-  {
     "id": "wavedbg",
     "name": "wavedbg",
     "category": "analysis",
@@ -158,6 +78,173 @@
       }
     ],
     "scope": "四个波形导览基于 v0.2.1 合成数据；v0.3.0 性能页展示自建激励的真实 FSDB 报告。均不代表用户 DUT 性能；本地 native 查询需要授权的 Verdi 环境。"
+  },
+  {
+    "id": "svip",
+    "name": "SVIP",
+    "category": "verification",
+    "label": "SYSTEMVERILOG / UVM VIP",
+    "color": "cyan",
+    "description": "用协议 VIP 驱动或旁路观察 DUT，从 XDP 四路 credit 到逐字节错比和 tracker 定位。",
+    "lead": "SVIP 协议验证 IP 提供主动 BFM、被动观测、用户 API 与定向回归。查看 XDP 架构、关键时序及从 tracker 回到引脚的方法。",
+    "tags": [
+      "XDP",
+      "UVM",
+      "AXI4",
+      "Tracker"
+    ],
+    "keywords": [
+      "验证",
+      "VIP",
+      "SystemVerilog",
+      "APB",
+      "JTAG",
+      "SPI",
+      "PCIe",
+      "Sendfree",
+      "regif",
+      "Control",
+      "时钟",
+      "复位",
+      "clock",
+      "reset",
+      "signal",
+      "credit",
+      "scoreboard",
+      "testsuite",
+      "用户 API"
+    ],
+    "format": "功能展示 / 波形 / 使用指南",
+    "metric": "04",
+    "metricLabel": "XDP credit lanes",
+    "primary": "projects/svip/",
+    "actions": [
+      {
+        "title": "XDP 关键波形",
+        "description": "错误返回、tag 复用、credit 归还",
+        "path": "projects/svip/#timing",
+        "type": "WAVEFORM"
+      },
+      {
+        "title": "Tracker 字段导览",
+        "description": "把字节错比关联到引脚记录",
+        "path": "projects/svip/#tracker",
+        "type": "LOG"
+      },
+      {
+        "title": "用户 API 与接入",
+        "description": "主从 BFM 与旁路 monitor 的调用方式",
+        "path": "projects/svip/#integration",
+        "type": "GUIDE"
+      },
+      {
+        "title": "Testsuite",
+        "description": "按读宽、初始化方式与用例复现",
+        "path": "projects/svip/#testsuite",
+        "type": "GUIDE"
+      },
+      {
+        "title": "公开指南与示例",
+        "description": "查阅归档 HTML 或阅读 SystemVerilog 示例",
+        "path": "svip/index.html",
+        "type": "GUIDES"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "XDP 端口",
+        "detail": "四路 credit 独立结算，支持仅状态错误返回、tag 复用和字节级比较。"
+      },
+      {
+        "title": "从事务追到引脚",
+        "detail": "按端口、复位代次和事务 UID 关联事件，用 pin_trk 从错比定位引脚行。"
+      },
+      {
+        "title": "按需接入",
+        "detail": "纯 SV BFM 和 UVM agent 提供主动与被动入口，testsuite 支持按用例、配置和种子复现。"
+      }
+    ],
+    "scope": "产品页提供架构、教学波形与 tracker 字段导览。原有 13 份指南和 17 个源码示例保留归档版本，XDP 回归命令面向完整产品环境。"
+  },
+  {
+    "id": "pvkit",
+    "name": "PVKit",
+    "category": "analysis",
+    "label": "PERFORMANCE & PROTOCOL",
+    "color": "lime",
+    "description": "从总线流量到性能指标，沿着每一笔事务追踪证据。",
+    "lead": "15 个 AXI4 / CXL Native 场景，将原始 CSV、交互报告、真实 TUI 和完整 tracker 放在同一个入口。",
+    "tags": [
+      "AXI4",
+      "CXL Native",
+      "HTML",
+      "TUI"
+    ],
+    "keywords": [
+      "性能",
+      "带宽",
+      "outstanding",
+      "tracker",
+      "WSTRB",
+      "credit"
+    ],
+    "format": "交互报告 / 终端回放",
+    "metric": "15",
+    "metricLabel": "release scenarios",
+    "primary": "pvkit/index.html",
+    "actions": [
+      {
+        "title": "全部场景",
+        "description": "7 个 AXI4 与 8 个 CXL Native 场景",
+        "path": "pvkit/index.html",
+        "type": "GALLERY"
+      },
+      {
+        "title": "AXI4 并发读写",
+        "description": "带宽、outstanding、背压与事务关联",
+        "path": "pvkit/examples/axi4/concurrent/traffic.pv.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "CXL 反复 EMPTY",
+        "description": "展开 slot，观察 credit EMPTY 的时间关系",
+        "path": "pvkit/examples/cxl_native/repeated_empty/traffic.pv.html",
+        "type": "INTERACTIVE"
+      },
+      {
+        "title": "真实 TUI 打印",
+        "description": "3 种报告模式与 3 种终端列宽",
+        "path": "pvkit/examples/axi4/concurrent/tui.html",
+        "type": "TERMINAL"
+      },
+      {
+        "title": "分析日志",
+        "description": "完整模式与全部趋势的 UTF-8 输出",
+        "path": "pvkit/examples/axi4/concurrent/traffic.analyze.log",
+        "type": "LOG"
+      },
+      {
+        "title": "Tracker 日志",
+        "description": "原始采样事件和请求关联",
+        "path": "pvkit/examples/axi4/concurrent/traffic.tracker.log",
+        "type": "LOG"
+      }
+    ],
+    "highlights": [
+      {
+        "title": "Performance → Debug",
+        "detail": "从指标概览进入协议事件，在相同数据上切换观察角度。"
+      },
+      {
+        "title": "同源多种输出",
+        "detail": "HTML、TUI、日志与 CSV 来自相同 release 数据，输入哈希可校验。"
+      },
+      {
+        "title": "完整的证据边界",
+        "detail": "保留缺失响应与 UNKNOWN，区分数据活动带宽窗口和完整采集范围。"
+      }
+    ],
+    "scope": "使用 xpvkit 0.5.5 release 的合成数据。响应未完成案例包含预期诊断；示例不代表真实 DUT 性能。"
   },
   {
     "id": "bus-protocol-lab",
@@ -332,76 +419,6 @@
       }
     ],
     "scope": "这是静态源码索引。运行时 factory override、动态实例及精确 DUT/BFM 绑定不由静态图推断。完整源码服务与全文搜索需本地运行。"
-  },
-  {
-    "id": "svip",
-    "name": "SVIP",
-    "category": "verification",
-    "label": "VERIFICATION BUILDING BLOCKS",
-    "color": "cyan",
-    "description": "从协议接入到时序控制，浏览可复用 VIP 的架构与用法。",
-    "lead": "精选 AXI4、APB、JTAG、SPI 和 Clock / Reset / Signal 的使用指南、架构页及操作 recipe，配套自有示例。",
-    "tags": [
-      "UVM",
-      "AXI4",
-      "APB",
-      "JTAG",
-      "SPI"
-    ],
-    "keywords": [
-      "验证",
-      "时钟",
-      "复位",
-      "clock",
-      "reset",
-      "signal",
-      "VIP"
-    ],
-    "format": "离线指南 / 源码示例",
-    "metric": "13",
-    "metricLabel": "selected guides",
-    "primary": "svip/index.html",
-    "actions": [
-      {
-        "title": "SVIP 指南目录",
-        "description": "选择协议，阅读接入与架构",
-        "path": "svip/index.html",
-        "type": "GUIDES"
-      },
-      {
-        "title": "AXI4 使用指南",
-        "description": "manager / subordinate / passive 的事务与配置",
-        "path": "svip/axi/doc/user-guide.html",
-        "type": "GUIDE"
-      },
-      {
-        "title": "Control Recipes",
-        "description": "Clock、Reset、Signal 的组合使用场景",
-        "path": "svip/control/doc/recipes.html",
-        "type": "GUIDE"
-      },
-      {
-        "title": "SPI 使用指南",
-        "description": "Mode 0–3、时序控制与 tracker",
-        "path": "svip/spi/doc/user-guide.html",
-        "type": "GUIDE"
-      }
-    ],
-    "highlights": [
-      {
-        "title": "按任务查阅",
-        "detail": "从接入、配置、事务、时序控制到扩展和调试，沿真实使用流程组织。"
-      },
-      {
-        "title": "协议与通用控制",
-        "detail": "协议组件与 Clock / Reset / Signal 可分别理解，也可组合使用。"
-      },
-      {
-        "title": "可独立阅读的交付",
-        "detail": "HTML 指南与精选自有示例同时保留，便于从说明进入代码。"
-      }
-    ],
-    "scope": "此处为精选文档与自有示例，不在浏览器执行 UVM 仿真。实际使用需对应仿真器与 UVM 环境，协议支持范围以各指南为准。"
   },
   {
     "id": "xpggen",
